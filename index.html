@@ -196,10 +196,26 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .si button{font:inherit;font-weight:800;border-radius:99px;border:2px solid var(--pur);background:var(--lil);color:#2a0f3d;padding:.4rem 1rem;cursor:pointer}.si button:disabled{opacity:.4;cursor:not-allowed}
 .sbd{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:1rem}.sbd span{border:2px solid var(--line);border-radius:99px;padding:.2rem .7rem;font-weight:700;font-size:.9rem}.sbd .now{background:var(--hot);color:#fff;border-color:var(--hot)}
 #ph{font-weight:800;margin-top:.6rem}
+.podium{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;align-items:end;margin:1.5rem 0 2rem}
+.podium-item{min-width:0;text-align:center;padding:.8rem .6rem;border:2px solid var(--line);border-radius:24px 24px 8px 8px;background:var(--card)}
+.podium-item.first{padding-top:1.8rem;border-color:var(--hot);background:linear-gradient(180deg,rgba(255,79,216,.28),var(--card))}
+.podium-item.second{padding-top:1.2rem}.podium-item.third{padding-top:1rem}
+.podium-place{display:block;font:400 2.4rem/1 var(--disp);color:var(--hot);margin-bottom:.6rem}
+.podium-item .fa{height:100%}.podium-item .fa figcaption{justify-content:center}
+.rank-others{padding-left:2.4rem}.rank-others li{padding:.35rem 0}.rank-others small{opacity:.7}
+.fa-open{display:block}.fa-open img{cursor:zoom-in}.fa-actions{display:flex;align-items:center;justify-content:center;gap:.4rem;flex-wrap:wrap}.fa-actions a{text-decoration:none}
+.click-admin{margin:1.5rem 0 2.2rem;overflow-x:auto}
+.click-admin table{width:100%;border-collapse:collapse;min-width:560px}
+.click-admin th,.click-admin td{text-align:left;padding:.65rem;border-bottom:1px solid var(--line)}
+.click-admin th:last-child,.click-admin td:last-child{text-align:right}
+.click-adjust{display:flex;justify-content:flex-end;gap:.5rem;align-items:center}
+.click-adjust input{width:120px;padding:.35rem .55rem;border-radius:12px}
+.mini.download{display:inline-block;font-size:.9rem}
 .tabs a[hidden]{display:none}
 .hl{flex:0 0 auto;white-space:nowrap;background:var(--lil);color:#2a0f3d;border-color:var(--lil);max-width:9.5rem;overflow:hidden;text-overflow:ellipsis}
 #ul{width:min(92vw,420px);padding:1.5rem;border-radius:24px;background:var(--bg);color:var(--ink);border:2px solid var(--pur)}#ul .fld{width:100%;font-size:16px;margin:.4rem 0}#ul::backdrop{background:rgba(0,0,0,.6)}
 @media (max-width:860px){.hl{padding:.4rem .85rem;font-size:.9rem}.nv{gap:.5rem}.si{flex-direction:column;align-items:stretch}.si button{width:100%;padding:.7rem}.fg{grid-template-columns:1fr 1fr;gap:.6rem}#btn{touch-action:manipulation}}
+@media (max-width:700px){body{padding-bottom:calc(62px + env(safe-area-inset-bottom,0px))}.nav{backdrop-filter:none}.nv nav.tabs{position:fixed;top:auto;left:0;right:0;bottom:0;z-index:35;height:calc(58px + env(safe-area-inset-bottom,0px));padding:4px 8px env(safe-area-inset-bottom,0px);justify-content:flex-start;gap:.2rem;background:var(--nav);backdrop-filter:blur(14px);border-top:1px solid var(--line);border-bottom:0}.nv nav.tabs a{display:flex;align-items:center;min-height:44px;padding:.3rem .65rem;font-size:.82rem}.nv nav.tabs .ind{display:none}.podium{gap:.45rem}.podium-item{padding:.6rem .3rem}.podium-item.first{padding-top:1rem}.podium-place{font-size:1.8rem}.podium .fa figcaption{font-size:.83rem}.podium .fa-actions{gap:.25rem}.podium .mini{font-size:.78rem;padding:.2rem .45rem}}
 </style>
 </head>
 <body>
@@ -307,7 +323,7 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   <div id="fw"></div><h3>ranking da semana</h3><div class="fg" id="frk"></div><h3>mural</h3><div class="fg" id="fmu"></div>
 </div></div></section>
 
-<section class="panel" id="admin"><div class="sec"><div class="wrap"><div class="sh"><h2>painel admin</h2><p>Tudo de administrador num lugar só: avisos, fanarts, vencedora, cliques e os 10 do 1 milhão.</p></div><div id="adm-box"></div><div id="accounts"></div><div id="sa"></div><div id="fq"></div></div></div></section>
+<section class="panel" id="admin"><div class="sec"><div class="wrap"><div class="sh"><h2>painel admin</h2><p>Tudo de administrador num lugar só: avisos, fanarts, vencedora, cliques e os 10 do 1 milhão.</p></div><div id="adm-box"></div><div id="accounts"></div><div id="clicks-admin"></div><div id="sa"></div><div id="fq"></div></div></div></section>
 
 <section class="panel" id="calabresos">
 <section class="sec" style="padding-bottom:0"><div class="wrap"><div class="sh rv" style="margin:0"><h2>área dos calabresos</h2><p>Coisas pra mexer enquanto o sábado não chega.</p></div></div></section>
@@ -345,7 +361,7 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 
 <div id="lb"><img id="lbi" alt=""></div>
 
-<dialog id="ul" style="padding:1.5rem;border-radius:24px;background:var(--bg);color:var(--ink);border:2px solid var(--pur)"><form id="ulf"><h3 id="ut">entrar</h3><input class="fld" id="uh" placeholder="seu @ do Instagram" autocomplete="username" required maxlength="30"><input class="fld" id="upw" type="password" placeholder="senha" autocomplete="current-password" required maxlength="72"><p class="hint" id="um">Entre com seu @ e sua senha.</p><button class="cta sm" id="usubmit" type="submit">entrar</button> <button class="cta ghost sm" id="uswitch" type="button">criar conta</button> <button class="cta ghost sm" type="button" onclick="ul.close()">fechar</button></form></dialog>
+<dialog id="ul" style="padding:1.5rem;border-radius:24px;background:var(--bg);color:var(--ink);border:2px solid var(--pur)"><form id="ulf"><h3 id="ut">entrar</h3><input class="fld" id="uh" placeholder="nome do Instagram (sem @)" autocomplete="username" required maxlength="30"><input class="fld" id="upw" type="password" placeholder="senha" autocomplete="current-password" required maxlength="72"><p class="hint" id="um">Entre com seu @ e sua senha.</p><button class="cta sm" id="usubmit" type="submit">entrar</button> <button class="cta ghost sm" id="uswitch" type="button">criar conta</button> <button class="cta ghost sm" type="button" onclick="ul.close()">fechar</button></form></dialog>
 <dialog id="lg"><form id="lgf"><h3 style="font:400 1.8rem var(--disp);margin:0">entrar (admin)</h3>
   <input class="fld" id="le" type="email" placeholder="E-mail" autocomplete="username" required>
   <input class="fld" id="lp" type="password" placeholder="Senha" autocomplete="current-password" required>
@@ -554,7 +570,7 @@ $('#shl').onclick=e=>{const b=e.target.closest('button');if(!b)return;const i=+b
 setInterval(()=>{const c=me?cps():0;if(c){N+=c;G.coin+=c}saveG();rendG()},1000);addEventListener('pagehide',saveG);rendG();
 setInterval(async()=>{if(!sb||!me)return;
   const b=(await sb.from('placar').select('bonus').eq('user_id',me.id).maybeSingle()).data?.bonus||0;
-  if(b>0){N+=+b;G.coin+=+b;saveG();rendG()}
+  if(b){N=Math.max(0,N+Number(b));G.coin=Math.max(0,G.coin+Number(b));saveG();rendG()}
   if(!isAdmin)await sb.from('placar').upsert({user_id:me.id,handle:me.user_metadata?.handle,clicks:N,bonus:0})},30000);
 function rendSA(){const b=$('#sa');if(!isAdmin){b.innerHTML='';return}
   b.innerHTML=`<div class="si" style="display:block"><b>👑 painel admin</b><p class="hint">Só funciona com a sua conta de admin. Seus cliques não entram no ranking do 1 milhão.</p>
@@ -573,7 +589,7 @@ async function who(){if(!sb)return;me=(await sb.auth.getSession()).data.session?
 $('#hl').onclick=$('#fu').onclick=async()=>{if(!sb)return alert('Fanarts ainda não disponíveis.');if(me){await sb.auth.signOut();await who();loadFa()}else ul.showModal()};
 let signupMode=false;
 const authEmail=handle=>`${handle.toLowerCase()}@login.sabadou.invalid`;
-function setFanAuthMode(create){signupMode=create;$('#ut').textContent=create?'criar conta':'entrar';$('#usubmit').textContent=create?'criar conta':'entrar';$('#uswitch').textContent=create?'já tenho conta':'criar conta';$('#upw').autocomplete=create?'new-password':'current-password';$('#um').textContent=create?'Escolha uma senha com pelo menos 8 caracteres.':'Entre com seu @ e sua senha.'}
+function setFanAuthMode(create){signupMode=create;$('#ut').textContent=create?'criar conta':'entrar';$('#usubmit').textContent=create?'criar conta':'entrar';$('#uswitch').textContent=create?'já tenho conta':'criar conta';$('#uh').placeholder='nome do Instagram (sem @)';$('#upw').autocomplete=create?'new-password':'current-password';$('#upw').placeholder=create?'senha nova, diferente da senha do Instagram':'senha';$('#um').textContent=create?'Use seu nome de usuário do Instagram sem @ e crie uma senha nova, diferente da senha do Instagram.':'Entre com seu @ e sua senha.'}
 $('#uswitch').onclick=()=>setFanAuthMode(!signupMode);
 $('#ulf').onsubmit=async ev=>{ev.preventDefault();if(!sb){$('#um').textContent='Login indisponível no momento.';return}
   const handle=$('#uh').value.trim().replace(/^@/,'').toLowerCase(),password=$('#upw').value;
@@ -600,17 +616,22 @@ const shrink=f=>new Promise(ok=>{const i=new Image();i.onload=()=>{const k=Math.
 $('#ff').onsubmit=async ev=>{ev.preventDefault();const m=$('#fm');m.textContent='Enviando...';const b=await shrink($('#fi').files[0]),path=me.id+'/'+Date.now()+'.jpg';
   const u=await sb.storage.from('fanarts').upload(path,b,{contentType:'image/jpeg'});if(u.error){m.textContent='Erro: '+u.error.message;return}
   const r=await sb.from('fanarts').insert({handle:me.user_metadata?.handle||'?',path});m.textContent=r.error?'Erro: '+r.error.message:'Enviada! Ela está em revisão. 💜';$('#ff').reset()};
-const card=(a,adm)=>`<figure class="fa${a.vencedora?' win':''}"><img loading="lazy" src="${pub(a.path)}" alt="Fanart de @${esc(a.handle)}"><figcaption><span>@${esc(a.handle)}</span>${adm?`<span><button class="mini ok" data-a="ok" data-id="${a.id}">aprovar</button> <button class="mini no" data-a="no" data-id="${a.id}">descartar</button></span>`:`<button class="lk" data-v="${a.id}">${mv[a.id]?'💜':'🤍'} ${a.votos}</button>`}</figcaption></figure>`;
+const card=(a,adm=false,approvedAdmin=false)=>{const url=pub(a.path),download=url+(url.includes('?')?'&':'?')+'download='+encodeURIComponent('fanart-'+a.handle+'.jpg');
+  const actions=adm?`<button class="mini ok" data-a="ok" data-id="${a.id}">aprovar</button> <button class="mini no" data-a="no" data-id="${a.id}">descartar</button>`:approvedAdmin?`<button class="mini ok" data-a="win" data-id="${a.id}">escolher vencedora</button> <button class="mini no" data-a="del" data-id="${a.id}">remover</button>`:`<button class="lk" data-v="${a.id}">${mv[a.id]?'💜':'🤍'} ${a.votos}</button>`;
+  return `<figure class="fa${a.vencedora?' win':''}"><a class="fa-open" href="${url}" target="_blank" rel="noopener"><img loading="lazy" src="${url}" alt="Fanart de @${esc(a.handle)}; abrir imagem"></a><figcaption><span>@${esc(a.handle)}</span><div class="fa-actions">${actions}<a class="mini download" href="${download}">baixar</a></div></figcaption></figure>`};
 async function loadFa(){if(!sb)return;await who();rendSA();mv={};
   FA=(await sb.from('fanarts').select('*').eq('status','aprovada').order('criado_em',{ascending:false})).data||[];
   if(me)((await sb.from('votos').select('fanart_id')).data||[]).forEach(x=>mv[x.fanart_id]=1);
-  const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-d.getDay());const sem=FA.filter(a=>new Date(a.criado_em)>=d).sort((a,b)=>b.votos-a.votos).slice(0,3);
+  const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-d.getDay());const ranked=FA.filter(a=>new Date(a.criado_em)>=d).sort((a,b)=>b.votos-a.votos);
   const w=FA.find(a=>a.vencedora);$('#fw').innerHTML=w?`<h3>🏆 vencedora da semana</h3><div class="fg">${card(w)}</div>`:'';
-  $('#frk').innerHTML=sem.length?sem.map(a=>card(a)).join(''):'<p class="mut">Nenhuma arte votada nesta semana ainda.</p>';
-  $('#fmu').innerHTML=FA.length?FA.map(a=>card(a)).join(''):'<p class="mut">O mural está vazio. Seja o primeiro!</p>';
-  const q=$('#fq'),accounts=$('#accounts');if(!isAdmin){q.innerHTML='';accounts.innerHTML='';return}
+  const podium=[{a:ranked[1],n:2,c:'second'},{a:ranked[0],n:1,c:'first'},{a:ranked[2],n:3,c:'third'}].filter(x=>x.a);
+  $('#frk').innerHTML=ranked.length?`<div class="podium">${podium.map(x=>`<div class="podium-item ${x.c}"><span class="podium-place">${x.n}º</span>${card(x.a,false,isAdmin)}</div>`).join('')}</div>${ranked.length>3?`<ol class="rank-others" start="4">${ranked.slice(3).map((a,i)=>`<li><b>${i+4}º</b> @${esc(a.handle)} <small>· ${a.votos} votos</small></li>`).join('')}</ol>`:''}`:'<p class="mut">Nenhuma arte aprovada nesta semana ainda.</p>';
+  $('#fmu').innerHTML=FA.length?FA.map(a=>card(a,false,isAdmin)).join(''):'<p class="mut">O mural está vazio. Seja o primeiro!</p>';
+  const q=$('#fq'),accounts=$('#accounts'),clicksAdmin=$('#clicks-admin');if(!isAdmin){q.innerHTML='';accounts.innerHTML='';clicksAdmin.innerHTML='';return}
   const AC=await sb.from('contas').select('handle,criado_em').order('criado_em',{ascending:false});
   accounts.innerHTML=AC.error?'<p class="hint">Para ativar o registro de contas, execute o arquivo supabase-fanarts.sql no Supabase.</p>':`<h3>contas cadastradas (${AC.data.length})</h3><ol>${AC.data.map(a=>`<li>@${esc(a.handle)} · ${new Date(a.criado_em).toLocaleString('pt-BR')}</li>`).join('')||'<li>Nenhuma conta registrada.</li>'}</ol>`;
+  const CL=await sb.from('placar').select('user_id,handle,clicks').order('clicks',{ascending:false}).limit(500);
+  clicksAdmin.innerHTML=CL.error?'<p class="hint">Não foi possível carregar os cliques.</p>':`<h3>cliques dos calabresos (${CL.data.length})</h3><div class="click-admin"><table><thead><tr><th>Instagram</th><th>cliques registrados</th><th>corrigir</th></tr></thead><tbody>${CL.data.map(c=>`<tr><td>@${esc(c.handle||'?')}</td><td>${Number(c.clicks||0).toLocaleString('pt-BR')}</td><td><form class="click-adjust" data-user="${c.user_id}" data-handle="${esc(c.handle||'?')}"><input class="fld" name="qtd" type="number" min="1" max="1000000000" required aria-label="Quantidade de cliques para remover"><button class="mini no" type="submit">remover</button></form></td></tr>`).join('')}</tbody></table></div>`;
   const P=(await sb.from('fanarts').select('*').eq('status','pendente').order('criado_em')).data||[];
   const T=(await sb.from('placar').select('handle,clicks,milhao_em').not('milhao_em','is',null).order('milhao_em').limit(10)).data||[];
   q.innerHTML=`<h3>fila de aprovação (${P.length})</h3><div class="fg">${P.map(a=>card(a,1)).join('')||'<p class="mut">Fila vazia.</p>'}</div><h3>🏆 vencedora da semana</h3><div class="fg">${FA.filter(a=>new Date(a.criado_em)>=d).sort((a,b)=>b.votos-a.votos).map(a=>`<figure class="fa${a.vencedora?' win':''}"><img src="${pub(a.path)}" alt=""><figcaption><span>@${esc(a.handle)} · ${a.votos}💜</span><button class="mini ok" data-a="win" data-id="${a.id}">🏆 escolher</button></figcaption></figure>`).join('')||'<p class="mut">Nenhuma aprovada nesta semana.</p>'}</div><h3>🥇 primeiros ao 1 milhão (follow)</h3><ol>${T.map(t=>`<li>@${esc(t.handle||'?')} · ${new Date(t.milhao_em).toLocaleString('pt-BR')}</li>`).join('')||'<li>Ninguém ainda.</li>'}</ol>`}
@@ -619,13 +640,24 @@ document.addEventListener('click',async e=>{
   const b=e.target.closest('[data-a][data-id]');if(!b||!b.classList.contains('mini')||!isAdmin)return;const id=b.dataset.id;
   if(b.dataset.a=='ok'){await sb.from('fanarts').update({status:'aprovada'}).eq('id',id)}
   else if(b.dataset.a=='win'){if(!confirm('Marcar como vencedora da semana?'))return;await sb.from('fanarts').update({vencedora:false}).eq('vencedora',true);await sb.from('fanarts').update({vencedora:true}).eq('id',id)}
-  else if(b.dataset.a=='no'){if(!confirm('Tem certeza? A fanart será APAGADA DO SERVIDOR PARA SEMPRE.'))return;
-    const a=(await sb.from('fanarts').select('path').eq('id',id).single()).data;if(a)await sb.storage.from('fanarts').remove([a.path]);await sb.from('fanarts').delete().eq('id',id)}
+  else if(b.dataset.a=='no'||b.dataset.a=='del'){
+    const a=(await sb.from('fanarts').select('path,handle').eq('id',id).single()).data;if(!a)return;
+    const prompt=b.dataset.a=='del'?`Remover a fanart de @${a.handle} do mural e do servidor?`:'Descartar e apagar a fanart do servidor para sempre?';if(!confirm(prompt))return;
+    const removed=await sb.storage.from('fanarts').remove([a.path]);if(removed.error){alert('Não foi possível remover a imagem: '+removed.error.message);return}
+    const deleted=await sb.from('fanarts').delete().eq('id',id);if(deleted.error){alert('A imagem saiu do armazenamento, mas não foi possível remover o registro: '+deleted.error.message);return}
+  }
   loadFa()});
+document.addEventListener('submit',async e=>{
+  const form=e.target.closest('.click-adjust');if(!form)return;e.preventDefault();if(!isAdmin)return;
+  const qtd=Number(form.elements.qtd.value),handle=form.dataset.handle||'?';
+  if(!Number.isSafeInteger(qtd)||qtd<1||qtd>1000000000)return alert('Digite uma quantidade válida.');
+  if(!confirm(`Remover até ${qtd.toLocaleString('pt-BR')} cliques de @${handle}?`))return;
+  const r=await sb.rpc('remover_clicks',{p_user_id:form.dataset.user,p_qtd:qtd});
+  if(r.error){alert('Não foi possível remover: '+r.error.message);return}
+  if(!r.data){alert('Esse fã ainda não tem uma linha no placar.');return}
+  await loadFa();
+});
 (async()=>{while(typeof sb==='undefined'||!sb){await new Promise(r=>setTimeout(r,400));if(!CFG.supabaseUrl)return}await loadFa()})();
-
-document.addEventListener('click',async e=>{const c=e.target.closest('#fmu .fa');if(!isAdmin||!c||e.target.closest('button'))return;
-  const a=FA.find(x=>c.querySelector('img').src.endsWith(x.path));if(a&&confirm('Marcar @'+a.handle+' como vencedora da semana?')){await sb.from('fanarts').update({vencedora:false}).eq('vencedora',true);await sb.from('fanarts').update({vencedora:true}).eq('id',a.id);loadFa()}});
 </script>
 </body>
 </html>
