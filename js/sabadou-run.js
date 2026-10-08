@@ -19,7 +19,7 @@ function size(){const m=innerWidth<700;if(ready&&m===mob)return;ready=true;mob=m
   stars=Array.from({length:36},()=>({x:Math.random()*W,y:Math.random()*H*.58,s:Math.random()*1.6+.4}));
   if(st==='run')st='idle';obs=[];y=G;vy=0}
 const sp=()=>mob?.92:1;size();addEventListener('resize',size);
-function reset(){score=0;phase=0;v=6.4;y=G;vy=0;obs=[];gap=250;banner=100;st='run';shake=0}
+function reset(){score=0;phase=0;v=6.4;y=G;vy=0;obs=[];gap=560;banner=100;st='run';shake=0}
 function jump(){if(st!=='run'){reset();return}if(y>=G-.5)vy=-12.8}
 function spawn(){
   const k=['cal'];if(phase>=1)k.push('cal2');if(phase>=2)k.push('bird','bird');if(phase>=4)k.push('cal3');
@@ -31,10 +31,10 @@ function step(dt){
   if(st!=='run')return;
   score+=v*dt*.06/sp();
   const p=Math.min(5,Math.floor(score/PL));if(p!==phase){phase=p;banner=120}
-  v=Math.min(16,6.4+phase*1.35+(score%PL)/PL*.9)*sp();
+  v=Math.min(14.5,6.4+phase*1.1+(score%PL)/PL*.7)*sp();
   vy+=(down&&y<G?1.5:.65)*dt;y+=vy*dt;if(y>=G){y=G;vy=0}
   ducking=down&&y>=G;off=(off+v*dt)%40;
-  gap-=v*dt;if(gap<=0){spawn();gap=Math.max(155,205+Math.random()*125+v*7)}
+  gap-=v*dt;if(gap<=0){spawn();gap=Math.max(520,560+Math.random()*220+v*12)}
   for(const o of obs)o.x-=v*dt;obs=obs.filter(o=>o.x>-120);
   const fh=ducking?26:46,fw=ducking?54:40,fx=76,fy=y-fh+5,fW=fw-12,fH=fh-8;
   for(const o of obs)if(fx<o.x+o.w-4&&fx+fW>o.x+4&&fy<o.y+o.h-3&&fy+fH>o.y+3){
@@ -56,12 +56,13 @@ function bg(){
 }
 function frog(){
   const d=ducking,air=y<G-1,run=Math.floor(t/5)%2,base=Math.round(y/4)*4,x=68;
+  const bodyLilac='#b87af5',highlight='#e3c6ff',shadow='#8146bd';
   // Silhueta do sapo em blocos, com dois quadros de corrida e olhos grandes.
   const body=d?[[8,-24,44,16], [0,-16,12,12]]:[[8,-32,32,24],[0,-24,12,16],[32,-24,12,16],[4,-8,12,8],[28,-8,12,8]];
-  body.forEach(([dx,dy,w,h])=>px(x+dx,base+dy,w,h,'#8ee85b'));
-  px(x+12,base-(d?20:32),24,8,'#baff77');px(x+8,base-(d?8:12),32,4,'#5bbd45');
-  if(!d){px(x+4,base-40,12,12,'#8ee85b');px(x+28,base-40,12,12,'#8ee85b');px(x+8,base-36,4,8,'#fff');px(x+32,base-36,4,8,'#fff');px(x+12,base-32,4,8,'#20122d');px(x+36,base-32,4,8,'#20122d');px(x+20,base-20,12,4,'#397d3c')}
-  px(x+(air?0:run?0:8),base-4,12,4,'#5bbd45');px(x+(air?28:run?28:20),base-4,12,4,'#5bbd45');
+  body.forEach(([dx,dy,w,h])=>px(x+dx,base+dy,w,h,bodyLilac));
+  px(x+12,base-(d?20:32),24,8,highlight);px(x+8,base-(d?8:12),32,4,shadow);
+  if(!d){px(x+4,base-40,12,12,bodyLilac);px(x+28,base-40,12,12,bodyLilac);px(x+8,base-36,4,8,'#fff');px(x+32,base-36,4,8,'#fff');px(x+12,base-32,4,8,'#20122d');px(x+36,base-32,4,8,'#20122d');px(x+20,base-20,12,4,'#60328e')}
+  px(x+(air?0:run?0:8),base-4,12,4,shadow);px(x+(air?28:run?28:20),base-4,12,4,shadow);
   if(st==='dead'){px(x+12,base-36,8,4,'#20122d');px(x+32,base-36,8,4,'#20122d')}
 }
 function obstacle(o){
