@@ -287,7 +287,7 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   <div class="gbar"><button class="cta" id="gj" type="button">pular ↑</button><button class="cta ghost" id="gd" type="button">agachar ↓</button></div>
   <p class="hint mobhint">Dica: gire o celular na horizontal pra jogar em tela maior.</p>
   <p class="hint">Espaço ou ↑ pula, ↓ agacha. No celular, use os botões. Cada fase é um dia da semana e a última é o sábado.</p>
-  <div class="shop"><h2>lojinha do sapo</h2><p class="lead">Cada clique no sabadômetro rende moedas. Gaste aqui pra clicar mais.</p><div id="coin" style="font-size:2rem;font-weight:800"></div><div id="shl"></div></div>
+  <div class="shop"><h2>lojinha do sapo</h2><p class="lead">Cada clique no sabadômetro rende moedas. Gaste aqui pra clicar mais.</p><div id="coin" style="font-size:2rem;font-weight:800"></div><div id="shl"></div><div id="sa"></div></div>
 </div></div></section>
 
 <section class="panel" id="fanarts"><div class="sec"><div class="wrap">
@@ -543,7 +543,19 @@ function saveG(){store.set('sab_n',N);store.set('sab_g',G)}
 $('#btn').addEventListener('click',()=>{const p=pw();N+=p-1;G.coin+=p;rendG()});
 $('#shl').onclick=e=>{const b=e.target.closest('button');if(!b)return;const i=+b.dataset.i;if(G.coin>=cost(i)){G.coin-=cost(i);G.lv[i]++;saveG();rendG()}};
 setInterval(()=>{const c=cps();if(c){N+=c;G.coin+=c}saveG();rendG()},1000);addEventListener('pagehide',saveG);rendG();
-setInterval(async()=>{if(sb&&me)await sb.from('placar').upsert({user_id:me.id,handle:me.user_metadata?.handle,clicks:N})},30000);
+setInterval(async()=>{if(!sb||!me)return;
+  const b=(await sb.from('placar').select('bonus').eq('user_id',me.id).maybeSingle()).data?.bonus||0;
+  if(b>0){N+=+b;G.coin+=+b;saveG();rendG()}
+  if(!isAdmin)await sb.from('placar').upsert({user_id:me.id,handle:me.user_metadata?.handle,clicks:N,bonus:0})},30000);
+function rendSA(){const b=$('#sa');if(!isAdmin){b.innerHTML='';return}
+  b.innerHTML=`<div class="si" style="display:block"><b>👑 painel admin</b><p class="hint">Só funciona com a sua conta de admin. Seus cliques não entram no ranking do 1 milhão.</p>
+  <button class="mini ok" id="s1">desbloquear tudo</button> <button class="mini" id="s2">definir meus cliques</button><br><br>
+  <input class="fld" id="sh" placeholder="@ do fã" maxlength="30"> <input class="fld" id="sq" type="number" min="1" placeholder="quantidade"> <button class="mini ok" id="s3">dar cliques</button><p class="hint" id="sm"></p></div>`;
+  $('#s1').onclick=()=>{G.lv=G.lv.map(l=>Math.max(l,25));G.coin+=1e9;saveG();rendG()};
+  $('#s2').onclick=()=>{const v=parseInt(prompt('Quantos cliques?',N),10);if(v>=0){N=v;saveG();rendG()}};
+  $('#s3').onclick=async()=>{const r=await sb.rpc('dar_clicks',{p_handle:$('#sh').value.replace('@','').trim(),p_qtd:+$('#sq').value});
+    $('#sm').textContent=r.error?'Erro: '+r.error.message:(r.data?'Enviado! Chega no aparelho do fã em até 30 s.':'Ninguém com esse @ entrou no placar ainda.')}}
+
 
 // ===== login de fã + fanarts =====
 let me=null,FA=[],mv={};const ul=$('#ul'),pub=p=>sb.storage.from('fanarts').getPublicUrl(p).data.publicUrl;
@@ -557,7 +569,7 @@ $('#ff').onsubmit=async ev=>{ev.preventDefault();const m=$('#fm');m.textContent=
   const u=await sb.storage.from('fanarts').upload(path,b,{contentType:'image/jpeg'});if(u.error){m.textContent='Erro: '+u.error.message;return}
   const r=await sb.from('fanarts').insert({handle:me.user_metadata?.handle||'?',path});m.textContent=r.error?'Erro: '+r.error.message:'Enviada! Ela está em revisão. 💜';$('#ff').reset()};
 const card=(a,adm)=>`<figure class="fa${a.vencedora?' win':''}"><img loading="lazy" src="${pub(a.path)}" alt="Fanart de @${esc(a.handle)}"><figcaption><span>@${esc(a.handle)}</span>${adm?`<span><button class="mini ok" data-a="ok" data-id="${a.id}">aprovar</button> <button class="mini no" data-a="no" data-id="${a.id}">descartar</button></span>`:`<button class="lk" data-v="${a.id}">${mv[a.id]?'💜':'🤍'} ${a.votos}</button>`}</figcaption></figure>`;
-async function loadFa(){if(!sb)return;await who();mv={};
+async function loadFa(){if(!sb)return;await who();rendSA();mv={};
   FA=(await sb.from('fanarts').select('*').eq('status','aprovada').order('criado_em',{ascending:false})).data||[];
   if(me)((await sb.from('votos').select('fanart_id')).data||[]).forEach(x=>mv[x.fanart_id]=1);
   const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-d.getDay());const sem=FA.filter(a=>new Date(a.criado_em)>=d).sort((a,b)=>b.votos-a.votos).slice(0,3);
