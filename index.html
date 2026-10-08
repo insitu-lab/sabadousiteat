@@ -589,6 +589,7 @@ $('#ulf').onsubmit=async ev=>{ev.preventDefault();if(!sb){$('#um').textContent='
       weak_password:'A senha não atende aos critérios do Supabase.',
       user_already_exists:'Já existe uma conta com esse @. Tente entrar em “já tenho conta”.',
       signup_disabled:'O cadastro está desativado nas configurações do Supabase.',
+      over_email_send_rate_limit:'O Supabase tentou enviar confirmações demais. Desative Confirm email no provedor Email e aguarde o limite liberar.',
       database_error:'O banco rejeitou o cadastro. Confira se o SQL de registro de contas foi executado.'
     };
     $('#um').textContent=messages[code]||`Falha no cadastro (código ${code}).`;return
