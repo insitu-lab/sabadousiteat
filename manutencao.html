@@ -6,6 +6,18 @@
 <meta name="robots" content="noindex">
 <title>Sabadou — voltamos já</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Nunito:wght@600;800&display=swap">
+<script src="config.js"></script>
+<script>
+document.documentElement.dataset.maintenanceCheck='pending';
+const revealMaintenance=()=>delete document.documentElement.dataset.maintenanceCheck;
+(async()=>{try{const c=typeof SITE_CONFIG!=='undefined'?SITE_CONFIG:{};if(!c.supabaseUrl||!c.supabaseKey){revealMaintenance();return}
+  const r=await fetch(c.supabaseUrl.replace(/\/$/,'')+'/rest/v1/site_settings?id=eq.1&select=maintenance',{headers:{apikey:c.supabaseKey}});
+  if(!r.ok)throw new Error('settings unavailable');const rows=await r.json();
+  const deadline=Date.parse(c.maintenanceUntil);
+  if(!rows[0]?.maintenance||(Number.isFinite(deadline)&&Date.now()>=deadline)){location.replace('index.html');return}
+}catch(e){console.warn('Não foi possível verificar o modo de manutenção.',e)}revealMaintenance()})();
+</script>
+<style>html[data-maintenance-check="pending"] body{visibility:hidden}</style>
 
 <style>
 :root{
@@ -243,6 +255,17 @@ small{
       Ver o Instagram
     </a>
 
+    <dialog id="admin-login" style="border:2px solid var(--pur);border-radius:24px;background:var(--bg);color:var(--ink);padding:1.4rem;width:min(92vw,420px)">
+      <form id="admin-login-form">
+        <h3 style="font:400 1.8rem var(--disp);margin-bottom:1rem">entrar</h3>
+        <input id="admin-email" type="email" placeholder="E-mail" autocomplete="username" required style="display:block;width:100%;margin:.7rem 0;padding:.8rem 1rem;border:2px solid var(--pur);border-radius:14px;background:var(--bg);color:var(--ink);font:inherit">
+        <input id="admin-password" type="password" placeholder="Senha" autocomplete="current-password" required style="display:block;width:100%;margin:.7rem 0;padding:.8rem 1rem;border:2px solid var(--pur);border-radius:14px;background:var(--bg);color:var(--ink);font:inherit">
+        <p id="admin-login-status" aria-live="polite" style="min-height:1.5em;font-size:.95rem;overflow-wrap:anywhere"></p>
+        <button class="cta" type="submit">continuar</button>
+        <button class="cta" type="button" id="admin-login-close" style="background:transparent;color:var(--ink)">fechar</button>
+      </form>
+    </dialog>
+
     <small>
       toque em qualquer lugar 💜
     </small>
@@ -257,7 +280,7 @@ small{
 const CONFIG={
   titulo:'em manutenção',
   frase:'o sabadou tá arrumando a casa. volta já, calabresos.',
-  volta:'2026-10-10T18:00',
+  volta:SITE_CONFIG.maintenanceUntil,
   instagram:'https://www.instagram.com/sabadouofficiall/',
   status:[
     'arrumando o sábado...',
@@ -271,6 +294,24 @@ const CONFIG={
 
 const $=s=>document.querySelector(s);
 const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// Atalho discreto: cinco toques rápidos na imagem do sapo abrem o login.
+let adminTaps=0,adminTapTimer;
+$('#fr').addEventListener('click',()=>{adminTaps++;clearTimeout(adminTapTimer);if(adminTaps>=5){adminTaps=0;$('#admin-login').showModal();$('#admin-email').focus()}else adminTapTimer=setTimeout(()=>adminTaps=0,2200)});
+$('#admin-login-close').onclick=()=>$('#admin-login').close();
+$('#admin-login-form').onsubmit=async e=>{
+  e.preventDefault();const status=$('#admin-login-status'),button=e.submitter||$('#admin-login-form button[type="submit"]');button.disabled=true;status.textContent='Verificando...';
+  try{
+    const c=window.SITE_CONFIG||{};if(!c.supabaseUrl||!c.supabaseKey)throw new Error('Login indisponível.');
+    await new Promise((ok,no)=>{const script=document.createElement('script');script.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';script.onload=ok;script.onerror=no;document.head.appendChild(script)});
+    const client=window.supabase.createClient(c.supabaseUrl,c.supabaseKey);
+    const login=await client.auth.signInWithPassword({email:$('#admin-email').value.trim(),password:$('#admin-password').value});
+    if(login.error)throw new Error('E-mail ou senha incorretos.');
+    const check=await client.from('admins').select('user_id').eq('user_id',login.data.user.id).maybeSingle();
+    if(check.error||!check.data){await client.auth.signOut();throw new Error('Essa conta não tem acesso de administrador.');}
+    status.textContent='Acesso confirmado.';location.replace('index.html');
+  }catch(error){status.textContent=error.message||'Não foi possível entrar.';button.disabled=false}
+};
 
 $('#titulo').innerHTML=[...CONFIG.titulo]
   .map((c,i)=>
@@ -313,7 +354,7 @@ function volta(){
   }
 
   if(t<=0){
-    el.textContent='já já volta. atualiza a página!';
+    location.replace('index.html');
     return
   }
 
