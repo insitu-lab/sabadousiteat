@@ -196,12 +196,21 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .si button{font:inherit;font-weight:800;border-radius:99px;border:2px solid var(--pur);background:var(--lil);color:#2a0f3d;padding:.4rem 1rem;cursor:pointer}.si button:disabled{opacity:.4;cursor:not-allowed}
 .sbd{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:1rem}.sbd span{border:2px solid var(--line);border-radius:99px;padding:.2rem .7rem;font-weight:700;font-size:.9rem}.sbd .now{background:var(--hot);color:#fff;border-color:var(--hot)}
 #ph{font-weight:800;margin-top:.6rem}
-.podium{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;align-items:end;margin:1.5rem 0 2rem}
-.podium-item{min-width:0;text-align:center;padding:.8rem .6rem;border:2px solid var(--line);border-radius:24px 24px 8px 8px;background:var(--card)}
-.podium-item.first{padding-top:1.8rem;border-color:var(--hot);background:linear-gradient(180deg,rgba(255,79,216,.28),var(--card))}
-.podium-item.second{padding-top:1.2rem}.podium-item.third{padding-top:1rem}
-.podium-place{display:block;font:400 2.4rem/1 var(--disp);color:var(--hot);margin-bottom:.6rem}
-.podium-item .fa{height:100%}.podium-item .fa figcaption{justify-content:center}
+#rank-title{text-align:center;margin:2rem 0 1rem}
+#frk{display:flex;flex-direction:column;align-items:center;text-align:center}
+.podium{width:min(100%,760px);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(.4rem,2vw,1.2rem);align-items:end;margin:1.5rem auto 2rem}
+.podium-entry{min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;text-align:center;gap:.45rem}
+.podium-photo{display:block;width:clamp(68px,14vw,118px);aspect-ratio:1;overflow:hidden;border:3px solid var(--line);border-radius:22px;background:var(--card);box-shadow:0 8px 24px #0005}
+.podium-photo img{display:block;width:100%;height:100%;object-fit:cover}
+.place-1 .podium-photo{border-color:#ffd76a;box-shadow:0 0 24px #ffc83d66}
+.podium-name{max-width:100%;overflow-wrap:anywhere;font-size:clamp(.78rem,2vw,1rem)}
+.podium-votes{font-size:.85rem;opacity:.85}
+.podium-tools{display:flex;align-items:center;justify-content:center;gap:.3rem;flex-wrap:wrap;min-height:32px}
+.podium-tools .mini{font-size:.8rem;padding:.18rem .5rem}.podium-tools a{text-decoration:none}
+.podium-base{width:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;border:2px solid #ffffff30;border-bottom:0;border-radius:18px 18px 0 0;color:#fff;text-shadow:0 2px 5px #0006;background:linear-gradient(160deg,#b8b8c8,#737387);height:clamp(88px,14vw,132px)}
+.podium-base strong{font:400 clamp(2.2rem,5vw,3.6rem)/1 var(--disp)}.podium-base small{font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+.place-1 .podium-base{height:clamp(132px,22vw,190px);background:linear-gradient(160deg,#ffe58a,#e5a91d 58%,#a76612);border-color:#fff0a8}
+.place-3 .podium-base{height:clamp(68px,11vw,104px);background:linear-gradient(160deg,#d99a68,#9f5d38 65%,#70402e)}
 .rank-others{padding-left:2.4rem}.rank-others li{padding:.35rem 0}.rank-others small{opacity:.7}
 .fa-open{display:block}.fa-open img{cursor:zoom-in}.fa-actions{display:flex;align-items:center;justify-content:center;gap:.4rem;flex-wrap:wrap}.fa-actions a{text-decoration:none}
 .click-admin{margin:1.5rem 0 2.2rem;overflow-x:auto}
@@ -215,7 +224,7 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .hl{flex:0 0 auto;white-space:nowrap;background:var(--lil);color:#2a0f3d;border-color:var(--lil);max-width:9.5rem;overflow:hidden;text-overflow:ellipsis}
 #ul{width:min(92vw,420px);padding:1.5rem;border-radius:24px;background:var(--bg);color:var(--ink);border:2px solid var(--pur)}#ul .fld{width:100%;font-size:16px;margin:.4rem 0}#ul::backdrop{background:rgba(0,0,0,.6)}
 @media (max-width:860px){.hl{padding:.4rem .85rem;font-size:.9rem}.nv{gap:.5rem}.si{flex-direction:column;align-items:stretch}.si button{width:100%;padding:.7rem}.fg{grid-template-columns:1fr 1fr;gap:.6rem}#btn{touch-action:manipulation}}
-@media (max-width:700px){body{padding-bottom:calc(62px + env(safe-area-inset-bottom,0px))}.nav{backdrop-filter:none}.nv nav.tabs{position:fixed;top:auto;left:0;right:0;bottom:0;z-index:35;height:calc(58px + env(safe-area-inset-bottom,0px));padding:4px 8px env(safe-area-inset-bottom,0px);justify-content:flex-start;gap:.2rem;background:var(--nav);backdrop-filter:blur(14px);border-top:1px solid var(--line);border-bottom:0}.nv nav.tabs a{display:flex;align-items:center;min-height:44px;padding:.3rem .65rem;font-size:.82rem}.nv nav.tabs .ind{display:none}.podium{gap:.45rem}.podium-item{padding:.6rem .3rem}.podium-item.first{padding-top:1rem}.podium-place{font-size:1.8rem}.podium .fa figcaption{font-size:.83rem}.podium .fa-actions{gap:.25rem}.podium .mini{font-size:.78rem;padding:.2rem .45rem}}
+@media (max-width:700px){body{padding-bottom:calc(62px + env(safe-area-inset-bottom,0px))}.nav{backdrop-filter:none}.nv nav.tabs{position:fixed;top:auto;left:0;right:0;bottom:0;z-index:35;height:calc(58px + env(safe-area-inset-bottom,0px));padding:4px 8px env(safe-area-inset-bottom,0px);justify-content:flex-start;gap:.2rem;background:var(--nav);backdrop-filter:blur(14px);border-top:1px solid var(--line);border-bottom:0}.nv nav.tabs a{display:flex;align-items:center;min-height:44px;padding:.3rem .65rem;font-size:.82rem}.nv nav.tabs .ind{display:none}.podium{gap:.35rem}.podium-entry{gap:.3rem}.podium-photo{width:clamp(62px,18vw,96px);border-radius:16px}.podium-tools .mini,.podium-tools .download{font-size:.7rem;padding:.14rem .35rem}.podium-votes{font-size:.75rem}.podium-base strong{font-size:2rem}}
 </style>
 </head>
 <body>
@@ -320,7 +329,7 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   </div>
   <p><button class="cta sm" id="fu" type="button">entrar com @</button></p>
   <form id="ff" class="rv" hidden><input class="fld" type="file" id="fi" accept="image/*" required><button class="cta" type="submit">enviar fanart</button><p class="hint" id="fm"></p></form>
-  <div id="fw"></div><h3>ranking da semana</h3><div class="fg" id="frk"></div><h3>mural</h3><div class="fg" id="fmu"></div>
+  <div id="fw"></div><h3 id="rank-title">ranking da semana</h3><div id="frk"></div><h3>mural</h3><div class="fg" id="fmu"></div>
 </div></div></section>
 
 <section class="panel" id="admin"><div class="sec"><div class="wrap"><div class="sh"><h2>painel admin</h2><p>Tudo de administrador num lugar só: avisos, fanarts, vencedora, cliques e os 10 do 1 milhão.</p></div><div id="adm-box"></div><div id="accounts"></div><div id="clicks-admin"></div><div id="sa"></div><div id="fq"></div></div></div></section>
@@ -619,13 +628,16 @@ $('#ff').onsubmit=async ev=>{ev.preventDefault();const m=$('#fm');m.textContent=
 const card=(a,adm=false,approvedAdmin=false)=>{const url=pub(a.path),download=url+(url.includes('?')?'&':'?')+'download='+encodeURIComponent('fanart-'+a.handle+'.jpg');
   const actions=adm?`<button class="mini ok" data-a="ok" data-id="${a.id}">aprovar</button> <button class="mini no" data-a="no" data-id="${a.id}">descartar</button>`:approvedAdmin?`<button class="mini ok" data-a="win" data-id="${a.id}">escolher vencedora</button> <button class="mini no" data-a="del" data-id="${a.id}">remover</button>`:`<button class="lk" data-v="${a.id}">${mv[a.id]?'💜':'🤍'} ${a.votos}</button>`;
   return `<figure class="fa${a.vencedora?' win':''}"><a class="fa-open" href="${url}" target="_blank" rel="noopener"><img loading="lazy" src="${url}" alt="Fanart de @${esc(a.handle)}; abrir imagem"></a><figcaption><span>@${esc(a.handle)}</span><div class="fa-actions">${actions}<a class="mini download" href="${download}">baixar</a></div></figcaption></figure>`};
+const podiumCard=(a,n)=>{const url=pub(a.path),download=url+(url.includes('?')?'&':'?')+'download='+encodeURIComponent('fanart-'+a.handle+'.jpg');
+  const controls=isAdmin?`<button class="mini ok" data-a="win" data-id="${a.id}">vencedora</button> <button class="mini no" data-a="del" data-id="${a.id}">remover</button>`:`<button class="lk" data-v="${a.id}">${mv[a.id]?'💜':'🤍'} ${a.votos}</button>`;
+  return `<article class="podium-entry place-${n}"><a class="podium-photo" href="${url}" target="_blank" rel="noopener"><img loading="lazy" src="${url}" alt="Fanart de @${esc(a.handle)}"></a><b class="podium-name">@${esc(a.handle)}</b><span class="podium-votes">${a.votos} votos</span><div class="podium-tools">${controls}<a class="mini download" href="${download}">baixar</a></div><div class="podium-base"><strong>${n}º</strong><small>lugar</small></div></article>`};
 async function loadFa(){if(!sb)return;await who();rendSA();mv={};
   FA=(await sb.from('fanarts').select('*').eq('status','aprovada').order('criado_em',{ascending:false})).data||[];
   if(me)((await sb.from('votos').select('fanart_id')).data||[]).forEach(x=>mv[x.fanart_id]=1);
   const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-d.getDay());const ranked=FA.filter(a=>new Date(a.criado_em)>=d).sort((a,b)=>b.votos-a.votos);
   const w=FA.find(a=>a.vencedora);$('#fw').innerHTML=w?`<h3>🏆 vencedora da semana</h3><div class="fg">${card(w)}</div>`:'';
   const podium=[{a:ranked[1],n:2,c:'second'},{a:ranked[0],n:1,c:'first'},{a:ranked[2],n:3,c:'third'}].filter(x=>x.a);
-  $('#frk').innerHTML=ranked.length?`<div class="podium">${podium.map(x=>`<div class="podium-item ${x.c}"><span class="podium-place">${x.n}º</span>${card(x.a,false,isAdmin)}</div>`).join('')}</div>${ranked.length>3?`<ol class="rank-others" start="4">${ranked.slice(3).map((a,i)=>`<li><b>${i+4}º</b> @${esc(a.handle)} <small>· ${a.votos} votos</small></li>`).join('')}</ol>`:''}`:'<p class="mut">Nenhuma arte aprovada nesta semana ainda.</p>';
+  $('#frk').innerHTML=ranked.length?`<div class="podium">${podium.map(x=>podiumCard(x.a,x.n)).join('')}</div>${ranked.length>3?`<ol class="rank-others" start="4">${ranked.slice(3).map((a,i)=>`<li><b>${i+4}º</b> @${esc(a.handle)} <small>· ${a.votos} votos</small></li>`).join('')}</ol>`:''}`:'<p class="mut">Nenhuma arte aprovada nesta semana ainda.</p>';
   $('#fmu').innerHTML=FA.length?FA.map(a=>card(a,false,isAdmin)).join(''):'<p class="mut">O mural está vazio. Seja o primeiro!</p>';
   const q=$('#fq'),accounts=$('#accounts'),clicksAdmin=$('#clicks-admin');if(!isAdmin){q.innerHTML='';accounts.innerHTML='';clicksAdmin.innerHTML='';return}
   const AC=await sb.from('contas').select('handle,criado_em').order('criado_em',{ascending:false});
