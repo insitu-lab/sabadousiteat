@@ -302,7 +302,7 @@ $('#admin-login-close').onclick=()=>$('#admin-login').close();
 $('#admin-login-form').onsubmit=async e=>{
   e.preventDefault();const status=$('#admin-login-status'),button=e.submitter||$('#admin-login-form button[type="submit"]');button.disabled=true;status.textContent='Verificando...';
   try{
-    const c=window.SITE_CONFIG||{};if(!c.supabaseUrl||!c.supabaseKey)throw new Error('Login indisponível.');
+    const c=typeof SITE_CONFIG!=='undefined'?SITE_CONFIG:(window.SITE_CONFIG||{});if(!c.supabaseUrl||!c.supabaseKey)throw new Error('Login indisponível.');
     await new Promise((ok,no)=>{const script=document.createElement('script');script.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';script.onload=ok;script.onerror=no;document.head.appendChild(script)});
     const client=window.supabase.createClient(c.supabaseUrl,c.supabaseKey);
     const login=await client.auth.signInWithPassword({email:$('#admin-email').value.trim(),password:$('#admin-password').value});
