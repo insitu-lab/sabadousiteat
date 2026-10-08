@@ -589,6 +589,9 @@ async function checkAdmin(){
 }
 const lg=$('#lg');
 $('#adm').onclick=()=>{$('#lm').textContent='';lg.showModal();$('#le').focus()};
+// Atalho discreto: cinco toques rápidos no logo abrem o login administrativo.
+let adminLogoTaps=0,adminLogoTimer;
+document.querySelector('header .logo').addEventListener('click',e=>{adminLogoTaps++;clearTimeout(adminLogoTimer);if(adminLogoTaps>=5){e.preventDefault();adminLogoTaps=0;$('#lm').textContent='';lg.showModal();$('#le').focus()}else adminLogoTimer=setTimeout(()=>adminLogoTaps=0,2200)});
 $('#lc').onclick=()=>lg.close();
 $('#lgf').onsubmit=async ev=>{ev.preventDefault();const m=$('#lm');m.textContent='Entrando...';
   const r=await sb.auth.signInWithPassword({email:$('#le').value.trim(),password:$('#lp').value});
@@ -600,7 +603,7 @@ $('#lgf').onsubmit=async ev=>{ev.preventDefault();const m=$('#lm');m.textContent
   if(CFG.supabaseUrl&&CFG.supabaseKey){
     try{await new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';s.onload=ok;s.onerror=no;document.head.appendChild(s)});
       const came=/access_token|[?&]code=/.test(location.href);sb=supabase.createClient(CFG.supabaseUrl,CFG.supabaseKey);
-      sb.auth.onAuthStateChange((ev)=>setTimeout(async()=>{if(typeof loadFa==='function')await loadFa();if(came&&ev==='SIGNED_IN'&&me){const t=store.get('sab_after','calabresos');location.hash=TABS.includes(t)?t:'calabresos';ul.close()}},0));$('#adm').hidden=false}catch(e){sb=null}
+      sb.auth.onAuthStateChange((ev)=>setTimeout(async()=>{if(typeof loadFa==='function')await loadFa();if(came&&ev==='SIGNED_IN'&&me){const t=store.get('sab_after','calabresos');location.hash=TABS.includes(t)?t:'calabresos';ul.close()}},0))}catch(e){sb=null}
   }
   await loadAv();await checkAdmin();
   setInterval(()=>{if(!document.hidden){if(editId===null)loadAv();if(isAdmin)loadFa()}},60000); // atualiza avisos e painel admin a cada 1 min
