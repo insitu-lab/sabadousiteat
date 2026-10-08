@@ -5,7 +5,7 @@ const c=cv.getContext('2d'),$=s=>document.querySelector(s);let W=800,H=260,G=214
 const dpr=Math.min(devicePixelRatio||1,2);
 // [nome da fase, cor do topo, cor do fundo]
 const PH=[['segunda','#1a0a33','#3b1f6e'],['terça','#1e0c3a','#4a2486'],['quarta','#240e44','#5c2a9a'],['quinta','#2c1050','#7a31b0'],['sexta','#38125a','#a53cc0'],['sábado','#4a1264','#e04fc4']];
-const PL=220; // pontos por fase
+const PL=300; // seis fases mais longas para tornar a chegada mais difícil
 const hex=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
 let st='idle',score=0,hi=0,phase=0,v=5.2,y=G,vy=0,down=false,ducking=false,obs=[],gap=300,t=0,banner=0,off=0,last=0,shake=0;
 let ct=hex(PH[0][1]),cb=hex(PH[0][2]);
@@ -19,7 +19,7 @@ function size(){const m=innerWidth<700;if(ready&&m===mob)return;ready=true;mob=m
   stars=Array.from({length:36},()=>({x:Math.random()*W,y:Math.random()*H*.58,s:Math.random()*1.6+.4}));
   if(st==='run')st='idle';obs=[];y=G;vy=0}
 const sp=()=>mob?.92:1;size();addEventListener('resize',size);
-function reset(){score=0;phase=0;v=5.2;y=G;vy=0;obs=[];gap=320;banner=100;st='run';shake=0}
+function reset(){score=0;phase=0;v=6.4;y=G;vy=0;obs=[];gap=250;banner=100;st='run';shake=0}
 function jump(){if(st!=='run'){reset();return}if(y>=G-.5)vy=-12.8}
 function spawn(){
   const k=['cal'];if(phase>=1)k.push('cal2');if(phase>=2)k.push('bird','bird');if(phase>=4)k.push('cal3');
@@ -31,14 +31,15 @@ function step(dt){
   if(st!=='run')return;
   score+=v*dt*.06/sp();
   const p=Math.min(5,Math.floor(score/PL));if(p!==phase){phase=p;banner=120}
-  v=Math.min(11.5,5.2+phase*.85+(score%PL)/PL*.5)*sp();
+  v=Math.min(16,6.4+phase*1.35+(score%PL)/PL*.9)*sp();
   vy+=(down&&y<G?1.5:.65)*dt;y+=vy*dt;if(y>=G){y=G;vy=0}
   ducking=down&&y>=G;off=(off+v*dt)%40;
-  gap-=v*dt;if(gap<=0){spawn();gap=260+Math.random()*220+v*16}
+  gap-=v*dt;if(gap<=0){spawn();gap=Math.max(155,205+Math.random()*125+v*7)}
   for(const o of obs)o.x-=v*dt;obs=obs.filter(o=>o.x>-120);
   const fh=ducking?26:46,fw=ducking?54:40,fx=76,fy=y-fh+5,fW=fw-12,fH=fh-8;
   for(const o of obs)if(fx<o.x+o.w-4&&fx+fW>o.x+4&&fy<o.y+o.h-3&&fy+fH>o.y+3){
     st='dead';shake=14;if(score>hi){hi=Math.floor(score);try{localStorage.setItem('sab_hi',hi)}catch(e){}}}
+  if(score>=PL*6){score=PL*6;phase=5;st='won'}
 }
 
 const el=(x,y,rx,ry,col)=>{c.fillStyle=col;c.beginPath();c.ellipse(x,y,rx,ry,0,0,6.3);c.fill()};
@@ -87,6 +88,7 @@ function draw(){
   if(banner>0&&st==='run')txt(phase===5?'É SÁBADO!!!':PH[phase][0].toUpperCase(),W/2,mob?130:110,'400 '+(mob?46:58)+'px "Bagel Fat One",Impact,sans-serif',Math.min(1,banner/30));
   if(st==='idle')txt(mob?'toque aqui pra começar':'aperta espaço ou toca aqui pra começar',W/2,mob?130:110,'800 '+(mob?20:22)+'px Nunito,sans-serif');
   if(st==='dead'){txt(phase===5?'quase! o sábado é seu':'não é sábado :(',W/2,mob?120:100,'400 '+(mob?32:46)+'px "Bagel Fat One",Impact,sans-serif');txt(mob?'toque pra tentar de novo':'espaço ou toque pra tentar de novo',W/2,mob?154:134,'800 '+(mob?18:20)+'px Nunito,sans-serif')}
+  if(st==='won'){txt('VOCÊ CHEGOU AO SÁBADO!',W/2,mob?112:98,'400 '+(mob?30:44)+'px "Bagel Fat One",Impact,sans-serif');txt('Tire um print e mande no Direct do Sabadou para ganhar um salve!',W/2,mob?153:140,'800 '+(mob?13:18)+'px Nunito,sans-serif');txt(mob?'toque pra jogar de novo':'espaço ou toque pra jogar de novo',W/2,mob?188:176,'800 '+(mob?14:17)+'px Nunito,sans-serif')}
 }
 function loop(now){
   requestAnimationFrame(loop);
