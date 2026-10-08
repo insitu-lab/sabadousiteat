@@ -307,7 +307,7 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   <div id="fw"></div><h3>ranking da semana</h3><div class="fg" id="frk"></div><h3>mural</h3><div class="fg" id="fmu"></div>
 </div></div></section>
 
-<section class="panel" id="admin"><div class="sec"><div class="wrap"><div class="sh"><h2>painel admin</h2><p>Tudo de administrador num lugar só: avisos, fanarts, vencedora, cliques e os 10 do 1 milhão.</p></div><div id="adm-box"></div><div id="sa"></div><div id="fq"></div></div></div></section>
+<section class="panel" id="admin"><div class="sec"><div class="wrap"><div class="sh"><h2>painel admin</h2><p>Tudo de administrador num lugar só: avisos, fanarts, vencedora, cliques e os 10 do 1 milhão.</p></div><div id="adm-box"></div><div id="accounts"></div><div id="sa"></div><div id="fq"></div></div></div></section>
 
 <section class="panel" id="calabresos">
 <section class="sec" style="padding-bottom:0"><div class="wrap"><div class="sh rv" style="margin:0"><h2>área dos calabresos</h2><p>Coisas pra mexer enquanto o sábado não chega.</p></div></div></section>
@@ -528,7 +528,7 @@ $('#lgf').onsubmit=async ev=>{ev.preventDefault();const m=$('#lm');m.textContent
       sb.auth.onAuthStateChange((ev)=>setTimeout(async()=>{if(typeof loadFa==='function')await loadFa();if(came&&ev==='SIGNED_IN'&&me){const t=store.get('sab_after','calabresos');location.hash=TABS.includes(t)?t:'calabresos';ul.close()}},0));$('#adm').hidden=false}catch(e){sb=null}
   }
   await loadAv();await checkAdmin();
-  setInterval(()=>{if(!document.hidden&&editId===null)loadAv()},60000); // atualiza sozinho a cada 1 min
+  setInterval(()=>{if(!document.hidden){if(editId===null)loadAv();if(isAdmin)loadFa()}},60000); // atualiza avisos e painel admin a cada 1 min
 })();
 
 // ===== sábados dos últimos 12 meses =====
@@ -596,7 +596,9 @@ async function loadFa(){if(!sb)return;await who();rendSA();mv={};
   const w=FA.find(a=>a.vencedora);$('#fw').innerHTML=w?`<h3>🏆 vencedora da semana</h3><div class="fg">${card(w)}</div>`:'';
   $('#frk').innerHTML=sem.length?sem.map(a=>card(a)).join(''):'<p class="mut">Nenhuma arte votada nesta semana ainda.</p>';
   $('#fmu').innerHTML=FA.length?FA.map(a=>card(a)).join(''):'<p class="mut">O mural está vazio. Seja o primeiro!</p>';
-  const q=$('#fq');if(!isAdmin){q.innerHTML='';return}
+  const q=$('#fq'),accounts=$('#accounts');if(!isAdmin){q.innerHTML='';accounts.innerHTML='';return}
+  const AC=await sb.from('contas').select('handle,criado_em').order('criado_em',{ascending:false});
+  accounts.innerHTML=AC.error?'<p class="hint">Para ativar o registro de contas, execute o arquivo supabase-fanarts.sql no Supabase.</p>':`<h3>contas cadastradas (${AC.data.length})</h3><ol>${AC.data.map(a=>`<li>@${esc(a.handle)} · ${new Date(a.criado_em).toLocaleString('pt-BR')}</li>`).join('')||'<li>Nenhuma conta registrada.</li>'}</ol>`;
   const P=(await sb.from('fanarts').select('*').eq('status','pendente').order('criado_em')).data||[];
   const T=(await sb.from('placar').select('handle,clicks,milhao_em').not('milhao_em','is',null).order('milhao_em').limit(10)).data||[];
   q.innerHTML=`<h3>fila de aprovação (${P.length})</h3><div class="fg">${P.map(a=>card(a,1)).join('')||'<p class="mut">Fila vazia.</p>'}</div><h3>🏆 vencedora da semana</h3><div class="fg">${FA.filter(a=>new Date(a.criado_em)>=d).sort((a,b)=>b.votos-a.votos).map(a=>`<figure class="fa${a.vencedora?' win':''}"><img src="${pub(a.path)}" alt=""><figcaption><span>@${esc(a.handle)} · ${a.votos}💜</span><button class="mini ok" data-a="win" data-id="${a.id}">🏆 escolher</button></figcaption></figure>`).join('')||'<p class="mut">Nenhuma aprovada nesta semana.</p>'}</div><h3>🥇 primeiros ao 1 milhão (follow)</h3><ol>${T.map(t=>`<li>@${esc(t.handle||'?')} · ${new Date(t.milhao_em).toLocaleString('pt-BR')}</li>`).join('')||'<li>Ninguém ainda.</li>'}</ol>`}
