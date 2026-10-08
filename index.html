@@ -581,7 +581,18 @@ $('#ulf').onsubmit=async ev=>{ev.preventDefault();if(!sb){$('#um').textContent='
   if(signupMode&&password.length<8){$('#um').textContent='A senha precisa ter pelo menos 8 caracteres.';return}
   $('#um').textContent=signupMode?'Criando conta...':'Entrando...';
   const r=signupMode?await sb.auth.signUp({email:authEmail(handle),password,options:{data:{handle}}}):await sb.auth.signInWithPassword({email:authEmail(handle),password});
-  if(r.error){$('#um').textContent=signupMode?'Não foi possível criar a conta. Verifique os dados e tente novamente.':'@ ou senha incorretos.';return}
+  if(r.error){
+    console.error('Erro de autenticação do Supabase:',r.error);
+    if(!signupMode){$('#um').textContent='@ ou senha incorretos.';return}
+    const code=r.error.code||'unknown',messages={
+      email_address_invalid:'O Supabase rejeitou o endereço interno usado para esse @.',
+      weak_password:'A senha não atende aos critérios do Supabase.',
+      user_already_exists:'Já existe uma conta com esse @. Tente entrar em “já tenho conta”.',
+      signup_disabled:'O cadastro está desativado nas configurações do Supabase.',
+      database_error:'O banco rejeitou o cadastro. Confira se o SQL de registro de contas foi executado.'
+    };
+    $('#um').textContent=messages[code]||`Falha no cadastro (código ${code}).`;return
+  }
   if(signupMode&&!r.data.session){$('#um').textContent='A confirmação de e-mail precisa estar desativada no Supabase para esse tipo de conta.';return}
   store.set('sab_after',location.hash.slice(1)||'calabresos');$('#upw').value='';ul.close();await who();await loadFa();location.hash=TABS.includes(store.get('sab_after'))?store.get('sab_after'):'calabresos'};
 const shrink=f=>new Promise(ok=>{const i=new Image();i.onload=()=>{const k=Math.min(1,1400/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=i.width*k;c.height=i.height*k;c.getContext('2d').drawImage(i,0,0,c.width,c.height);c.toBlob(ok,'image/jpeg',.85)};i.src=URL.createObjectURL(f)});
