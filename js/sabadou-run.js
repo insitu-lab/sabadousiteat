@@ -1,7 +1,7 @@
 /* Sabadou Run — jogo do sapinho (pula, agacha, fases = dias da semana até o sábado) */
 (()=>{
 const cv=document.getElementById('dg');if(!cv)return;
-const c=cv.getContext('2d'),$=s=>document.querySelector(s);let W=800,H=260,G=214,mob=false,ready=false;
+const c=cv.getContext('2d',{alpha:false}),$=s=>document.querySelector(s);let W=800,H=260,G=214,mob=false,ready=false;
 const dpr=Math.min(devicePixelRatio||1,2);
 // [nome da fase, cor do topo, cor do fundo]
 const PH=[['segunda','#1a0a33','#3b1f6e'],['terça','#1e0c3a','#4a2486'],['quarta','#240e44','#5c2a9a'],['quinta','#2c1050','#7a31b0'],['sexta','#38125a','#a53cc0'],['sábado','#4a1264','#e04fc4']];
@@ -42,41 +42,35 @@ function step(dt){
   if(score>=PL*6){score=PL*6;phase=5;st='won'}
 }
 
-const el=(x,y,rx,ry,col)=>{c.fillStyle=col;c.beginPath();c.ellipse(x,y,rx,ry,0,0,6.3);c.fill()};
-function rr(x,y,w,h,r,col){c.fillStyle=col;c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();c.fill()}
+const px=(x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(Math.round(x/4)*4,Math.round(y/4)*4,Math.ceil(w/4)*4,Math.ceil(h/4)*4)};
+function rr(x,y,w,h,r,col){px(x,y,w,h,col)}
 function bg(){
   const T=hex(PH[phase][1]),B=hex(PH[phase][2]);
   for(let i=0;i<3;i++){ct[i]+=(T[i]-ct[i])*.04;cb[i]+=(B[i]-cb[i])*.04}
-  const g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,`rgb(${ct.map(Math.round)})`);g.addColorStop(1,`rgb(${cb.map(Math.round)})`);
-  c.fillStyle=g;c.fillRect(0,0,W,H);
-  for(const s of stars){s.x-=st==='run'?v*.15:.1;if(s.x<0)s.x=W;c.globalAlpha=.4+.5*Math.abs(Math.sin(t*.03+s.x));c.fillStyle='#fff';c.fillRect(s.x,s.y,s.s,s.s)}
-  c.globalAlpha=1;c.fillStyle='#ff4fd8';c.fillRect(0,G+2,W,3);
-  c.fillStyle='rgba(255,255,255,.35)';for(let x=-off;x<W;x+=40)c.fillRect(x,G+12,14,2);
+  c.fillStyle=`rgb(${ct.map(Math.round)})`;c.fillRect(0,0,W,H);
+  // Camadas de morros em blocos dão profundidade sem perder o visual pixel art.
+  for(let x=0;x<W;x+=32){const h=22+((x*17)%35);px(x,H-46-h,36,h+46,'rgba(12,4,28,.28)');px(x+8,H-46-h-8,16,8,'rgba(255,255,255,.06)')}
+  for(const s of stars){s.x-=st==='run'?v*.15:.1;if(s.x<0)s.x=W;c.globalAlpha=.45+.45*Math.abs(Math.sin(t*.03+s.x));px(s.x,s.y,4,4,'#fff')}
+  c.globalAlpha=1;px(0,G+2,W,4,'#f2b8ff');px(0,G+6,W,H-G-6,'#32134f');
+  for(let x=-off;x<W;x+=40){px(x,G+14,20,4,'#a64dff');px(x+24,G+26,8,4,'#60268a')}
 }
 function frog(){
-  const d=ducking,w=d?54:40,h=d?26:46,air=y<G-1,ph=Math.sin(t*.35)*5;
-  c.save();c.translate(70,y);
-  if(!d){el(10+(air?-3:ph),-3,9,5,'#8f4fe0');el(30+(air?5:-ph),-3,9,5,'#8f4fe0')}
-  el(w/2,-h/2-2,w/2,h/2,'#b57cff');el(w/2+3,-h/2+4,w/3,h/3,'#e6d0ff');
-  for(const ex of [w*.28,w*.7]){
-    const ey=-h+3;el(ex,ey,8,8,'#b57cff');
-    if(st==='dead'){c.strokeStyle='#0b0314';c.lineWidth=2.5;c.beginPath();c.moveTo(ex-4,ey-4);c.lineTo(ex+4,ey+4);c.moveTo(ex+4,ey-4);c.lineTo(ex-4,ey+4);c.stroke()}
-    else{el(ex+1,ey,5.5,5.5,'#0b0314');el(ex+3,ey-2,1.8,1.8,'#fff')}
-  }
-  c.strokeStyle='#5a2a9a';c.lineWidth=2;c.beginPath();c.moveTo(w*.5,-h*.5);c.lineTo(w*.9,-h*.5);c.stroke();
-  c.restore();
+  const d=ducking,air=y<G-1,run=Math.floor(t/5)%2,base=Math.round(y/4)*4,x=68;
+  // Silhueta do sapo em blocos, com dois quadros de corrida e olhos grandes.
+  const body=d?[[8,-24,44,16], [0,-16,12,12]]:[[8,-32,32,24],[0,-24,12,16],[32,-24,12,16],[4,-8,12,8],[28,-8,12,8]];
+  body.forEach(([dx,dy,w,h])=>px(x+dx,base+dy,w,h,'#8ee85b'));
+  px(x+12,base-(d?20:32),24,8,'#baff77');px(x+8,base-(d?8:12),32,4,'#5bbd45');
+  if(!d){px(x+4,base-40,12,12,'#8ee85b');px(x+28,base-40,12,12,'#8ee85b');px(x+8,base-36,4,8,'#fff');px(x+32,base-36,4,8,'#fff');px(x+12,base-32,4,8,'#20122d');px(x+36,base-32,4,8,'#20122d');px(x+20,base-20,12,4,'#397d3c')}
+  px(x+(air?0:run?0:8),base-4,12,4,'#5bbd45');px(x+(air?28:run?28:20),base-4,12,4,'#5bbd45');
+  if(st==='dead'){px(x+12,base-36,8,4,'#20122d');px(x+32,base-36,8,4,'#20122d')}
 }
 function obstacle(o){
   if(o.T==='bird'){
-    const f=Math.sin(t*.4)*9;el(o.x+24,o.y+14,22,10,'#f2b8ff');
-    c.fillStyle='#ff4fd8';c.beginPath();c.moveTo(o.x+14,o.y+10);c.lineTo(o.x+26,o.y+10);c.lineTo(o.x+20,o.y-8+f);c.fill();
-    el(o.x+38,o.y+11,3,3,'#0b0314');return;
+    const flap=Math.floor(t/5)%2;px(o.x+8,o.y+8,32,16,'#ffd166');px(o.x+32,o.y+12,12,8,'#ffd166');px(o.x+40,o.y+14,8,4,'#ff8a3d');px(o.x+34,o.y+8,4,4,'#20122d');
+    px(o.x+12,o.y+(flap?0:20),20,8,'#fff0a6');px(o.x+8,o.y+24,8,4,'#ffb84d');return;
   }
-  const lab=phase===5?'DOM':PH[phase][0].slice(0,3).toUpperCase();
-  for(let i=0;i<o.n;i++){
-    const x=o.x+i*34;rr(x,o.y,32,44,5,'#ff4fd8');c.fillStyle='#fff';c.fillRect(x+3,o.y+12,26,29);
-    c.fillStyle='#7b2cbf';c.font='800 10px Nunito,sans-serif';c.textAlign='center';c.fillText(lab,x+16,o.y+30);
-  }
+  // Cactos substituem os blocos genéricos, como nos obstáculos do Dino.
+  for(let i=0;i<o.n;i++){const x=o.x+i*34,y=o.y;px(x+12,y,12,44,'#54d66b');px(x+4,y+14,12,8,'#54d66b');px(x+4,y+14,8,18,'#54d66b');px(x+20,y+24,12,8,'#54d66b');px(x+24,y+24,8,16,'#54d66b');px(x+16,y+4,4,28,'#a5ff91')}
 }
 function txt(s,x,y,font,a=1){c.globalAlpha=a;c.fillStyle='#fff';c.font=font;c.textAlign='center';c.fillText(s,x,y);c.globalAlpha=1}
 function draw(){
