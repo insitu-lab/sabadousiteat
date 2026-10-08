@@ -184,6 +184,18 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 }
 @media (max-width:700px) and (orientation:portrait){.mobhint{display:block}}
 </style>
+<style>
+.fa{margin:0;background:var(--card);border:2px solid var(--line);border-radius:22px;overflow:hidden}.fa img{width:100%;aspect-ratio:1;object-fit:cover;display:block}
+.fa figcaption{display:flex;justify-content:space-between;align-items:center;padding:.6rem .9rem;font-weight:800;gap:.5rem;flex-wrap:wrap}
+.fg{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:1rem;margin:1rem 0 2.2rem}
+.lk,.mini{font:inherit;font-weight:800;background:transparent;color:var(--ink);border:2px solid var(--pur);border-radius:99px;padding:.25rem .8rem;cursor:pointer}
+.mini.ok{background:var(--lil);color:#2a0f3d}.mini.no{border-color:var(--hot)}
+.win{border-color:var(--hot);box-shadow:0 0 40px var(--hot)}
+.shop{margin-top:2.5rem}.si{display:flex;justify-content:space-between;align-items:center;gap:1rem;background:var(--card);border:2px solid var(--line);border-radius:20px;padding:.8rem 1.1rem;margin:.6rem 0}
+.si button{font:inherit;font-weight:800;border-radius:99px;border:2px solid var(--pur);background:var(--lil);color:#2a0f3d;padding:.4rem 1rem;cursor:pointer}.si button:disabled{opacity:.4;cursor:not-allowed}
+.sbd{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:1rem}.sbd span{border:2px solid var(--line);border-radius:99px;padding:.2rem .7rem;font-weight:700;font-size:.9rem}.sbd .now{background:var(--hot);color:#fff;border-color:var(--hot)}
+#ph{font-weight:800;margin-top:.6rem}
+</style>
 </head>
 <body>
 <div class="bar" id="bar"></div>
@@ -275,6 +287,7 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   <div class="gbar"><button class="cta" id="gj" type="button">pular ↑</button><button class="cta ghost" id="gd" type="button">agachar ↓</button></div>
   <p class="hint mobhint">Dica: gire o celular na horizontal pra jogar em tela maior.</p>
   <p class="hint">Espaço ou ↑ pula, ↓ agacha. No celular, use os botões. Cada fase é um dia da semana e a última é o sábado.</p>
+  <div class="shop"><h2>lojinha do sapo</h2><p class="lead">Cada clique no sabadômetro rende moedas. Gaste aqui pra clicar mais.</p><div id="coin" style="font-size:2rem;font-weight:800"></div><div id="shl"></div></div>
 </div></div></section>
 
 <section class="panel" id="fanarts"><div class="sec"><div class="wrap">
@@ -284,7 +297,10 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
     <div class="pn"><b>2</b><h3>revisão</h3><p>O Sabadou vê tudo antes de publicar. Você recebe o aviso de que sua arte está em revisão.</p></div>
     <div class="pn"><b>3</b><h3>mural</h3><p>Se for aprovada, entra no mural e disputa o ranking.</p></div>
   </div>
-  <div class="soon rv"><h3>em breve</h3><p>O envio direto pelo site está sendo preparado. Enquanto isso, mostre sua arte no Instagram e marque o perfil.</p><a class="cta" href="https://www.instagram.com/sabadouofficiall/" target="_blank" rel="noopener">Ir pro Instagram</a></div>
+  <p><button class="cta sm" id="fu" type="button">entrar com @</button></p>
+  <form id="ff" class="rv" hidden><input class="fld" type="file" id="fi" accept="image/*" required><button class="cta" type="submit">enviar fanart</button><p class="hint" id="fm"></p></form>
+  <div id="fw"></div><h3>ranking da semana</h3><div class="fg" id="frk"></div><h3>mural</h3><div class="fg" id="fmu"></div><div id="fq"></div>
+<dialog id="ul" style="padding:1.5rem;border-radius:24px;background:var(--bg);color:var(--ink);border:2px solid var(--pur)"><form id="ulf"><h3>entrar</h3><input class="fld" id="uh" placeholder="seu @ do Instagram" required maxlength="30"><input class="fld" id="ue" type="email" placeholder="seu e-mail" required><p class="hint" id="um">Mandamos um link mágico pro seu e-mail. Sem senha.</p><button class="cta sm" type="submit">enviar link</button> <button class="cta ghost sm" type="button" onclick="ul.close()">fechar</button></form></dialog>
 </div></div></section>
 
 <section class="panel" id="calabresos">
@@ -301,9 +317,10 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
     <input id="mw" maxlength="18" value="sábado" aria-label="Palavra"><p style="margin-top:1.2rem;font-size:1rem;opacity:.7">No celular, segure a imagem para salvar. No computador, botão direito.</p></div>
   <div class="rv"><img id="mo" alt="Sua frase no estilo do Sabadou"></div>
 </div></section>
+<section class="sec"><div class="wrap"><div class="sh rv"><h2>sábados do ano</h2><p id="sbn"></p></div><div class="sbd" id="sbd"></div></div></section>
 <section class="sec band ckb"><div class="wrap split">
   <div class="rv"><button id="btn" aria-label="Sabadar"><img src="img/sabadou-classico.jpg" alt=""></button></div>
-  <div class="rv"><h2 class="big">sabadômetro</h2><p class="lead">Toque no sapo. Sem motivo. Só toca.</p><div id="cnt">0</div><div id="msg"></div></div>
+  <div class="rv"><h2 class="big">sabadômetro</h2><p class="lead">Toque no sapo. Sem motivo. Só toca.</p><div id="cnt">0</div><div id="msg"></div><div id="ph"></div></div>
 </div></section>
 </section>
 </main>
@@ -485,7 +502,7 @@ async function checkAdmin(){
   if(!sb)return;isAdmin=false;
   const s=await sb.auth.getSession();
   if(s.data.session){const r=await sb.from('admins').select('user_id').maybeSingle();isAdmin=!!(r.data)}
-  renderAdm();renderAv();
+  renderAdm();renderAv();if(typeof loadFa==='function'&&sb)loadFa();
 }
 const lg=$('#lg');
 $('#adm').onclick=()=>{$('#lm').textContent='';lg.showModal();$('#le').focus()};
@@ -504,6 +521,64 @@ $('#lgf').onsubmit=async ev=>{ev.preventDefault();const m=$('#lm');m.textContent
   await loadAv();await checkAdmin();
   setInterval(()=>{if(!document.hidden&&editId===null)loadAv()},60000); // atualiza sozinho a cada 1 min
 })();
+
+// ===== sábados dos últimos 12 meses =====
+(function(){const f=n=>String(n).padStart(2,'0'),t=new Date();t.setHours(12,0,0,0);
+  const d=new Date(t);d.setDate(d.getDate()-((d.getDay()+1)%7));const lim=new Date(t);lim.setFullYear(lim.getFullYear()-1);
+  const L=[];while(d>lim){L.unshift(new Date(d));d.setDate(d.getDate()-7)}
+  $('#sbd').innerHTML=L.map((x,i)=>`<span class="${i==L.length-1?'now':''}">#${i+1} · ${f(x.getDate())}/${f(x.getMonth()+1)}</span>`).join('');
+  const nx=new Date(L[L.length-1]);nx.setDate(nx.getDate()+7);if(nx<=t)nx.setDate(nx.getDate()+7);
+  $('#sbn').textContent=`${L.length} sábados no último ano. Próximo: ${f(nx.getDate())}/${f(nx.getMonth()+1)}. Quando ele passar, entra como #${L.length} e o mais antigo sai.`})();
+
+// ===== lojinha + fases do sabadômetro (progresso salvo no aparelho e, logado, no servidor) =====
+const SH=[['🖱️ mouse melhor','+1 clique por toque','p',1,15],['🐸 sapo ajudante','+1 clique/s','c',1,60],['🏡 fazendinha','+8 cliques/s','c',8,500],['🏭 fábrica de sábado','+60 cliques/s','c',60,4000]];
+const PH=[[0,'girino'],[100,'sapinho'],[1e3,'sapo de respeito'],[1e4,'calabreso'],[1e5,'mestre do sábado'],[1e6,'lenda do sábado 🏆']];
+let G=store.get('sab_g',{coin:0,lv:[0,0,0,0]});
+const cost=i=>Math.ceil(SH[i][4]*Math.pow(1.15,G.lv[i])),pw=()=>1+G.lv[0],cps=()=>G.lv.reduce((a,l,i)=>a+(SH[i][2]=='c'?l*SH[i][3]:0),0);
+function rendG(){$('#cnt').textContent=N;const p=PH.filter(x=>N>=x[0]).pop(),n=PH[PH.indexOf(p)+1];
+  $('#ph').textContent=`fase: ${p[1]}`+(n?` · próxima com ${n[0].toLocaleString('pt-BR')} cliques`:' · os 10 primeiros a chegar aqui ganham follow!');
+  $('#coin').textContent=`🪙 ${Math.floor(G.coin)} · ${pw()}/clique · ${cps()}/s`;
+  $('#shl').innerHTML=SH.map((x,i)=>`<div class="si"><span><b>${x[0]}</b> nv ${G.lv[i]}<br><small>${x[1]}</small></span><button data-i="${i}" ${G.coin<cost(i)?'disabled':''}>🪙 ${cost(i)}</button></div>`).join('')}
+function saveG(){store.set('sab_n',N);store.set('sab_g',G)}
+$('#btn').addEventListener('click',()=>{const p=pw();N+=p-1;G.coin+=p;rendG()});
+$('#shl').onclick=e=>{const b=e.target.closest('button');if(!b)return;const i=+b.dataset.i;if(G.coin>=cost(i)){G.coin-=cost(i);G.lv[i]++;saveG();rendG()}};
+setInterval(()=>{const c=cps();if(c){N+=c;G.coin+=c}saveG();rendG()},1000);addEventListener('pagehide',saveG);rendG();
+setInterval(async()=>{if(sb&&me)await sb.from('placar').upsert({user_id:me.id,handle:me.user_metadata?.handle,clicks:N})},30000);
+
+// ===== login de fã + fanarts =====
+let me=null,FA=[],mv={};const ul=$('#ul'),pub=p=>sb.storage.from('fanarts').getPublicUrl(p).data.publicUrl;
+async function who(){if(!sb)return;me=(await sb.auth.getSession()).data.session?.user||null;
+  $('#fu').textContent=me?'@'+(me.user_metadata?.handle||'fã')+' (sair)':'entrar com @';$('#ff').hidden=!me}
+$('#fu').onclick=async()=>{if(!sb)return alert('Fanarts ainda não disponíveis.');if(me){await sb.auth.signOut();await who();loadFa()}else ul.showModal()};
+$('#ulf').onsubmit=async ev=>{ev.preventDefault();const r=await sb.auth.signInWithOtp({email:$('#ue').value.trim(),options:{data:{handle:$('#uh').value.replace('@','').trim()},emailRedirectTo:location.origin+location.pathname+'#fanarts'}});
+  $('#um').textContent=r.error?'Erro: '+r.error.message:'Link enviado! Abra o e-mail neste aparelho.'};
+const shrink=f=>new Promise(ok=>{const i=new Image();i.onload=()=>{const k=Math.min(1,1400/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=i.width*k;c.height=i.height*k;c.getContext('2d').drawImage(i,0,0,c.width,c.height);c.toBlob(ok,'image/jpeg',.85)};i.src=URL.createObjectURL(f)});
+$('#ff').onsubmit=async ev=>{ev.preventDefault();const m=$('#fm');m.textContent='Enviando...';const b=await shrink($('#fi').files[0]),path=me.id+'/'+Date.now()+'.jpg';
+  const u=await sb.storage.from('fanarts').upload(path,b,{contentType:'image/jpeg'});if(u.error){m.textContent='Erro: '+u.error.message;return}
+  const r=await sb.from('fanarts').insert({handle:me.user_metadata?.handle||'?',path});m.textContent=r.error?'Erro: '+r.error.message:'Enviada! Ela está em revisão. 💜';$('#ff').reset()};
+const card=(a,adm)=>`<figure class="fa${a.vencedora?' win':''}"><img loading="lazy" src="${pub(a.path)}" alt="Fanart de @${esc(a.handle)}"><figcaption><span>@${esc(a.handle)}</span>${adm?`<span><button class="mini ok" data-a="ok" data-id="${a.id}">aprovar</button> <button class="mini no" data-a="no" data-id="${a.id}">descartar</button></span>`:`<button class="lk" data-v="${a.id}">${mv[a.id]?'💜':'🤍'} ${a.votos}</button>`}</figcaption></figure>`;
+async function loadFa(){if(!sb)return;await who();mv={};
+  FA=(await sb.from('fanarts').select('*').eq('status','aprovada').order('criado_em',{ascending:false})).data||[];
+  if(me)((await sb.from('votos').select('fanart_id')).data||[]).forEach(x=>mv[x.fanart_id]=1);
+  const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-d.getDay());const sem=FA.filter(a=>new Date(a.criado_em)>=d).sort((a,b)=>b.votos-a.votos).slice(0,3);
+  const w=FA.find(a=>a.vencedora);$('#fw').innerHTML=w?`<h3>🏆 vencedora da semana</h3><div class="fg">${card(w)}</div>`:'';
+  $('#frk').innerHTML=sem.length?sem.map(a=>card(a)).join(''):'<p class="mut">Nenhuma arte votada nesta semana ainda.</p>';
+  $('#fmu').innerHTML=FA.length?FA.map(a=>card(a)).join(''):'<p class="mut">O mural está vazio. Seja o primeiro!</p>';
+  const q=$('#fq');if(!isAdmin){q.innerHTML='';return}
+  const P=(await sb.from('fanarts').select('*').eq('status','pendente').order('criado_em')).data||[];
+  const T=(await sb.from('placar').select('handle,clicks,milhao_em').not('milhao_em','is',null).order('milhao_em').limit(10)).data||[];
+  q.innerHTML=`<h3>fila de aprovação (${P.length})</h3><div class="fg">${P.map(a=>card(a,1)).join('')||'<p class="mut">Fila vazia.</p>'}</div><h3>vencedora: escolha</h3><p class="hint">Clique no 🏆 de uma arte do mural para marcá-la.</p><h3>🥇 primeiros ao 1 milhão (follow)</h3><ol>${T.map(t=>`<li>@${esc(t.handle||'?')} · ${new Date(t.milhao_em).toLocaleString('pt-BR')}</li>`).join('')||'<li>Ninguém ainda.</li>'}</ol>`}
+document.addEventListener('click',async e=>{
+  const v=e.target.closest('[data-v]');if(v){if(!me)return ul.showModal();await sb.from('votos').insert({fanart_id:v.dataset.v});return loadFa()}
+  const b=e.target.closest('[data-a][data-id]');if(!b||!b.classList.contains('mini')||!isAdmin)return;const id=b.dataset.id;
+  if(b.dataset.a=='ok'){await sb.from('fanarts').update({status:'aprovada'}).eq('id',id)}
+  else if(b.dataset.a=='no'){if(!confirm('Tem certeza? A fanart será APAGADA DO SERVIDOR PARA SEMPRE.'))return;
+    const a=(await sb.from('fanarts').select('path').eq('id',id).single()).data;if(a)await sb.storage.from('fanarts').remove([a.path]);await sb.from('fanarts').delete().eq('id',id)}
+  loadFa()});
+(async()=>{while(typeof sb==='undefined'||!sb){await new Promise(r=>setTimeout(r,400));if(!CFG.supabaseUrl)return}await loadFa()})();
+
+document.addEventListener('click',async e=>{const c=e.target.closest('#fmu .fa');if(!isAdmin||!c||e.target.closest('button'))return;
+  const a=FA.find(x=>c.querySelector('img').src.endsWith(x.path));if(a&&confirm('Marcar @'+a.handle+' como vencedora da semana?')){await sb.from('fanarts').update({vencedora:false}).eq('vencedora',true);await sb.from('fanarts').update({vencedora:true}).eq('id',a.id);loadFa()}});
 </script>
 </body>
 </html>
