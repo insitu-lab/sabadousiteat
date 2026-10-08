@@ -195,13 +195,14 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .si button{font:inherit;font-weight:800;border-radius:99px;border:2px solid var(--pur);background:var(--lil);color:#2a0f3d;padding:.4rem 1rem;cursor:pointer}.si button:disabled{opacity:.4;cursor:not-allowed}
 .sbd{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:1rem}.sbd span{border:2px solid var(--line);border-radius:99px;padding:.2rem .7rem;font-weight:700;font-size:.9rem}.sbd .now{background:var(--hot);color:#fff;border-color:var(--hot)}
 #ph{font-weight:800;margin-top:.6rem}
+.tabs a[hidden]{display:none}
 </style>
 </head>
 <body>
 <div class="bar" id="bar"></div>
 <header class="nav"><div class="wrap nv">
   <a class="logo" href="#inicio">sabadou</a>
-  <nav class="tabs" role="tablist" aria-label="Seções do site"><a role="tab" href="#inicio">início</a><a role="tab" href="#avisos">avisos<i class="dot" hidden></i></a><a role="tab" href="#musica">música</a><a role="tab" href="#galeria">galeria</a><a role="tab" href="#jogos">jogos</a><a role="tab" href="#fanarts">fanarts</a><a role="tab" href="#calabresos">calabresos</a><i class="ind"></i></nav>
+  <nav class="tabs" role="tablist" aria-label="Seções do site"><a role="tab" href="#inicio">início</a><a role="tab" href="#avisos">avisos<i class="dot" hidden></i></a><a role="tab" href="#musica">música</a><a role="tab" href="#galeria">galeria</a><a role="tab" href="#jogos">jogos</a><a role="tab" href="#fanarts">fanarts</a><a role="tab" href="#calabresos">calabresos</a><a role="tab" href="#admin" id="tadm" hidden>admin</a><i class="ind"></i></nav>
   <a class="cta sm" href="https://www.instagram.com/sabadouofficiall/" target="_blank" rel="noopener">Instagram</a>
 </div></header>
 <div class="nb" id="nb" hidden><span id="nbt"></span><a href="#avisos">ver aviso</a><button id="nbx" type="button" aria-label="Fechar aviso">×</button></div>
@@ -253,7 +254,6 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 
 <section class="panel" id="avisos"><div class="sec"><div class="wrap">
   <div class="sh rv"><h2>avisos</h2><p>Recados do Sabadou para os calabresos.</p></div>
-  <div id="adm-box"></div>
   <div class="avl" id="avl"><p class="mut">Carregando avisos...</p></div>
 </div></div></section>
 
@@ -287,7 +287,7 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   <div class="gbar"><button class="cta" id="gj" type="button">pular ↑</button><button class="cta ghost" id="gd" type="button">agachar ↓</button></div>
   <p class="hint mobhint">Dica: gire o celular na horizontal pra jogar em tela maior.</p>
   <p class="hint">Espaço ou ↑ pula, ↓ agacha. No celular, use os botões. Cada fase é um dia da semana e a última é o sábado.</p>
-  <div class="shop"><h2>lojinha do sapo</h2><p class="lead">Cada clique no sabadômetro rende moedas. Gaste aqui pra clicar mais.</p><div id="coin" style="font-size:2rem;font-weight:800"></div><div id="shl"></div><div id="sa"></div></div>
+  <div class="shop"><h2>lojinha do sapo</h2><p class="lead">Cada clique no sabadômetro rende moedas. Gaste aqui pra clicar mais.</p><div id="coin" style="font-size:2rem;font-weight:800"></div><div id="shl"></div></div>
 </div></div></section>
 
 <section class="panel" id="fanarts"><div class="sec"><div class="wrap">
@@ -299,9 +299,11 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   </div>
   <p><button class="cta sm" id="fu" type="button">entrar com @</button></p>
   <form id="ff" class="rv" hidden><input class="fld" type="file" id="fi" accept="image/*" required><button class="cta" type="submit">enviar fanart</button><p class="hint" id="fm"></p></form>
-  <div id="fw"></div><h3>ranking da semana</h3><div class="fg" id="frk"></div><h3>mural</h3><div class="fg" id="fmu"></div><div id="fq"></div>
+  <div id="fw"></div><h3>ranking da semana</h3><div class="fg" id="frk"></div><h3>mural</h3><div class="fg" id="fmu"></div>
 <dialog id="ul" style="padding:1.5rem;border-radius:24px;background:var(--bg);color:var(--ink);border:2px solid var(--pur)"><form id="ulf"><h3>entrar</h3><input class="fld" id="uh" placeholder="seu @ do Instagram" required maxlength="30"><input class="fld" id="ue" type="email" placeholder="seu e-mail" required><p class="hint" id="um">Mandamos um link mágico pro seu e-mail. Sem senha.</p><button class="cta sm" type="submit">enviar link</button> <button class="cta ghost sm" type="button" onclick="ul.close()">fechar</button></form></dialog>
 </div></div></section>
+
+<section class="panel" id="admin"><div class="sec"><div class="wrap"><div class="sh"><h2>painel admin</h2><p>Tudo de administrador num lugar só: avisos, fanarts, vencedora, cliques e os 10 do 1 milhão.</p></div><div id="adm-box"></div><div id="sa"></div><div id="fq"></div></div></div></section>
 
 <section class="panel" id="calabresos">
 <section class="sec" style="padding-bottom:0"><div class="wrap"><div class="sh rv" style="margin:0"><h2>área dos calabresos</h2><p>Coisas pra mexer enquanto o sábado não chega.</p></div></div></section>
@@ -389,7 +391,7 @@ addEventListener('scroll',()=>{$('#bar').style.width=scrollY/Math.max(1,document
 // sabadômetro
 let N=store.get('sab_n',0);const M={10:'tá esquentando…',30:'já é quase sábado',67:'67!!! 💜💜💜',100:'cem sabadadas. respeito.',200:'você é um calabreso de verdade'};
 $('#cnt').textContent=N;
-$('#btn').onclick=e=>{N++;store.set('sab_n',N);$('#cnt').textContent=N;if(M[N])$('#msg').textContent=M[N];
+$('#btn').onclick=e=>{if(!me){$('#um').textContent='Entre com seu @ pra jogar e disputar o 1 milhão.';ul.showModal();return}N++;store.set('sab_n',N);$('#cnt').textContent=N;if(M[N])$('#msg').textContent=M[N];
   const r=e.clientX?[e.clientX,e.clientY]:[$('#btn').getBoundingClientRect().left+100,$('#btn').getBoundingClientRect().top+60];
   spawn(r[0],r[1],N===67?30:3)};
 $('#up').onclick=()=>scrollTo({top:0,behavior:still?'auto':'smooth'});
@@ -437,7 +439,7 @@ if(!still)document.querySelectorAll('[data-n]').forEach(e=>cio.observe(e));
 
 
 // ===== abas (rotas por #hash) =====
-const TABS=['inicio','avisos','musica','galeria','jogos','fanarts','calabresos'],tabLinks=document.querySelectorAll('.tabs a'),ind=$('.ind'),mini=$('#mini');let cur=-1;
+const TABS=['inicio','avisos','musica','galeria','jogos','fanarts','calabresos','admin'],tabLinks=document.querySelectorAll('.tabs a'),ind=$('.ind'),mini=$('#mini');let cur=-1;
 function moveInd(){const a=document.querySelector('.tabs a.on');if(a){ind.style.width=a.offsetWidth+'px';ind.style.transform='translateX('+a.offsetLeft+'px)'}}
 function go(id,anchor){const i=TABS.indexOf(id);if(i<0)return;const left=i<cur;
   document.querySelectorAll('.panel').forEach(p=>{p.classList.remove('on','l');if(p.id===id){p.classList.add('on');if(left)p.classList.add('l')}});
@@ -485,9 +487,10 @@ $('#avl').addEventListener('click',async e=>{
   const b=e.target.closest('button[data-a]');if(!b||!isAdmin||!sb)return;const a=AV.find(x=>String(x.id)===b.dataset.id);if(!a)return;
   if(b.dataset.a==='del'&&confirm('Apagar este aviso?')){await sb.from('avisos').delete().eq('id',a.id);loadAv()}
   if(b.dataset.a==='fix'){await sb.from('avisos').update({fixado:!a.fixado}).eq('id',a.id);loadAv()}
-  if(b.dataset.a==='ed'){editId=a.id;$('#at').value=a.titulo;$('#ax').value=a.texto;$('#af').checked=a.fixado;$('#apub').textContent='salvar';scrollTo({top:$('#adm-box').offsetTop-90,behavior:'smooth'})}
+  if(b.dataset.a==='ed'){editId=a.id;$('#at').value=a.titulo;$('#ax').value=a.texto;$('#af').checked=a.fixado;$('#apub').textContent='salvar';location.hash='admin'}
 });
 function renderAdm(){
+  $('#tadm').hidden=!isAdmin;if(!isAdmin&&location.hash==='#admin')location.hash='inicio';
   const b=$('#adm-box');if(!isAdmin){b.innerHTML='';return}
   b.innerHTML=`<form class="ed" id="edf"><h3>${editId?'editar aviso':'novo aviso'}<button type="button" id="aout" class="lnk">sair</button></h3><input class="fld" id="at" placeholder="Título" maxlength="120" required><textarea class="fld" id="ax" placeholder="Texto do aviso" maxlength="2000" required></textarea><label class="chk"><input type="checkbox" id="af"> fixar (vira faixa no site todo)</label><div class="edb"><button class="cta" id="apub" type="submit">publicar</button><button class="cta ghost" type="button" id="acl">limpar</button></div><p class="mut" id="am"></p></form>`;
   $('#edf').onsubmit=async ev=>{ev.preventDefault();
@@ -512,7 +515,7 @@ $('#lgf').onsubmit=async ev=>{ev.preventDefault();const m=$('#lm');m.textContent
   if(r.error){m.textContent='E-mail ou senha incorretos.';return}
   await checkAdmin();
   if(!isAdmin){await sb.auth.signOut();m.textContent='Essa conta não tem permissão de administrador.';return}
-  lg.close();$('#lp').value='';location.hash='avisos'};
+  lg.close();$('#lp').value='';location.hash='admin'};
 (async()=>{
   if(CFG.supabaseUrl&&CFG.supabaseKey){
     try{await new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';s.onload=ok;s.onerror=no;document.head.appendChild(s)});
@@ -540,9 +543,9 @@ function rendG(){$('#cnt').textContent=N;const p=PH.filter(x=>N>=x[0]).pop(),n=P
   $('#coin').textContent=`🪙 ${Math.floor(G.coin)} · ${pw()}/clique · ${cps()}/s`;
   $('#shl').innerHTML=SH.map((x,i)=>`<div class="si"><span><b>${x[0]}</b> nv ${G.lv[i]}<br><small>${x[1]}</small></span><button data-i="${i}" ${G.coin<cost(i)?'disabled':''}>🪙 ${cost(i)}</button></div>`).join('')}
 function saveG(){store.set('sab_n',N);store.set('sab_g',G)}
-$('#btn').addEventListener('click',()=>{const p=pw();N+=p-1;G.coin+=p;rendG()});
+$('#btn').addEventListener('click',()=>{if(!me)return;const p=pw();N+=p-1;G.coin+=p;rendG()});
 $('#shl').onclick=e=>{const b=e.target.closest('button');if(!b)return;const i=+b.dataset.i;if(G.coin>=cost(i)){G.coin-=cost(i);G.lv[i]++;saveG();rendG()}};
-setInterval(()=>{const c=cps();if(c){N+=c;G.coin+=c}saveG();rendG()},1000);addEventListener('pagehide',saveG);rendG();
+setInterval(()=>{const c=me?cps():0;if(c){N+=c;G.coin+=c}saveG();rendG()},1000);addEventListener('pagehide',saveG);rendG();
 setInterval(async()=>{if(!sb||!me)return;
   const b=(await sb.from('placar').select('bonus').eq('user_id',me.id).maybeSingle()).data?.bonus||0;
   if(b>0){N+=+b;G.coin+=+b;saveG();rendG()}
@@ -579,11 +582,12 @@ async function loadFa(){if(!sb)return;await who();rendSA();mv={};
   const q=$('#fq');if(!isAdmin){q.innerHTML='';return}
   const P=(await sb.from('fanarts').select('*').eq('status','pendente').order('criado_em')).data||[];
   const T=(await sb.from('placar').select('handle,clicks,milhao_em').not('milhao_em','is',null).order('milhao_em').limit(10)).data||[];
-  q.innerHTML=`<h3>fila de aprovação (${P.length})</h3><div class="fg">${P.map(a=>card(a,1)).join('')||'<p class="mut">Fila vazia.</p>'}</div><h3>vencedora: escolha</h3><p class="hint">Clique no 🏆 de uma arte do mural para marcá-la.</p><h3>🥇 primeiros ao 1 milhão (follow)</h3><ol>${T.map(t=>`<li>@${esc(t.handle||'?')} · ${new Date(t.milhao_em).toLocaleString('pt-BR')}</li>`).join('')||'<li>Ninguém ainda.</li>'}</ol>`}
+  q.innerHTML=`<h3>fila de aprovação (${P.length})</h3><div class="fg">${P.map(a=>card(a,1)).join('')||'<p class="mut">Fila vazia.</p>'}</div><h3>🏆 vencedora da semana</h3><div class="fg">${FA.filter(a=>new Date(a.criado_em)>=d).sort((a,b)=>b.votos-a.votos).map(a=>`<figure class="fa${a.vencedora?' win':''}"><img src="${pub(a.path)}" alt=""><figcaption><span>@${esc(a.handle)} · ${a.votos}💜</span><button class="mini ok" data-a="win" data-id="${a.id}">🏆 escolher</button></figcaption></figure>`).join('')||'<p class="mut">Nenhuma aprovada nesta semana.</p>'}</div><h3>🥇 primeiros ao 1 milhão (follow)</h3><ol>${T.map(t=>`<li>@${esc(t.handle||'?')} · ${new Date(t.milhao_em).toLocaleString('pt-BR')}</li>`).join('')||'<li>Ninguém ainda.</li>'}</ol>`}
 document.addEventListener('click',async e=>{
   const v=e.target.closest('[data-v]');if(v){if(!me)return ul.showModal();await sb.from('votos').insert({fanart_id:v.dataset.v});return loadFa()}
   const b=e.target.closest('[data-a][data-id]');if(!b||!b.classList.contains('mini')||!isAdmin)return;const id=b.dataset.id;
   if(b.dataset.a=='ok'){await sb.from('fanarts').update({status:'aprovada'}).eq('id',id)}
+  else if(b.dataset.a=='win'){if(!confirm('Marcar como vencedora da semana?'))return;await sb.from('fanarts').update({vencedora:false}).eq('vencedora',true);await sb.from('fanarts').update({vencedora:true}).eq('id',id)}
   else if(b.dataset.a=='no'){if(!confirm('Tem certeza? A fanart será APAGADA DO SERVIDOR PARA SEMPRE.'))return;
     const a=(await sb.from('fanarts').select('path').eq('id',id).single()).data;if(a)await sb.storage.from('fanarts').remove([a.path]);await sb.from('fanarts').delete().eq('id',id)}
   loadFa()});
