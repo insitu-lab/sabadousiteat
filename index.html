@@ -196,6 +196,9 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .sbd{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:1rem}.sbd span{border:2px solid var(--line);border-radius:99px;padding:.2rem .7rem;font-weight:700;font-size:.9rem}.sbd .now{background:var(--hot);color:#fff;border-color:var(--hot)}
 #ph{font-weight:800;margin-top:.6rem}
 .tabs a[hidden]{display:none}
+.hl{flex:0 0 auto;white-space:nowrap;background:var(--lil);color:#2a0f3d;border-color:var(--lil);max-width:9.5rem;overflow:hidden;text-overflow:ellipsis}
+#ul{width:min(92vw,420px);padding:1.5rem;border-radius:24px;background:var(--bg);color:var(--ink);border:2px solid var(--pur)}#ul .fld{width:100%;font-size:16px;margin:.4rem 0}#ul::backdrop{background:rgba(0,0,0,.6)}
+@media (max-width:860px){.hl{padding:.4rem .85rem;font-size:.9rem}.nv{gap:.5rem}.si{flex-direction:column;align-items:stretch}.si button{width:100%;padding:.7rem}.fg{grid-template-columns:1fr 1fr;gap:.6rem}#btn{touch-action:manipulation}}
 </style>
 </head>
 <body>
@@ -204,6 +207,7 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   <a class="logo" href="#inicio">sabadou</a>
   <nav class="tabs" role="tablist" aria-label="Seções do site"><a role="tab" href="#inicio">início</a><a role="tab" href="#avisos">avisos<i class="dot" hidden></i></a><a role="tab" href="#musica">música</a><a role="tab" href="#galeria">galeria</a><a role="tab" href="#jogos">jogos</a><a role="tab" href="#fanarts">fanarts</a><a role="tab" href="#calabresos">calabresos</a><a role="tab" href="#admin" id="tadm" hidden>admin</a><i class="ind"></i></nav>
   <a class="cta sm" href="https://www.instagram.com/sabadouofficiall/" target="_blank" rel="noopener">Instagram</a>
+  <button class="lk hl" id="hl" type="button">entrar</button>
 </div></header>
 <div class="nb" id="nb" hidden><span id="nbt"></span><a href="#avisos">ver aviso</a><button id="nbx" type="button" aria-label="Fechar aviso">×</button></div>
 
@@ -300,7 +304,6 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   <p><button class="cta sm" id="fu" type="button">entrar com @</button></p>
   <form id="ff" class="rv" hidden><input class="fld" type="file" id="fi" accept="image/*" required><button class="cta" type="submit">enviar fanart</button><p class="hint" id="fm"></p></form>
   <div id="fw"></div><h3>ranking da semana</h3><div class="fg" id="frk"></div><h3>mural</h3><div class="fg" id="fmu"></div>
-<dialog id="ul" style="padding:1.5rem;border-radius:24px;background:var(--bg);color:var(--ink);border:2px solid var(--pur)"><form id="ulf"><h3>entrar</h3><input class="fld" id="uh" placeholder="seu @ do Instagram" required maxlength="30"><input class="fld" id="ue" type="email" placeholder="seu e-mail" required><p class="hint" id="um">Mandamos um link mágico pro seu e-mail. Sem senha.</p><button class="cta sm" type="submit">enviar link</button> <button class="cta ghost sm" type="button" onclick="ul.close()">fechar</button></form></dialog>
 </div></div></section>
 
 <section class="panel" id="admin"><div class="sec"><div class="wrap"><div class="sh"><h2>painel admin</h2><p>Tudo de administrador num lugar só: avisos, fanarts, vencedora, cliques e os 10 do 1 milhão.</p></div><div id="adm-box"></div><div id="sa"></div><div id="fq"></div></div></div></section>
@@ -341,6 +344,7 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 
 <div id="lb"><img id="lbi" alt=""></div>
 
+<dialog id="ul" style="padding:1.5rem;border-radius:24px;background:var(--bg);color:var(--ink);border:2px solid var(--pur)"><form id="ulf"><h3>entrar</h3><input class="fld" id="uh" placeholder="seu @ do Instagram" required maxlength="30"><input class="fld" id="ue" type="email" placeholder="seu e-mail" required><p class="hint" id="um">Mandamos um link mágico pro seu e-mail. Sem senha.</p><button class="cta sm" type="submit">enviar link</button> <button class="cta ghost sm" type="button" onclick="ul.close()">fechar</button></form></dialog>
 <dialog id="lg"><form id="lgf"><h3 style="font:400 1.8rem var(--disp);margin:0">entrar (admin)</h3>
   <input class="fld" id="le" type="email" placeholder="E-mail" autocomplete="username" required>
   <input class="fld" id="lp" type="password" placeholder="Senha" autocomplete="current-password" required>
@@ -519,7 +523,8 @@ $('#lgf').onsubmit=async ev=>{ev.preventDefault();const m=$('#lm');m.textContent
 (async()=>{
   if(CFG.supabaseUrl&&CFG.supabaseKey){
     try{await new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';s.onload=ok;s.onerror=no;document.head.appendChild(s)});
-      sb=supabase.createClient(CFG.supabaseUrl,CFG.supabaseKey);$('#adm').hidden=false}catch(e){sb=null}
+      const came=/access_token|[?&]code=/.test(location.href);sb=supabase.createClient(CFG.supabaseUrl,CFG.supabaseKey);
+      sb.auth.onAuthStateChange((ev)=>setTimeout(async()=>{if(typeof loadFa==='function')await loadFa();if(came&&ev==='SIGNED_IN'&&me){const t=store.get('sab_after','calabresos');location.hash=TABS.includes(t)?t:'calabresos';ul.close()}},0));$('#adm').hidden=false}catch(e){sb=null}
   }
   await loadAv();await checkAdmin();
   setInterval(()=>{if(!document.hidden&&editId===null)loadAv()},60000); // atualiza sozinho a cada 1 min
@@ -563,9 +568,9 @@ function rendSA(){const b=$('#sa');if(!isAdmin){b.innerHTML='';return}
 // ===== login de fã + fanarts =====
 let me=null,FA=[],mv={};const ul=$('#ul'),pub=p=>sb.storage.from('fanarts').getPublicUrl(p).data.publicUrl;
 async function who(){if(!sb)return;me=(await sb.auth.getSession()).data.session?.user||null;
-  $('#fu').textContent=me?'@'+(me.user_metadata?.handle||'fã')+' (sair)':'entrar com @';$('#ff').hidden=!me}
-$('#fu').onclick=async()=>{if(!sb)return alert('Fanarts ainda não disponíveis.');if(me){await sb.auth.signOut();await who();loadFa()}else ul.showModal()};
-$('#ulf').onsubmit=async ev=>{ev.preventDefault();const r=await sb.auth.signInWithOtp({email:$('#ue').value.trim(),options:{data:{handle:$('#uh').value.replace('@','').trim()},emailRedirectTo:location.origin+location.pathname+'#fanarts'}});
+  const hn=me?'@'+(me.user_metadata?.handle||'fã'):'entrar';$('#fu').textContent=me?hn+' (sair)':'entrar com @';$('#hl').textContent=hn;$('#hl').title=me?'Sair':'Entrar';$('#ff').hidden=!me}
+$('#hl').onclick=$('#fu').onclick=async()=>{if(!sb)return alert('Fanarts ainda não disponíveis.');if(me){await sb.auth.signOut();await who();loadFa()}else ul.showModal()};
+$('#ulf').onsubmit=async ev=>{ev.preventDefault();store.set('sab_after',location.hash.slice(1)||'calabresos');const r=await sb.auth.signInWithOtp({email:$('#ue').value.trim(),options:{data:{handle:$('#uh').value.replace('@','').trim()},emailRedirectTo:location.origin+location.pathname}});
   $('#um').textContent=r.error?'Erro: '+r.error.message:'Link enviado! Abra o e-mail neste aparelho.'};
 const shrink=f=>new Promise(ok=>{const i=new Image();i.onload=()=>{const k=Math.min(1,1400/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=i.width*k;c.height=i.height*k;c.getContext('2d').drawImage(i,0,0,c.width,c.height);c.toBlob(ok,'image/jpeg',.85)};i.src=URL.createObjectURL(f)});
 $('#ff').onsubmit=async ev=>{ev.preventDefault();const m=$('#fm');m.textContent='Enviando...';const b=await shrink($('#fi').files[0]),path=me.id+'/'+Date.now()+'.jpg';
