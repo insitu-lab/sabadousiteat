@@ -220,6 +220,13 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .click-adjust{display:flex;justify-content:flex-end;gap:.5rem;align-items:center}
 .click-adjust input{width:120px;padding:.35rem .55rem;border-radius:12px}
 .mini.download{display:inline-block;font-size:.9rem}
+.game-shortcuts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;margin:1.5rem 0 2.5rem}
+.game-shortcut{min-width:0;padding:1rem;border:2px solid var(--line);border-radius:24px;background:var(--card)}
+.game-pill{display:flex;justify-content:space-between;align-items:center;gap:.8rem;padding:.85rem 1.2rem;border-radius:999px;background:linear-gradient(100deg,var(--pur),var(--hot));color:#fff;text-decoration:none;font-weight:900}
+.game-shortcut details{margin-top:.65rem}.game-shortcut summary{cursor:pointer;list-style:none;text-align:center;font-size:.95rem;font-weight:800;opacity:.85}.game-shortcut summary::-webkit-details-marker{display:none}.game-shortcut summary::after{content:'⌄';display:inline-block;margin-left:.45rem;font-size:1.2em;transition:transform .2s}.game-shortcut details[open] summary::after{transform:rotate(180deg)}
+.game-shortcut p{margin:.65rem .3rem .1rem;font-size:.98rem;line-height:1.45;opacity:.88}
+.game-rewards{padding:1rem 1.2rem;border-radius:20px;border:1px solid var(--line);background:var(--card);margin:1.5rem 0}
+@media(max-width:600px){.game-shortcuts{grid-template-columns:1fr}}
 .tabs a[hidden]{display:none}
 .hl{flex:0 0 auto;white-space:nowrap;background:var(--lil);color:#2a0f3d;border-color:var(--lil);max-width:9.5rem;overflow:hidden;text-overflow:ellipsis}
 #ul{width:min(92vw,420px);padding:1.5rem;border-radius:24px;background:var(--bg);color:var(--ink);border:2px solid var(--pur)}#ul .fld{width:100%;font-size:16px;margin:.4rem 0}#ul::backdrop{background:rgba(0,0,0,.6)}
@@ -313,11 +320,21 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 
 <section class="panel" id="jogos"><div class="sec"><div class="wrap">
   <div class="sh rv"><h2>jogos</h2><p>Mais jogos chegam por aqui. Por enquanto, tem o Sabadou Run.</p></div>
+  <div class="game-shortcuts">
+    <div class="game-shortcut"><a class="game-pill" href="#dg">🐸 Sabadou Run <span aria-hidden="true">→</span></a><details><summary>sobre o jogo</summary><p>Pule e agache para atravessar seis fases cada vez mais difíceis. Chegue ao fim para ganhar um salve no Direct: tire um print da vitória e mande para o Instagram do Sabadou.</p></details></div>
+    <div class="game-shortcut"><a class="game-pill" href="#sabadometro">💜 Sabadômetro <span aria-hidden="true">→</span></a><details><summary>sobre o desafio</summary><p>Toque no sapo para ganhar cliques e moedas, compre melhorias e suba de fase. Os 10 primeiros a registrar 1 milhão de cliques ganham follow; o primeiro a 1 bilhão ganha R$ 5 via Pix. Use uma conta por pessoa e não compartilhe sua senha.</p></details></div>
+  </div>
   <div class="stage rv"><canvas id="dg" width="800" height="260" aria-label="Sabadou Run, jogo do sapinho que pula e agacha"></canvas></div>
   <div class="gbar"><button class="cta" id="gj" type="button">pular ↑</button><button class="cta ghost" id="gd" type="button">agachar ↓</button></div>
   <p class="hint mobhint">Dica: gire o celular na horizontal pra jogar em tela maior.</p>
   <p class="hint">Espaço ou ↑ pula, ↓ agacha. No celular, use os botões. Cada fase é um dia da semana e a última é o sábado.</p>
-  <div class="shop"><h2>lojinha do sapo</h2><p class="lead">Cada clique no sabadômetro rende moedas. Gaste aqui pra clicar mais.</p><div id="coin" style="font-size:2rem;font-weight:800"></div><div id="shl"></div></div>
+  <section class="sec band ckb" id="sabadometro" style="margin-top:3rem;padding:2rem 0;border-radius:28px"><div class="wrap split">
+    <div><button id="btn" aria-label="Sabadar"><img src="img/sabadou-classico.jpg" alt=""></button></div>
+    <div><h2 class="big">sabadômetro</h2><p class="lead">Toque no sapo. Sem motivo. Só toca.</p><div id="cnt">0</div><div id="msg"></div><div id="ph"></div>
+      <div class="game-rewards"><b>🏆 Recompensas</b><br>Os 10 primeiros a chegar a 1 milhão de cliques ganham follow. O primeiro a chegar a 1 bilhão ganha R$ 5 via Pix. O Sabadou pode pedir confirmação da conta e do resultado.</div>
+      <div class="shop"><h3>lojinha do sapo</h3><p class="hint">Cada clique rende moedas. Compre melhorias para tocar mais rápido.</p><div id="coin" style="font-size:2rem;font-weight:800"></div><div id="shl"></div></div>
+    </div>
+  </div></section>
 </div></div></section>
 
 <section class="panel" id="fanarts"><div class="sec"><div class="wrap">
@@ -349,10 +366,6 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   <div class="rv"><img id="mo" alt="Sua frase no estilo do Sabadou"></div>
 </div></section>
 <section class="sec"><div class="wrap"><div class="sh rv"><h2>sábados do ano</h2><p id="sbn"></p></div><div class="sbd" id="sbd"></div></div></section>
-<section class="sec band ckb"><div class="wrap split">
-  <div class="rv"><button id="btn" aria-label="Sabadar"><img src="img/sabadou-classico.jpg" alt=""></button></div>
-  <div class="rv"><h2 class="big">sabadômetro</h2><p class="lead">Toque no sapo. Sem motivo. Só toca.</p><div id="cnt">0</div><div id="msg"></div><div id="ph"></div></div>
-</div></section>
 </section>
 </main>
 
@@ -646,7 +659,8 @@ async function loadFa(){if(!sb)return;await who();rendSA();mv={};
   clicksAdmin.innerHTML=CL.error?'<p class="hint">Não foi possível carregar os cliques.</p>':`<h3>cliques dos calabresos (${CL.data.length})</h3><div class="click-admin"><table><thead><tr><th>Instagram</th><th>cliques registrados</th><th>corrigir</th></tr></thead><tbody>${CL.data.map(c=>`<tr><td>@${esc(c.handle||'?')}</td><td>${Number(c.clicks||0).toLocaleString('pt-BR')}</td><td><form class="click-adjust" data-user="${c.user_id}" data-handle="${esc(c.handle||'?')}"><input class="fld" name="qtd" type="number" min="1" max="1000000000" required aria-label="Quantidade de cliques para remover"><button class="mini no" type="submit">remover</button></form></td></tr>`).join('')}</tbody></table></div>`;
   const P=(await sb.from('fanarts').select('*').eq('status','pendente').order('criado_em')).data||[];
   const T=(await sb.from('placar').select('handle,clicks,milhao_em').not('milhao_em','is',null).order('milhao_em').limit(10)).data||[];
-  q.innerHTML=`<h3>fila de aprovação (${P.length})</h3><div class="fg">${P.map(a=>card(a,1)).join('')||'<p class="mut">Fila vazia.</p>'}</div><h3>🏆 vencedora da semana</h3><div class="fg">${FA.filter(a=>new Date(a.criado_em)>=d).sort((a,b)=>b.votos-a.votos).map(a=>`<figure class="fa${a.vencedora?' win':''}"><img src="${pub(a.path)}" alt=""><figcaption><span>@${esc(a.handle)} · ${a.votos}💜</span><button class="mini ok" data-a="win" data-id="${a.id}">🏆 escolher</button></figcaption></figure>`).join('')||'<p class="mut">Nenhuma aprovada nesta semana.</p>'}</div><h3>🥇 primeiros ao 1 milhão (follow)</h3><ol>${T.map(t=>`<li>@${esc(t.handle||'?')} · ${new Date(t.milhao_em).toLocaleString('pt-BR')}</li>`).join('')||'<li>Ninguém ainda.</li>'}</ol>`}
+  const B=(await sb.from('placar').select('handle,bilhao_em').not('bilhao_em','is',null).order('bilhao_em').limit(1)).data||[];
+  q.innerHTML=`<h3>fila de aprovação (${P.length})</h3><div class="fg">${P.map(a=>card(a,1)).join('')||'<p class="mut">Fila vazia.</p>'}</div><h3>🏆 vencedora da semana</h3><div class="fg">${FA.filter(a=>new Date(a.criado_em)>=d).sort((a,b)=>b.votos-a.votos).map(a=>`<figure class="fa${a.vencedora?' win':''}"><img src="${pub(a.path)}" alt=""><figcaption><span>@${esc(a.handle)} · ${a.votos}💜</span><button class="mini ok" data-a="win" data-id="${a.id}">🏆 escolher</button></figcaption></figure>`).join('')||'<p class="mut">Nenhuma aprovada nesta semana.</p>'}</div><h3>🥇 primeiros ao 1 milhão (follow)</h3><ol>${T.map(t=>`<li>@${esc(t.handle||'?')} · ${new Date(t.milhao_em).toLocaleString('pt-BR')}</li>`).join('')||'<li>Ninguém ainda.</li>'}</ol><h3>💸 primeiro a 1 bilhão (R$ 5 via Pix)</h3><ol>${B.map(t=>`<li>@${esc(t.handle||'?')} · ${new Date(t.bilhao_em).toLocaleString('pt-BR')}</li>`).join('')||'<li>Ninguém chegou ainda.</li>'}</ol>`}
 document.addEventListener('click',async e=>{
   const v=e.target.closest('[data-v]');if(v){if(!me)return ul.showModal();await sb.from('votos').insert({fanart_id:v.dataset.v});return loadFa()}
   const b=e.target.closest('[data-a][data-id]');if(!b||!b.classList.contains('mini')||!isAdmin)return;const id=b.dataset.id;
