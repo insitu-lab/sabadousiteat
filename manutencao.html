@@ -295,9 +295,9 @@ const CONFIG={
 const $=s=>document.querySelector(s);
 const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// Atalho discreto: cinco toques rápidos na imagem do sapo abrem o login.
+// Atalho discreto: cinco toques rápidos no título abrem o login.
 let adminTaps=0,adminTapTimer;
-$('#fr').addEventListener('click',()=>{adminTaps++;clearTimeout(adminTapTimer);if(adminTaps>=5){adminTaps=0;$('#admin-login').showModal();$('#admin-email').focus()}else adminTapTimer=setTimeout(()=>adminTaps=0,2200)});
+$('#titulo').addEventListener('click',()=>{adminTaps++;clearTimeout(adminTapTimer);if(adminTaps>=5){adminTaps=0;$('#admin-login').showModal();$('#admin-email').focus()}else adminTapTimer=setTimeout(()=>adminTaps=0,2200)});
 $('#admin-login-close').onclick=()=>$('#admin-login').close();
 $('#admin-login-form').onsubmit=async e=>{
   e.preventDefault();const status=$('#admin-login-status'),button=e.submitter||$('#admin-login-form button[type="submit"]');button.disabled=true;status.textContent='Verificando...';
