@@ -60,7 +60,7 @@ h1,h2,h3{font-family:var(--disp);font-weight:400;margin:0;line-height:1}
 .lead{font-size:clamp(1.5rem,3vw,2.4rem);line-height:1.25;margin:1.6rem 0 2.4rem;font-weight:800}
 .split h3{font-size:clamp(1.6rem,3vw,2.4rem);margin-bottom:.8rem}.split p{margin:0;opacity:.88;max-width:30em}
 .ph{position:relative}.ph>img:first-child{display:block;width:100%;border-radius:40px;box-shadow:0 30px 90px rgba(166,77,255,.4)}
-.ph .av{position:absolute;left:-20px;bottom:-20px;width:clamp(96px,14vw,150px);aspect-ratio:1;border-radius:50%;object-fit:cover;border:5px solid var(--bg);box-shadow:0 0 0 5px var(--pur)}
+.ph .av{position:absolute;left:-20px;bottom:-20px;width:clamp(140px,19vw,210px);height:clamp(140px,19vw,210px);aspect-ratio:1;padding:0;border-radius:50%;object-fit:cover;background:none;border:5px solid var(--bg);box-shadow:0 0 0 5px var(--pur)}
 .mu{background:linear-gradient(135deg,#3b0f78,#7b2cbf 50%,#c2399f)}
 .mu .pl{background:rgba(10,0,25,.38);border-radius:40px;padding:clamp(1.4rem,4vw,3rem)}
 #eq{display:block;width:100%;height:clamp(110px,16vw,190px)}
@@ -107,7 +107,7 @@ footer nav{display:flex;flex-direction:column;gap:.6rem}footer a{color:#f6ecff;t
 footer .cta{color:#f6ecff}
 .rv{opacity:0;transform:translateY(46px);transition:opacity .8s,transform .8s cubic-bezier(.2,.8,.2,1)}.rv.in{opacity:1;transform:none}
 .cta:focus-visible,#pp:focus-visible,#btn:focus-visible,.day:focus-visible,#mw:focus-visible,.gi:focus-visible,a:focus-visible{outline:3px solid var(--hot);outline-offset:3px}
-@media (max-width:860px){.hero .wrap,.split,.ig,footer .wrap{grid-template-columns:1fr}.hero .wrap{text-align:center;min-height:0;gap:2.5rem}.hero p{margin-left:auto;margin-right:auto}.nv nav{display:none}.stats{gap:1rem}.stats span{font-size:.95rem}.bento{grid-template-columns:1fr 1fr}.b1{grid-row:span 1}.b3{grid-row:span 1}.mkw{align-items:center;text-align:center}.ph .av{left:8px}}
+@media (max-width:860px){.hero .wrap,.split,.ig,footer .wrap{grid-template-columns:1fr}.hero .wrap{text-align:center;min-height:0;gap:2.5rem}.hero p{margin-left:auto;margin-right:auto}.nv nav{display:none}.stats{gap:1rem}.stats span{font-size:.95rem}.bento{grid-template-columns:1fr 1fr}.b1{grid-row:span 1}.b3{grid-row:span 1}.mkw{align-items:center;text-align:center}.ph .av{left:8px;bottom:-14px;width:clamp(112px,32vw,160px);height:clamp(112px,32vw,160px)}}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.hero h1 .w{animation:none;opacity:1;transform:none}.fl,#btn{animation:none}.rv{opacity:1;transform:none;transition:none}}
 
 /* ===== abas ===== */
@@ -653,8 +653,8 @@ async function loadFa(){if(!sb)return;await who();rendSA();mv={};
   $('#frk').innerHTML=ranked.length?`<div class="podium">${podium.map(x=>podiumCard(x.a,x.n)).join('')}</div>${ranked.length>3?`<ol class="rank-others" start="4">${ranked.slice(3).map((a,i)=>`<li><b>${i+4}º</b> @${esc(a.handle)} <small>· ${a.votos} votos</small></li>`).join('')}</ol>`:''}`:'<p class="mut">Nenhuma arte aprovada nesta semana ainda.</p>';
   $('#fmu').innerHTML=FA.length?FA.map(a=>card(a,false,isAdmin)).join(''):'<p class="mut">O mural está vazio. Seja o primeiro!</p>';
   const q=$('#fq'),accounts=$('#accounts'),clicksAdmin=$('#clicks-admin');if(!isAdmin){q.innerHTML='';accounts.innerHTML='';clicksAdmin.innerHTML='';return}
-  const AC=await sb.from('contas').select('handle,criado_em').order('criado_em',{ascending:false});
-  accounts.innerHTML=AC.error?'<p class="hint">Para ativar o registro de contas, execute o arquivo supabase-fanarts.sql no Supabase.</p>':`<h3>contas cadastradas (${AC.data.length})</h3><ol>${AC.data.map(a=>`<li>@${esc(a.handle)} · ${new Date(a.criado_em).toLocaleString('pt-BR')}</li>`).join('')||'<li>Nenhuma conta registrada.</li>'}</ol>`;
+  const AC=await sb.from('contas').select('user_id,handle,criado_em').order('criado_em',{ascending:false});
+  accounts.innerHTML=AC.error?'<p class="hint">Para ativar o registro de contas, execute o arquivo supabase-fanarts.sql no Supabase.</p>':`<h3>contas cadastradas (${AC.data.length})</h3><div class="click-admin"><table><thead><tr><th>Instagram</th><th>Cadastro</th><th>ação</th></tr></thead><tbody>${AC.data.map(a=>`<tr><td>@${esc(a.handle)}</td><td>${new Date(a.criado_em).toLocaleString('pt-BR')}</td><td><form class="account-delete" data-user="${a.user_id}" data-handle="${esc(a.handle)}"><button class="mini no" type="submit">excluir conta</button></form></td></tr>`).join('')||'<tr><td colspan="3">Nenhuma conta cadastrada.</td></tr>'}</tbody></table></div><p class="hint">A exclusão remove a conta, os cliques do ranking, os votos e as fanarts enviadas por ela.</p>`;
   const CL=await sb.from('placar').select('user_id,handle,clicks').order('clicks',{ascending:false}).limit(500);
   clicksAdmin.innerHTML=CL.error?'<p class="hint">Não foi possível carregar os cliques.</p>':`<h3>cliques dos calabresos (${CL.data.length})</h3><div class="click-admin"><table><thead><tr><th>Instagram</th><th>cliques registrados</th><th>corrigir</th></tr></thead><tbody>${CL.data.map(c=>`<tr><td>@${esc(c.handle||'?')}</td><td>${Number(c.clicks||0).toLocaleString('pt-BR')}</td><td><form class="click-adjust" data-user="${c.user_id}" data-handle="${esc(c.handle||'?')}"><input class="fld" name="qtd" type="number" min="1" max="1000000000" required aria-label="Quantidade de cliques para remover"><button class="mini no" type="submit">remover</button></form></td></tr>`).join('')}</tbody></table></div>`;
   const P=(await sb.from('fanarts').select('*').eq('status','pendente').order('criado_em')).data||[];
@@ -674,6 +674,13 @@ document.addEventListener('click',async e=>{
   }
   loadFa()});
 document.addEventListener('submit',async e=>{
+  const account=e.target.closest('.account-delete');if(account){e.preventDefault();if(!isAdmin)return;
+    const handle=account.dataset.handle||'?';if(!confirm(`Excluir permanentemente a conta @${handle}, seus cliques, votos e fanarts? Essa ação não pode ser desfeita.`))return;
+    const button=account.querySelector('button');button.disabled=true;button.textContent='excluindo...';
+    const r=await sb.functions.invoke('admin-delete-account',{body:{userId:account.dataset.user}});
+    if(r.error){button.disabled=false;button.textContent='excluir conta';alert('Não foi possível excluir a conta. Confirme se a Edge Function admin-delete-account foi publicada no Supabase. '+r.error.message);return}
+    await loadFa();return;
+  }
   const form=e.target.closest('.click-adjust');if(!form)return;e.preventDefault();if(!isAdmin)return;
   const qtd=Number(form.elements.qtd.value),handle=form.dataset.handle||'?';
   if(!Number.isSafeInteger(qtd)||qtd<1||qtd>1000000000)return alert('Digite uma quantidade válida.');
