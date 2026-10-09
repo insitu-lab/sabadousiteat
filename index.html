@@ -468,7 +468,7 @@ addEventListener('scroll',()=>{$('#bar').style.width=scrollY/Math.max(1,document
 // sabadômetro
 let N=store.get('sab_n',0);const M={10:'tá esquentando…',30:'já é quase sábado',67:'67!!! 💜💜💜',100:'cem sabadadas. respeito.',200:'você é um calabreso de verdade'};
 $('#cnt').textContent=N;
-$('#btn').onclick=e=>{if(!me){$('#um').textContent='Entre com seu @ pra jogar e disputar o 1 milhão.';ul.showModal();return}N++;store.set('sab_n',N);$('#cnt').textContent=N;if(M[N])$('#msg').textContent=M[N];
+$('#btn').onclick=e=>{if(!me){$('#um').textContent='Entre com seu @ pra jogar e disputar o 1 milhão.';ul.showModal();return}N++;saveG();$('#cnt').textContent=N;if(M[N])$('#msg').textContent=M[N];
   const r=e.clientX?[e.clientX,e.clientY]:[$('#btn').getBoundingClientRect().left+100,$('#btn').getBoundingClientRect().top+60];
   spawn(r[0],r[1],N===67?30:3)};
 $('#up').onclick=()=>scrollTo({top:0,behavior:still?'auto':'smooth'});
@@ -583,9 +583,7 @@ function renderAdm(){
   $('#aout').onclick=async()=>{await sb.auth.signOut();isAdmin=false;renderAdm();renderAv()};
 }
 async function checkAdmin(){
-  if(!sb)return;isAdmin=false;
-  const s=await sb.auth.getSession();
-  if(s.data.session){const r=await sb.from('admins').select('user_id').maybeSingle();isAdmin=!!(r.data)}
+  if(!sb)return;await who(true);
   renderAdm();renderAv();if(typeof loadFa==='function'&&sb)loadFa();
 }
 const lg=$('#lg');
@@ -621,18 +619,24 @@ $('#lgf').onsubmit=async ev=>{ev.preventDefault();const m=$('#lm');m.textContent
 // ===== lojinha + fases do sabadômetro (progresso salvo no aparelho e, logado, no servidor) =====
 const SH=[['🖱️ mouse melhor','+1 clique por toque','p',1,15],['🐸 sapo ajudante','+1 clique/s','c',1,60],['🏡 fazendinha','+8 cliques/s','c',8,500],['🏭 fábrica de sábado','+60 cliques/s','c',60,4000]];
 const PH=[[0,'girino'],[100,'sapinho'],[1e3,'sapo de respeito'],[1e4,'calabreso'],[1e5,'mestre do sábado'],[1e6,'lenda do sábado 🏆']];
-let G=store.get('sab_g',{coin:0,lv:[0,0,0,0]});
-const cost=i=>Math.ceil(SH[i][4]*Math.pow(1.15,G.lv[i])),pw=()=>1+G.lv[0],cps=()=>G.lv.reduce((a,l,i)=>a+(SH[i][2]=='c'?l*SH[i][3]:0),0);
+let G=store.get('sab_g',{coin:0,lv:[0,0,0,0]}),gameProfile='';
+const cost=i=>isAdmin?0:Math.ceil(SH[i][4]*Math.pow(1.15,G.lv[i])),pw=()=>1+G.lv[0],cps=()=>G.lv.reduce((a,l,i)=>a+(SH[i][2]=='c'?l*SH[i][3]:0),0);
+// O progresso de teste fica separado do progresso normal neste aparelho.
+function selectGameProfile(){const profile=isAdmin&&me?'_admin_'+me.id:'';
+  if(profile!==gameProfile){saveG();gameProfile=profile;N=store.get('sab_n'+profile,0);G=store.get('sab_g'+profile,{coin:0,lv:[0,0,0,0]})}
+  if(isAdmin)G.lv=G.lv.map(l=>Math.max(l,25));rendG();
+}
 function rendG(){$('#cnt').textContent=N;const p=PH.filter(x=>N>=x[0]).pop(),n=PH[PH.indexOf(p)+1];
-  $('#ph').textContent=`fase: ${p[1]}`+(n?` · próxima com ${n[0].toLocaleString('pt-BR')} cliques`:' · os 10 primeiros a chegar aqui ganham follow!');
-  $('#coin').innerHTML=`<span class="coinmark" aria-label="moedas">S</span> ${Math.floor(G.coin)} · ${pw()}/clique · ${cps()}/s`;
+  $('#ph').textContent=isAdmin?'conta de teste · melhorias liberadas · fora do ranking':`fase: ${p[1]}`+(n?` · próxima com ${n[0].toLocaleString('pt-BR')} cliques`:' · os 10 primeiros a chegar aqui ganham follow!');
+  $('#coin').innerHTML=`<span class="coinmark" aria-label="moedas">S</span> ${isAdmin?'∞ moedas':Math.floor(G.coin)} · ${pw()}/clique · ${cps()}/s`;
   $('#shl').innerHTML=SH.map((x,i)=>`<div class="si"><span><b>${x[0]}</b> nv ${G.lv[i]}<br><small>${x[1]}</small></span><button data-i="${i}" ${G.coin<cost(i)?'disabled':''}><span class="coinmark" aria-hidden="true">S</span> ${cost(i)}</button></div>`).join('')}
-function saveG(){store.set('sab_n',N);store.set('sab_g',G)}
+function saveG(){store.set('sab_n'+gameProfile,N);store.set('sab_g'+gameProfile,G)}
 $('#btn').addEventListener('click',()=>{if(!me)return;const p=pw();N+=p-1;G.coin+=p;rendG()});
 $('#shl').onclick=e=>{const b=e.target.closest('button');if(!b)return;const i=+b.dataset.i;if(G.coin>=cost(i)){G.coin-=cost(i);G.lv[i]++;saveG();rendG()}};
 setInterval(()=>{const c=me?cps():0;if(c){N+=c;G.coin+=c}saveG();rendG()},1000);addEventListener('pagehide',saveG);rendG();
-setInterval(async()=>{if(!sb||!me)return;
+setInterval(async()=>{if(!sb||!me||isAdmin)return;const userId=me.id;
   const b=(await sb.from('placar').select('bonus').eq('user_id',me.id).maybeSingle()).data?.bonus||0;
+  if(me?.id!==userId||isAdmin)return;
   if(b){N=Math.max(0,N+Number(b));G.coin=Math.max(0,G.coin+Number(b));saveG();rendG()}
   if(!isAdmin)await sb.from('placar').upsert({user_id:me.id,handle:me.user_metadata?.handle,clicks:N,bonus:0})},30000);
 function rendSA(){const b=$('#sa');if(!isAdmin){b.innerHTML='';return}
@@ -646,9 +650,21 @@ function rendSA(){const b=$('#sa');if(!isAdmin){b.innerHTML='';return}
 
 
 // ===== login de fã + fanarts =====
-let me=null,FA=[],mv={};const ul=$('#ul'),pub=p=>sb.storage.from('fanarts').getPublicUrl(p).data.publicUrl;
-async function who(){if(!sb)return;me=(await sb.auth.getSession()).data.session?.user||null;
-  const hn=me?'@'+(me.user_metadata?.handle||'fã'):'entrar';$('#fu').textContent=me?hn+' (sair)':'entrar com @';$('#hl').textContent=hn;$('#hl').title=me?'Sair':'Entrar';$('#ff').hidden=!me}
+let me=null,FA=[],mv={},checkedUserId;let whoQueue=Promise.resolve();const ul=$('#ul'),pub=p=>sb.storage.from('fanarts').getPublicUrl(p).data.publicUrl;
+function who(force=false){const task=whoQueue.then(async()=>{if(!sb)return;
+  me=(await sb.auth.getSession()).data.session?.user||null;const userId=me?.id||null;
+  if(force||checkedUserId!==userId){isAdmin=false;
+    if(me){const r=await sb.from('admins').select('user_id').eq('user_id',me.id).maybeSingle();isAdmin=!r.error&&!!r.data}
+    checkedUserId=userId;selectGameProfile();renderAdm();renderAv();
+    if(me&&!isAdmin){const registered=await sb.rpc('registrar_conta_atual');
+      if(registered.error)console.warn('Execute supabase-contas-ativas.sql para reparar o registro das contas.',registered.error);
+      // Cria o placar no primeiro acesso sem substituir os cliques já registrados.
+      const handle=me.user_metadata?.handle;
+      if(handle)await sb.from('placar').upsert({user_id:me.id,handle,clicks:0},{onConflict:'user_id',ignoreDuplicates:true});
+    }
+  }
+  const hn=me?(isAdmin?'admin (teste)':'@'+(me.user_metadata?.handle||'fã')):'entrar';$('#fu').textContent=me?hn+' (sair)':'entrar com @';$('#hl').textContent=hn;$('#hl').title=me?'Sair':'Entrar';$('#ff').hidden=!me;
+});whoQueue=task.catch(()=>{});return task}
 $('#hl').onclick=$('#fu').onclick=async()=>{if(!sb)return alert('Fanarts ainda não disponíveis.');if(me){await sb.auth.signOut();await who();loadFa()}else ul.showModal()};
 let signupMode=false;
 const authEmail=handle=>`${handle.toLowerCase()}@login.sabadou.invalid`;
@@ -678,11 +694,11 @@ $('#ulf').onsubmit=async ev=>{ev.preventDefault();if(!sb){$('#um').textContent='
 const shrink=f=>new Promise(ok=>{const i=new Image();i.onload=()=>{const k=Math.min(1,1400/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=i.width*k;c.height=i.height*k;c.getContext('2d').drawImage(i,0,0,c.width,c.height);c.toBlob(ok,'image/jpeg',.85)};i.src=URL.createObjectURL(f)});
 $('#fi').addEventListener('change',e=>{$('#fi-name').textContent=e.target.files[0]?.name||'Nenhuma imagem escolhida'});
 $('#ff').onsubmit=async ev=>{ev.preventDefault();const m=$('#fm');if(!me||!$('#fi').files[0])return;m.textContent='Verificando seu envio...';
-  const allowed=await sb.rpc('pode_enviar_fanart');if(allowed.error){m.textContent='Não consegui verificar o limite semanal. Execute o SQL atualizado do Supabase.';return}
+  const allowed=isAdmin?{data:true}:await sb.rpc('pode_enviar_fanart');if(allowed.error){m.textContent='Não consegui verificar o limite semanal. Execute o SQL atualizado do Supabase.';return}
   if(!allowed.data){m.textContent='Você já enviou uma fanart nesta semana. Aguarde a próxima semana ou peça ao Sabadou para liberar um reenvio.';return}
   m.textContent='Enviando...';const b=await shrink($('#fi').files[0]),path=me.id+'/'+Date.now()+'.jpg';
   const u=await sb.storage.from('fanarts').upload(path,b,{contentType:'image/jpeg'});if(u.error){m.textContent='Erro: '+u.error.message;return}
-  const r=await sb.from('fanarts').insert({handle:me.user_metadata?.handle||'?',path});
+  const r=await sb.from('fanarts').insert({handle:me.user_metadata?.handle||(isAdmin?'admin-teste':'?'),path});
   if(r.error){await sb.storage.from('fanarts').remove([path]);m.textContent=r.error.message.includes('limite_semanal_fanart')?'Você já enviou uma fanart nesta semana. Aguarde a próxima semana ou peça um reenvio.':'Erro ao registrar a fanart: '+r.error.message;return}
   m.textContent='Enviada! Ela está em análise. 💜';$('#ff').reset();$('#fi-name').textContent='Nenhuma imagem escolhida';await loadFa()};
 async function refreshMyFanart(){
@@ -713,12 +729,10 @@ async function loadFa(){if(!sb)return;await who();rendSA();await refreshMyFanart
   $('#frk').innerHTML=ranked.length?`<div class="podium">${podium.map(x=>podiumCard(x.a,x.n)).join('')}</div>${ranked.length>3?`<ol class="rank-others" start="4">${ranked.slice(3).map((a,i)=>`<li><b>${i+4}º</b> @${esc(a.handle)} <small>· ${a.votos} votos</small></li>`).join('')}</ol>`:''}`:'<p class="mut">Nenhuma arte aprovada nesta semana ainda.</p>';
   $('#fmu').innerHTML=FA.length?FA.map(a=>card(a,false,isAdmin)).join(''):'<p class="mut">O mural está vazio. Seja o primeiro!</p>';
   const q=$('#fq'),accounts=$('#accounts'),clicksAdmin=$('#clicks-admin');if(!isAdmin){q.innerHTML='';accounts.innerHTML='';clicksAdmin.innerHTML='';return}
-  const AC=await sb.from('contas').select('user_id,handle,criado_em').order('criado_em',{ascending:false});
-  accounts.innerHTML=AC.error?'<p class="hint">Para ativar o registro de contas, execute o arquivo supabase-fanarts.sql no Supabase.</p>':`<h3>contas cadastradas (${AC.data.length})</h3><div class="click-admin"><table><thead><tr><th>Instagram</th><th>Cadastro</th><th>ações</th></tr></thead><tbody>${AC.data.map(a=>`<tr><td>@${esc(a.handle)}</td><td>${new Date(a.criado_em).toLocaleString('pt-BR')}</td><td><button class="mini ok" type="button" data-release-fanart="${a.user_id}" data-handle="${esc(a.handle)}">liberar reenvio</button> <form class="account-delete" data-user="${a.user_id}" data-handle="${esc(a.handle)}"><button class="mini no" type="submit">excluir conta</button></form></td></tr>`).join('')||'<tr><td colspan="3">Nenhuma conta cadastrada.</td></tr>'}</tbody></table></div><p class="hint">“Liberar reenvio” autoriza uma fanart extra nesta semana. A exclusão remove a conta, os cliques do ranking, os votos e as fanarts enviadas por ela.</p>`;
-  const CL=await sb.from('placar').select('user_id,handle,clicks').order('clicks',{ascending:false}).limit(500);
-  const currentAccounts=new Map((AC.data||[]).map(a=>[a.user_id,a]));
-  const currentClicks=(CL.data||[]).filter(c=>currentAccounts.has(c.user_id));
-  clicksAdmin.innerHTML=AC.error?'<p class="hint">Não foi possível confirmar quais contas ainda existem.</p>':CL.error?'<p class="hint">Não foi possível carregar os cliques.</p>':`<h3>cliques dos calabresos (${currentClicks.length})</h3><div class="click-admin"><table><thead><tr><th>Instagram</th><th>cliques registrados</th><th>corrigir</th></tr></thead><tbody>${currentClicks.map(c=>{const account=currentAccounts.get(c.user_id),handle=account.handle||c.handle||'?';return `<tr><td>@${esc(handle)}</td><td>${Number(c.clicks||0).toLocaleString('pt-BR')}</td><td><form class="click-adjust" data-user="${c.user_id}" data-handle="${esc(handle)}"><input class="fld" name="qtd" type="number" min="1" max="1000000000" required aria-label="Quantidade de cliques para remover"><button class="mini no" type="submit">remover</button></form></td></tr>`}).join('')||'<tr><td colspan="3">Nenhuma conta ativa no placar.</td></tr>'}</tbody></table></div>`;
+  const AC=await sb.rpc('listar_contas_ativas');
+  accounts.innerHTML=AC.error?'<p class="hint">Execute supabase-contas-ativas.sql no SQL Editor do Supabase para carregar as contas e os cliques.</p>':`<h3>contas cadastradas (${AC.data.length})</h3><div class="click-admin"><table><thead><tr><th>Instagram</th><th>Cadastro</th><th>ações</th></tr></thead><tbody>${AC.data.map(a=>`<tr><td>@${esc(a.handle)}</td><td>${new Date(a.criado_em).toLocaleString('pt-BR')}</td><td><button class="mini ok" type="button" data-release-fanart="${a.user_id}" data-handle="${esc(a.handle)}">liberar reenvio</button> <form class="account-delete" data-user="${a.user_id}" data-handle="${esc(a.handle)}"><button class="mini no" type="submit">excluir conta</button></form></td></tr>`).join('')||'<tr><td colspan="3">Nenhuma conta cadastrada.</td></tr>'}</tbody></table></div><p class="hint">“Liberar reenvio” autoriza uma fanart extra nesta semana. A exclusão remove a conta, os cliques do ranking, os votos e as fanarts enviadas por ela.</p>`;
+  const currentClicks=[...(AC.data||[])].sort((a,b)=>Number(b.clicks||0)-Number(a.clicks||0));
+  clicksAdmin.innerHTML=AC.error?'<p class="hint">Execute supabase-contas-ativas.sql no SQL Editor do Supabase para carregar as contas e os cliques.</p>':`<h3>cliques dos calabresos (${currentClicks.length})</h3><div class="click-admin"><table><thead><tr><th>Instagram</th><th>cliques registrados</th><th>corrigir</th></tr></thead><tbody>${currentClicks.map(c=>{const handle=c.handle||'?';return `<tr><td>@${esc(handle)}</td><td>${Number(c.clicks||0).toLocaleString('pt-BR')}</td><td><form class="click-adjust" data-user="${c.user_id}" data-handle="${esc(handle)}"><input class="fld" name="qtd" type="number" min="1" max="1000000000" required aria-label="Quantidade de cliques para remover"><button class="mini no" type="submit">remover</button></form></td></tr>`}).join('')||'<tr><td colspan="3">Nenhuma conta ativa no placar.</td></tr>'}</tbody></table></div>`;
   const P=(await sb.from('fanarts').select('*').eq('status','pendente').order('criado_em')).data||[];
   const T=(await sb.from('placar').select('handle,clicks,milhao_em').not('milhao_em','is',null).order('milhao_em').limit(10)).data||[];
   const B=(await sb.from('placar').select('handle,bilhao_em').not('bilhao_em','is',null).order('bilhao_em').limit(1)).data||[];
