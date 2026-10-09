@@ -17,28 +17,39 @@
     gain.gain.exponentialRampToValueAtTime(.0001,now+start+duration);
     osc.connect(gain);gain.connect(a.destination);osc.start(now+start);osc.stop(now+start+duration+.02);
   }
-  const clips={
-    click:new Audio('assets/sfx/click_001.ogg'),
-    tab:new Audio('assets/sfx/click_002.ogg'),
-    frog:new Audio('assets/sfx/select_001.ogg'),
-    buy:new Audio('assets/sfx/confirmation_001.ogg')
-  };
-  Object.values(clips).forEach(sound=>{sound.preload='auto';sound.volume=.38});
-  function playClip(name,fallback){
-    const sound=clips[name];if(!sound){fallback();return}
-    const copy=sound.cloneNode();copy.volume=sound.volume;
-    const result=copy.play();if(result?.catch)result.catch(fallback);
+  const clipFiles={click:'click_001.wav',tab:'click_002.wav',frog:'select_001.wav',buy:'confirmation_001.wav'};
+  const soundBase=new URL('assets/sfx/',document.baseURI),reported=new Set();
+  function report(name,error){
+    if(reported.has(name))return;
+    reported.add(name);
+    console.warn('Não foi possível tocar o efeito sonoro:',new URL(clipFiles[name],soundBase).href,error);
+  }
+  // Reutilizar os áudios pré-carregados mantém os cliques rápidos do sapo responsivos.
+  const clips=Object.fromEntries(Object.entries(clipFiles).map(([name,file])=>[name,
+    Array.from({length:4},()=>{
+      const sound=new Audio(new URL(file,soundBase).href);
+      sound.preload='auto';sound.volume=.38;
+      sound.addEventListener('error',()=>report(name,sound.error));
+      sound.load();return sound;
+    })
+  ]));
+  const nextClip={};
+  function playClip(name){
+    const pool=clips[name];if(!pool)return;
+    const index=nextClip[name]||0,sound=pool[index];nextClip[name]=(index+1)%pool.length;
+    sound.pause();sound.currentTime=0;
+    const result=sound.play();if(result?.catch)result.catch(error=>report(name,error));
   }
   const sounds={
-    click(){playClip('click',()=>tone(620,0,.055,'triangle',.025,470))},
-    tab(){playClip('tab',()=>tone(720,0,.07,'triangle',.025,570))},
-    frog(){playClip('frog',()=>{tone(470,0,.075,'square',.035,720);tone(720,.055,.09,'triangle',.035,930)})},
-    buy(){playClip('buy',()=>{tone(520,0,.09,'triangle',.04,780);tone(780,.085,.12,'triangle',.045,1040)})},
+    click(){playClip('click')},
+    tab(){playClip('tab')},
+    frog(){playClip('frog')},
+    buy(){playClip('buy')},
     jump(){tone(300,0,.11,'square',.045,560)},
     lose(){tone(300,0,.18,'triangle',.055,220);tone(220,.15,.3,'sawtooth',.035,95)},
     win(){tone(523,0,.14,'triangle',.05,523);tone(659,.12,.14,'triangle',.05,659);tone(784,.24,.2,'triangle',.055,784);tone(1047,.42,.36,'triangle',.06,1047)}
   };
-  window.SabadouSounds={play(name){sounds[name]?.()}};
+  window.SabadouSounds={version:'20261008-2',play(name){sounds[name]?.()}};
   addEventListener('pointerdown',context,{once:true,passive:true});
   addEventListener('keydown',context,{once:true});
   function buttonSound(e){
