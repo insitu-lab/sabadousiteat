@@ -1,7 +1,7 @@
 /* Mantém os links das páginas comuns na versão de site que as abriu. */
 (()=>{
   const version=new URLSearchParams(location.search).get('site')==='atualizacao'?'atualizacao':'oficial';
-  const entries={oficial:'../site-oficial/index.html',atualizacao:'../site-atualizacao/index.html'};
+  const entries={oficial:'index.html',atualizacao:'index.html'};
   const home=new URL(entries[version],document.baseURI).href;
   window.SabadouSiteLinks={home,version};
   function links(){

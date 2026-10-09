@@ -6,8 +6,8 @@
 <meta name="theme-color" content="#12061f">
 
 <!-- SISTEMA DE MANUTENÇÃO -->
-<script src="../comum/config.js"></script>
-<script src="../comum/js/sabadou-maintenance.js?v=20261009-prazo"></script>
+<script src="config.js"></script>
+<script src="js/sabadou-maintenance.js?v=20261009-prazo-publicacao-20261009"></script>
 <script>
 // A configuração remota permite ligar a manutenção pelo painel admin.
 document.documentElement.dataset.maintenanceCheck='pending';
@@ -23,11 +23,11 @@ if(cfg.supabaseUrl&&cfg.supabaseKey){
       const session=raw&&JSON.parse(raw),token=session?.access_token,userId=session?.user?.id;
       let admin=false;
       if(token&&userId){const check=await fetch(base+'/rest/v1/admins?user_id=eq.'+encodeURIComponent(userId)+'&select=user_id',{headers:{...headers,Authorization:'Bearer '+token}});admin=check.ok&&(await check.json()).length>0}
-      if(!admin){location.replace('../comum/manutencao.html?site=atualizacao');return}
+      if(!admin){location.replace('manutencao.html?site=atualizacao');return}
     }
-  }catch(e){console.warn('Não foi possível verificar o modo de manutenção.',e);location.replace('../comum/manutencao.html?site=atualizacao');return}
+  }catch(e){console.warn('Não foi possível verificar o modo de manutenção.',e);location.replace('manutencao.html?site=atualizacao');return}
   revealSite()})();
-}else location.replace('../comum/manutencao.html?site=atualizacao');
+}else location.replace('manutencao.html?site=atualizacao');
 </script>
 <style>html[data-maintenance-check="pending"] body{visibility:hidden}</style>
 
@@ -263,7 +263,7 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 @media (max-width:860px){.hl{padding:.4rem .85rem;font-size:.9rem}.nv{gap:.5rem}.si{flex-direction:column;align-items:stretch}.si button{width:100%;padding:.7rem}.fg{grid-template-columns:1fr 1fr;gap:.6rem}#btn{touch-action:manipulation}}
 @media (max-width:700px){body{padding-bottom:calc(62px + env(safe-area-inset-bottom,0px))}.nav{backdrop-filter:none}.nv nav.tabs{position:fixed;top:auto;left:0;right:0;bottom:0;z-index:35;height:calc(58px + env(safe-area-inset-bottom,0px));padding:4px 8px env(safe-area-inset-bottom,0px);justify-content:flex-start;gap:.2rem;background:var(--nav);backdrop-filter:blur(14px);border-top:1px solid var(--line);border-bottom:0}.nv nav.tabs a{display:flex;align-items:center;min-height:44px;padding:.3rem .65rem;font-size:.82rem}.nv nav.tabs .ind{display:none}.podium{gap:.35rem}.podium-entry{gap:.3rem}.podium-photo{width:clamp(62px,18vw,96px);border-radius:16px}.podium-tools .mini,.podium-tools .download{font-size:.7rem;padding:.14rem .35rem}.podium-votes{font-size:.75rem}.podium-base strong{font-size:2rem}}
 </style>
-<link rel="stylesheet" href="../comum/css/sabadou-improvements.css?v=20261009-3">
+<link rel="stylesheet" href="css/sabadou-improvements.css?v=20261009-3-publicacao-20261009">
 </head>
 <body data-site="atualizacao" data-site-version="2.1.0">
 <div class="bar" id="bar"></div>
@@ -284,7 +284,7 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
       <p>O cantinho oficial dos calabresos. Música, galeria e coisa pra mexer.</p>
       <button class="cta" id="hp"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>ouvir a música</button><a class="cta ghost" href="#calabresos">área dos calabresos</a><a class="cta ghost" href="#explore">explorar o site</a>
     </div>
-    <div class="frame" id="frame"><img src="../comum/img/sabadou-classico.jpg" alt="Sabadou, o sapo roxo, com a frase é sábado meus calabresos"></div>
+    <div class="frame" id="frame"><img src="img/sabadou-classico.jpg" alt="Sabadou, o sapo roxo, com a frase é sábado meus calabresos"></div>
   </div>
   <span class="fl" style="left:3%;top:12%">💜</span><span class="fl" style="right:4%;top:9%;animation-delay:-1s">✨</span><span class="fl" style="left:48%;bottom:4%;animation-delay:-2s">💖</span>
 </section>
@@ -302,7 +302,7 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
     <h3>o mundo dos bacanos</h3>
     <p>Todos os sapos desse universo são chamados de bacanos, e tem bacano de várias cores. Os fãs do Sabadou são os calabresos.</p>
   </div>
-  <div class="ph rv"><img loading="lazy" src="../comum/img/sabadou-celular.jpg" alt="Sabadou sentado na escada olhando o celular"><img class="av" src="../comum/img/sabadou-avatar.jpg" alt="Sabadou em preto e branco"></div>
+  <div class="ph rv"><img loading="lazy" src="img/sabadou-celular.jpg" alt="Sabadou sentado na escada olhando o celular"><img class="av" src="img/sabadou-avatar.jpg" alt="Sabadou em preto e branco"></div>
 </div></section>
 <section class="sec" id="explore"><div class="wrap">
   <div class="sh rv"><h2>explore</h2><p>O site tem abas. Escolhe pra onde ir.</p></div>
@@ -314,7 +314,7 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   </div>
 </div></section>
 <section class="sec" id="insta"><div class="wrap ig">
-  <img class="rv" src="../comum/img/instagram-perfil.jpg" alt="Perfil do Sabadou no Instagram">
+  <img class="rv" src="img/instagram-perfil.jpg" alt="Perfil do Sabadou no Instagram">
   <div class="rv"><h2>segue o sabadou lá também</h2><p>Posts novos, humor, sapo e sábado. Parcerias: chama na DM do Instagram.</p>
     <a class="cta" href="https://www.instagram.com/sabadouofficiall/" target="_blank" rel="noopener">Abrir o Instagram</a></div>
 </div></section>
@@ -332,7 +332,7 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   <div class="pl rv" id="mus">
     <canvas id="eq" width="600" height="90" aria-hidden="true"></canvas>
     <div class="ctl"><button id="pp" aria-label="Tocar"><svg viewBox="0 0 24 24" width="34" height="34" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg></button><input id="sk" type="range" min="0" max="1000" value="0" aria-label="Posição da música"><span class="tm" id="tm">0:00</span><input id="vol" type="range" min="0" max="100" value="80" aria-label="Volume"></div>
-    <audio id="au" preload="metadata" src="../comum/audio/musica.mp3"></audio>
+    <audio id="au" preload="metadata" src="audio/musica.mp3"></audio>
   </div>
 </div></section>
 </section>
@@ -341,10 +341,10 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 <section class="sec"><div class="wrap">
   <div class="sh rv"><h2>galeria</h2><p>Clica numa imagem para ver grande.</p></div>
   <div class="bento rv">
-    <figure class="gi b1" tabindex="0" role="button" aria-label="Ampliar"><img loading="lazy" src="../comum/img/sabadouxxx.jpg" alt="Sabadouxxx com raios e números 67"><figcaption>sabadouxxx 67</figcaption></figure>
-    <figure class="gi" tabindex="0" role="button" aria-label="Ampliar"><img src="../comum/img/sabadou-classico.jpg" alt="O clássico"><figcaption>o clássico</figcaption></figure>
-    <figure class="gi b3" tabindex="0" role="button" aria-label="Ampliar"><img loading="lazy" src="../comum/img/sabadou-celular.jpg" alt="Sabadou no celular"><figcaption>sabadou no celular</figcaption></figure>
-    <figure class="gi" tabindex="0" role="button" aria-label="Ampliar"><img loading="lazy" src="../comum/img/sabadou-e-calabresos.jpg" alt="Sabadou e calabresos"><figcaption>sabadou e calabresos</figcaption></figure>
+    <figure class="gi b1" tabindex="0" role="button" aria-label="Ampliar"><img loading="lazy" src="img/sabadouxxx.jpg" alt="Sabadouxxx com raios e números 67"><figcaption>sabadouxxx 67</figcaption></figure>
+    <figure class="gi" tabindex="0" role="button" aria-label="Ampliar"><img src="img/sabadou-classico.jpg" alt="O clássico"><figcaption>o clássico</figcaption></figure>
+    <figure class="gi b3" tabindex="0" role="button" aria-label="Ampliar"><img loading="lazy" src="img/sabadou-celular.jpg" alt="Sabadou no celular"><figcaption>sabadou no celular</figcaption></figure>
+    <figure class="gi" tabindex="0" role="button" aria-label="Ampliar"><img loading="lazy" src="img/sabadou-e-calabresos.jpg" alt="Sabadou e calabresos"><figcaption>sabadou e calabresos</figcaption></figure>
   </div>
 </div></section>
 
@@ -361,7 +361,7 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   <p class="hint mobhint">Dica: gire o celular na horizontal pra jogar em tela maior.</p>
   <p class="hint">Espaço ou ↑ pula, ↓ agacha. No celular, use os botões. Cada fase é um dia da semana e a última é o sábado.</p>
   <section class="sec band ckb" id="sabadometro" style="margin-top:3rem;padding:2rem 0;border-radius:28px"><div class="wrap split">
-    <div><button id="btn" aria-label="Sabadar"><img src="../comum/img/sabadou-classico.jpg" alt=""></button></div>
+    <div><button id="btn" aria-label="Sabadar"><img src="img/sabadou-classico.jpg" alt=""></button></div>
     <div><h2 class="big">sabadômetro</h2><p class="lead">Toque no sapo. Sem motivo. Só toca.</p><div id="cnt">0</div><div id="msg"></div><div id="ph"></div>
       <div class="game-rewards"><b>🏆 Recompensas</b><br>Os 10 primeiros a chegar a 1 milhão de cliques ganham follow. O primeiro a chegar a 1 bilhão ganha R$ 5 via Pix. O Sabadou pode pedir confirmação da conta e do resultado.</div>
       <div class="shop"><h3>lojinha do sapo</h3><p class="hint">Cada clique rende moedas. Compre melhorias para tocar mais rápido.</p><div id="coin" style="font-size:2rem;font-weight:800"></div><div id="shl"></div></div>
@@ -407,7 +407,7 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   <div class="wrap fg">
     <div><div class="logo" style="color:#f6ecff">sabadou</div><p class="tg">é sábado, meus calabresos.</p><a class="cta ghost sm" href="https://www.instagram.com/sabadouofficiall/" target="_blank" rel="noopener">Instagram</a></div>
     <nav aria-label="Navegar"><h4>navegar</h4><a href="#inicio">início</a><a href="#avisos">avisos</a><a href="#musica">música</a><a href="#galeria">galeria</a><a href="#jogos">jogos</a><a href="#fanarts">fanarts</a><a href="#calabresos">calabresos</a></nav>
-    <nav aria-label="Legal"><h4>legal</h4><a href="../comum/termos.html?site=atualizacao">termos de uso</a><a href="../comum/privacy.html?site=atualizacao">política de privacidade</a><a href="../comum/termos.html?site=atualizacao#direitos">direitos autorais</a><a href="../comum/termos.html?site=atualizacao#fanarts">regras das fanarts</a></nav>
+    <nav aria-label="Legal"><h4>legal</h4><a href="termos.html?site=atualizacao">termos de uso</a><a href="privacy.html?site=atualizacao">política de privacidade</a><a href="termos.html?site=atualizacao#direitos">direitos autorais</a><a href="termos.html?site=atualizacao#fanarts">regras das fanarts</a></nav>
     <div><h4>parcerias</h4><p>Chama na DM do Instagram.</p><button class="cta ghost sm" id="up" type="button">Voltar ao topo</button></div>
   </div>
   <div class="wrap fb"><span>© <span id="yr">2026</span> Sabadou. Todos os direitos reservados.</span><span>Feito pra quem vive de sábado. <button class="lnk" id="adm" type="button" hidden>admin</button></span></div>
@@ -425,11 +425,11 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   <p class="mut" id="lm" style="margin:0;min-height:1.4em"></p>
   <div class="edb"><button class="cta" type="submit">entrar</button><button class="cta ghost" type="button" id="lc">cancelar</button></div></form></dialog>
 
-<script src="../comum/js/sabadou-updates.js?v=20261009-3"></script>
-<script src="../comum/js/sabadou-navigation.js?v=20261009-3"></script>
-<script src="js/sabadou-fanart-records.js?v=20261009-3"></script>
-<script src="js/sabadou-sounds.js?v=20261009-3"></script>
-<script src="../comum/js/sabadou-run.js?v=20261009-3"></script>
+<script src="js/sabadou-updates.js?v=20261009-3-publicacao-20261009"></script>
+<script src="js/sabadou-navigation.js?v=20261009-3-publicacao-20261009"></script>
+<script src="js/sabadou-fanart-records.js?v=20261009-3-publicacao-20261009"></script>
+<script src="js/sabadou-sounds.js?v=20261009-3-publicacao-20261009"></script>
+<script src="js/sabadou-run.js?v=20261009-3-publicacao-20261009"></script>
 <script>
 
 const PLAY='<svg viewBox="0 0 24 24" width="34" height="34" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>',PAUSE='<svg viewBox="0 0 24 24" width="34" height="34" fill="currentColor" aria-hidden="true"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>';
@@ -497,7 +497,7 @@ function pick(i){document.querySelectorAll('.day').forEach(b=>b.classList.toggle
  else{const n=6-i;$('#dr').innerHTML=`<b>NÃO É SÁBADO</b>${n===1?'falta 1 dia':'faltam '+n+' dias'} pra sábado`}}
 document.querySelectorAll('.day').forEach(b=>b.onclick=()=>pick(+b.dataset.d));pick(new Date().getDay());
 // gerador de frase
-const SRC=new Image(),mc=document.createElement('canvas'),mg=mc.getContext('2d');mc.width=mc.height=1080;SRC.src='../comum/img/sabadou-classico.jpg';
+const SRC=new Image(),mc=document.createElement('canvas'),mg=mc.getContext('2d');mc.width=mc.height=1080;SRC.src='img/sabadou-classico.jpg';
 async function meme(){const t=($('#mw').value.trim()||'sábado').toLowerCase(),S=1080;
  try{await document.fonts.load('700 80px "Comic Neue"')}catch(e){}
  const gr=mg.createLinearGradient(0,0,0,S);gr.addColorStop(0,'#8b4aa9');gr.addColorStop(1,'#d3aee4');mg.fillStyle=gr;mg.fillRect(0,0,S,S);
@@ -544,7 +544,7 @@ $('#yr').textContent=new Date().getFullYear();
 // imagem larga do Instagram abre grande e rola para os lados
 const ip=document.querySelector('#insta .ig img');if(ip)ip.onclick=()=>{$('#lbi').src=ip.src;lb.classList.add('on','wide')};
 
-// ===== avisos (../comum/avisos.json ou Supabase) + área do admin =====
+// ===== avisos (avisos.json ou Supabase) + área do admin =====
 const CFG=(typeof SITE_CONFIG!=='undefined'?SITE_CONFIG:window.SITE_CONFIG)||{},ss=(k,v)=>{try{return v===undefined?sessionStorage.getItem(k):sessionStorage.setItem(k,v)}catch(e){}};
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmtD=d=>{try{return new Date(/^\d{4}-\d\d-\d\d$/.test(d)?d+'T12:00:00':d).toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'})}catch(e){return''}};
@@ -553,7 +553,7 @@ let sb=null,isAdmin=false,AV=[],editId=null;
 async function loadAv(){
   try{
     if(sb){const r=await sb.from('avisos').select('*').order('fixado',{ascending:false}).order('criado_em',{ascending:false});if(r.error)throw r.error;AV=r.data}
-    else{const r=await fetch('../comum/avisos.json',{cache:'no-store'});if(!r.ok)throw 0;
+    else{const r=await fetch('avisos.json',{cache:'no-store'});if(!r.ok)throw 0;
       AV=(await r.json()).map((a,i)=>({id:i,titulo:a.titulo,texto:a.texto,fixado:!!a.fixado,criado_em:a.data}));
       AV.sort((a,b)=>(b.fixado-a.fixado)||String(b.criado_em).localeCompare(String(a.criado_em)))}
   }catch(e){if(!AV.length)$('#avl').innerHTML='<p class="mut">Não consegui carregar os avisos agora.</p>';return}

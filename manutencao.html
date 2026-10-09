@@ -6,15 +6,15 @@
 <meta name="robots" content="noindex">
 <title>Sabadou — voltamos já</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Nunito:wght@600;800&display=swap">
-<script src="config.js?v=20261009-18h"></script>
+<script src="js/sabadou-site-links.js?v=20261009-comum-publicacao-20261009"></script>
+<script src="config.js?v=20261009-18h-publicacao-20261009"></script>
+<script src="js/sabadou-maintenance.js?v=20261009-prazo-publicacao-20261009"></script>
 <script>
 document.documentElement.dataset.maintenanceCheck='pending';
 const revealMaintenance=()=>delete document.documentElement.dataset.maintenanceCheck;
-(async()=>{try{const c=typeof SITE_CONFIG!=='undefined'?SITE_CONFIG:{};if(!c.supabaseUrl||!c.supabaseKey){revealMaintenance();return}
-  const r=await fetch(c.supabaseUrl.replace(/\/$/,'')+'/rest/v1/site_settings?id=eq.1&select=maintenance',{headers:{apikey:c.supabaseKey}});
-  if(!r.ok)throw new Error('settings unavailable');const rows=await r.json();
-  const deadline=Date.parse(c.maintenanceUntil);
-  if(!rows[0]?.maintenance||(Number.isFinite(deadline)&&Date.now()>=deadline)){location.replace('index.html');return}
+(async()=>{try{
+  const settings=await window.SabadouMaintenance.read();
+  if(!window.SabadouMaintenance.isActive(settings)){location.replace(window.SabadouSiteLinks.home);return}
 }catch(e){console.warn('Não foi possível verificar o modo de manutenção.',e)}revealMaintenance()})();
 </script>
 <style>html[data-maintenance-check="pending"] body{visibility:hidden}</style>
@@ -225,7 +225,7 @@ small{
 
     <div class="fr" id="fr">
       <img
-        src="assets/img/sabadou-classico.jpg"
+        src="img/sabadou-classico.jpg"
         alt="Sabadou, o sapo roxo"
         onerror="this.parentNode.style.display='none'"
       >
@@ -280,7 +280,6 @@ small{
 const CONFIG={
   titulo:'em manutenção',
   frase:'o sabadou tá arrumando a casa. volta já, calabresos.',
-  volta:SITE_CONFIG.maintenanceUntil,
   instagram:'https://www.instagram.com/sabadouofficiall/',
   status:[
     'arrumando o sábado...',
@@ -309,7 +308,7 @@ $('#admin-login-form').onsubmit=async e=>{
     if(login.error)throw new Error('E-mail ou senha incorretos.');
     const check=await client.from('admins').select('user_id').eq('user_id',login.data.user.id).maybeSingle();
     if(check.error||!check.data){await client.auth.signOut();throw new Error('Essa conta não tem acesso de administrador.');}
-    status.textContent='Acesso confirmado.';location.replace('index.html');
+    status.textContent='Acesso confirmado.';location.replace(window.SabadouSiteLinks.home);
   }catch(error){status.textContent=error.message||'Não foi possível entrar.';button.disabled=false}
 };
 
@@ -343,38 +342,26 @@ setInterval(()=>{
 /* previsão de volta */
 
 function volta(){
-
-  if(!CONFIG.volta)return;
-
-  const retorno=new Date(CONFIG.volta);
-  const t=retorno-new Date();
-  const el=$('#volta');
-
-  if(isNaN(t)){
-    return
-  }
-
-  if(t<=0){
-    location.replace('index.html');
-    return
-  }
-
-  const m=Math.floor(t/60000);
-  const d=Math.floor(m/1440);
-  const h=Math.floor(m%1440/60);
-  const mm=m%60;
-
-  el.textContent=
-    'volta em '+retorno.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',timeZone:'America/Sao_Paulo'})+
+  const settings=window.SabadouMaintenance.state;
+  const deadline=window.SabadouMaintenance.deadline(settings);
+  const retorno=new Date(deadline),t=retorno-Date.now(),el=$('#volta');
+  if(!deadline||!Number.isFinite(t)){el.textContent='voltamos em breve, calabresos.';return}
+  if(t<=0){el.textContent='Conferindo a volta do site...';return}
+  const total=Math.ceil(t/1000),d=Math.floor(total/86400),h=Math.floor(total%86400/3600),m=Math.floor(total%3600/60),s=total%60;
+  el.textContent='volta em '+retorno.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',timeZone:'America/Sao_Paulo'})+
     ' às '+retorno.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',timeZone:'America/Sao_Paulo'})+
-    ' (Brasília) · faltam '+
-    (d?d+'d ':'')+
-    (h||d?h+'h ':'')+
-    mm+'min'
+    ' (Brasília) · faltam '+(d?d+'d ':'')+(h||d?h+'h ':'')+m+'min '+s+'s';
 }
-
-volta();
-setInterval(volta,30000);
+function updateReturn(){
+  const settings=window.SabadouMaintenance.state;
+  if(settings&&!window.SabadouMaintenance.isActive(settings)){location.replace(window.SabadouSiteLinks.home);return}
+  volta();
+}
+window.addEventListener('sabadou:maintenance',updateReturn);
+updateReturn();
+setInterval(volta,1000);
+// Busca alterações feitas pelo admin enquanto a pessoa espera nesta página.
+setInterval(()=>{if(!document.hidden)window.SabadouMaintenance.read().catch(error=>console.warn('Não foi possível atualizar a volta.',error))},15000);
 
 
 /* inclinação do sapo */

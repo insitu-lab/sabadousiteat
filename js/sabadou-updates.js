@@ -55,7 +55,7 @@
     lock(true);
     (async()=>{try{
       const r=await client.from('site_settings').select('*').eq('id',1).single();if(r.error)throw r.error;
-      if(!Object.prototype.hasOwnProperty.call(r.data,'update_enabled'))throw new Error('Execute comum/supabase-avisos-atualizacao.sql no SQL Editor do Supabase.');
+      if(!Object.prototype.hasOwnProperty.call(r.data,'update_enabled'))throw new Error('Execute supabase/sql/supabase-avisos-atualizacao.sql no SQL Editor do Supabase.');
       const row=r.data;ready=true;enabled.checked=!!row.update_enabled;message.value=row.update_message||'';link.value=row.update_link||'#avisos';
       const minutes=Math.round((Date.parse(row.update_until)-Date.parse(row.update_started_at))/60000);
       if(minutes>0&&minutes<=43200){unit.value=minutes%1440===0?'1440':minutes%60===0?'60':'1';duration.value=minutes/Number(unit.value)}
