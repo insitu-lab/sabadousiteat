@@ -20,7 +20,15 @@ function size(){const m=innerWidth<700;if(ready&&m===mob)return;ready=true;mob=m
   if(st==='run')st='idle';obs=[];y=G;vy=0}
 const sp=()=>mob?.92:1;size();addEventListener('resize',size);
 function reset(){score=0;phase=0;v=6.4;y=G;vy=0;obs=[];gap=560;banner=100;st='run';shake=0}
-function jump(){if(st!=='run'){reset();return}if(y>=G-.5)vy=-12.8}
+function jump(){if(st!=='run')return;if(y>=G-.5){vy=-12.8;window.SabadouSounds?.play('jump')}}
+const endDialog=document.createElement('dialog');
+endDialog.style.cssText='width:min(92vw,420px);padding:1.5rem;border:2px solid #a64dff;border-radius:24px;background:#12061f;color:#f6ecff;text-align:center;font:700 1.05rem/1.5 Nunito,system-ui,sans-serif';
+endDialog.innerHTML='<h2 style="font:400 2rem/1.1 &quot;Bagel Fat One&quot;,Impact,sans-serif;margin:0 0 .8rem"></h2><p style="margin:0 0 1.2rem">Quer jogar de novo? Você também pode fechar esta janela e tirar seu print.</p><div style="display:flex;justify-content:center;gap:.7rem;flex-wrap:wrap"><button type="button" data-restart style="font:inherit;font-weight:800;border:0;border-radius:99px;padding:.75rem 1.1rem;background:#f2b8ff;color:#2a0f3d;cursor:pointer">jogar de novo</button><button type="button" data-dismiss style="font:inherit;font-weight:800;border:2px solid #a64dff;border-radius:99px;padding:.7rem 1rem;background:transparent;color:#f6ecff;cursor:pointer">fechar e tirar print</button></div>';
+document.body.appendChild(endDialog);
+function finish(result){if(st!=='run')return;st=result;shake=result==='dead'?14:0;endDialog.querySelector('h2').textContent=result==='won'?'Você chegou ao sábado!':'Fim de jogo';endDialog.showModal();window.SabadouSounds?.play(result==='won'?'win':'lose')}
+endDialog.querySelector('[data-restart]').addEventListener('click',()=>{endDialog.close();reset()});
+endDialog.querySelector('[data-dismiss]').addEventListener('click',()=>endDialog.close());
+endDialog.addEventListener('cancel',e=>e.preventDefault());
 function spawn(){
   const k=['cal'];if(phase>=1)k.push('cal2');if(phase>=2)k.push('bird','bird');if(phase>=4)k.push('cal3');
   const T=k[Math.floor(Math.random()*k.length)],x=W+40;
@@ -38,8 +46,8 @@ function step(dt){
   for(const o of obs)o.x-=v*dt;obs=obs.filter(o=>o.x>-120);
   const fh=ducking?26:46,fw=ducking?54:40,fx=76,fy=y-fh+5,fW=fw-12,fH=fh-8;
   for(const o of obs)if(fx<o.x+o.w-4&&fx+fW>o.x+4&&fy<o.y+o.h-3&&fy+fH>o.y+3){
-    st='dead';shake=14;if(score>hi){hi=Math.floor(score);try{localStorage.setItem('sab_hi',hi)}catch(e){}}}
-  if(score>=PL*6){score=PL*6;phase=5;st='won'}
+    finish('dead');if(score>hi){hi=Math.floor(score);try{localStorage.setItem('sab_hi',hi)}catch(e){}}break}
+  if(st==='run'&&score>=PL*6){score=PL*6;phase=5;finish('won')}
 }
 
 const px=(x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(Math.round(x/4)*4,Math.round(y/4)*4,Math.ceil(w/4)*4,Math.ceil(h/4)*4)};
