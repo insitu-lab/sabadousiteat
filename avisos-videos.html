@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#12061f">
+<title>Sabadou — avisos em vídeo</title>
+<script src="config.js"></script>
+<script>
+// A página dos vídeos segue a mesma manutenção da versão principal.
+document.documentElement.dataset.maintenanceCheck='pending';
+(async()=>{
+  const c=typeof SITE_CONFIG!=='undefined'?SITE_CONFIG:{};
+  try{
+    if(!c.supabaseUrl||!c.supabaseKey)throw new Error('Configuração indisponível');
+    const base=c.supabaseUrl.replace(/\/$/,''),headers={apikey:c.supabaseKey};
+    const response=await fetch(base+'/rest/v1/site_settings?id=eq.1&select=maintenance',{headers});
+    if(!response.ok)throw new Error('settings unavailable');
+    const rows=await response.json(),deadline=Date.parse(c.maintenanceUntil);
+    if(rows[0]?.maintenance&&(!Number.isFinite(deadline)||Date.now()<deadline)){
+      const ref=new URL(base).hostname.split('.')[0];
+      const raw=localStorage.getItem('sb-'+ref+'-auth-token'),session=raw&&JSON.parse(raw);
+      let admin=false;
+      if(session?.access_token&&session?.user?.id){
+        const check=await fetch(base+'/rest/v1/admins?user_id=eq.'+encodeURIComponent(session.user.id)+'&select=user_id',{headers:{...headers,Authorization:'Bearer '+session.access_token}});
+        admin=check.ok&&(await check.json()).length>0;
+      }
+      if(!admin){location.replace('manutencao.html');return}
+    }
+    delete document.documentElement.dataset.maintenanceCheck;
+  }catch(error){console.warn('Não foi possível verificar a manutenção.',error);location.replace('manutencao.html')}
+})();
+</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Nunito:wght@600;800&display=swap">
+<link rel="stylesheet" href="css/avisos-videos.css?v=20261009-1">
+<script src="js/avisos-videos.js?v=20261009-1" defer></script>
+</head>
+<body>
+<header class="nav"><div class="wrap nv">
+  <a class="logo" data-home href="index.html#avisos">sabadou</a>
+  <a class="cta ghost sm" data-back href="index.html#avisos"><span aria-hidden="true">←</span> voltar aos avisos</a>
+</div></header>
+<main class="wrap">
+  <div class="page-heading">
+    <div class="eyebrow"><span aria-hidden="true">▶</span> recados do Sabadou</div>
+    <h1>avisos em vídeo</h1>
+    <p>As novidades do sapo, agora em movimento. Escolhe um vídeo e dá o play, calabreso.</p>
+  </div>
+  <article class="video-feature" aria-labelledby="video-title">
+    <div class="video-player">
+      <div class="player-label"><span class="dot" aria-hidden="true"></span> novidade <span>1 min 19 s</span></div>
+      <div class="video-frame">
+        <video id="notice-video" controls playsinline preload="metadata" poster="assets/videos/fanarts-poster.jpg?v=20261009-fanart" aria-label="Aviso em vídeo: como enviar fanarts do Sabadou">
+          <source src="assets/videos/sabadou-fanarts-exemplo-1080x1920.mp4?v=20261009-fanart" type="video/mp4">
+          Seu navegador não conseguiu abrir o vídeo. Você pode baixar o arquivo pelo botão ao lado.
+        </video>
+      </div>
+      <p class="video-error" id="video-error" role="status" hidden>Não consegui carregar o vídeo agora. Tente novamente ou baixe o arquivo abaixo.</p>
+    </div>
+    <div class="video-info">
+      <span class="category">fanarts</span>
+      <h2 id="video-title">Sua arte no<br>universo Sabadou</h2>
+      <p class="lead">Agora você pode enviar suas próprias fanarts diretamente pelo site!</p>
+      <p>Veja como escolher seu desenho, acompanhar a análise, receber o resultado e participar do mural dos calabresos.</p>
+      <div class="video-actions">
+        <button class="cta" id="watch-video" type="button"><span aria-hidden="true">▶</span> assistir ao aviso</button>
+        <a class="cta ghost" href="assets/videos/sabadou-fanarts-exemplo-1080x1920.mp4?v=20261009-fanart" download="sabadou-fanarts.mp4"><span aria-hidden="true">↓</span> baixar vídeo</a>
+      </div>
+      <a class="fanart-link" data-fanarts href="index.html#fanarts">ir para as fanarts <span aria-hidden="true">→</span></a>
+      <details class="transcript">
+        <summary>ler o aviso <span aria-hidden="true">⌄</span></summary>
+        <div>
+          <p>Agora vocês podem enviar suas próprias fanarts do Sabadou diretamente pelo nosso site!</p>
+          <p>E olha só como funciona!</p>
+          <p>Primeiro, você entra no site, clica no botão "Enviar fanart", escolhe seu desenho e confirma o envio.</p>
+          <p>Depois disso, sua fanart entra no nosso sistema de análise! Você pode acompanhar tudo por uma barra com três etapas: Enviado, Análise e Resultado.</p>
+          <p>Mas o que acontece depois?</p>
+          <p>É simples! O administrador recebe sua fanart e decide se ela será aprovada ou recusada.</p>
+          <p>Se for aprovada, você recebe um aviso na tela informando que seu desenho passou pela análise!</p>
+          <p>Mas, se for recusada, você também recebe um aviso mostrando o resultado.</p>
+          <p>E agora vem a melhor parte!</p>
+          <p>Quando sua fanart é aprovada, ela aparece no pódio do nosso site, onde todos os calabresos podem admirar sua criação!</p>
+          <p>E não para por aí!</p>
+          <p>Como prêmio, sua fanart também será publicada nos Stories oficiais do Sabadou, com seu perfil marcado, para todo mundo conhecer o artista por trás do desenho!</p>
+          <p>Então, já prepara o lápis, solta a criatividade e manda sua fanart!</p>
+          <p>Quem sabe a próxima arte a aparecer nos Stories não seja a sua?</p>
+        </div>
+      </details>
+    </div>
+  </article>
+  <a class="back-bottom" data-back href="index.html#avisos">← voltar aos avisos</a>
+</main>
+<footer><div class="wrap footer-inner"><span class="logo">sabadou</span><span>é sábado, meus calabresos.</span><a class="cta ghost sm" href="https://www.instagram.com/sabadouofficiall/" target="_blank" rel="noopener">Instagram</a></div></footer>
+<script src="js/sabadou-sounds.js?v=20261008-4"></script>
+</body>
+</html>

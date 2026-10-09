@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#12061f">
+
+<!-- SISTEMA DE MANUTENÇÃO -->
+<script src="config.js"></script>
+<script>
+document.documentElement.dataset.maintenanceCheck='pending';
+const revealSite=()=>delete document.documentElement.dataset.maintenanceCheck;
+const cfg=typeof SITE_CONFIG!=='undefined'?SITE_CONFIG:{};
+if(cfg.supabaseUrl&&cfg.supabaseKey){
+  (async()=>{try{
+    const base=cfg.supabaseUrl.replace(/\/$/,'');
+    const headers={apikey:cfg.supabaseKey};
+    const settings=await fetch(base+'/rest/v1/site_settings?id=eq.1&select=maintenance',{headers});
+    if(!settings.ok)throw new Error('settings unavailable');
+    const rows=await settings.json();
+    const deadline=Date.parse(cfg.maintenanceUntil);
+    if(rows[0]?.maintenance&&(!Number.isFinite(deadline)||Date.now()<deadline)){
+      const ref=new URL(base).hostname.split('.')[0],raw=localStorage.getItem('sb-'+ref+'-auth-token');
+      const session=raw&&JSON.parse(raw),token=session?.access_token,userId=session?.user?.id;
+      let admin=false;
+      if(token&&userId){const check=await fetch(base+'/rest/v1/admins?user_id=eq.'+encodeURIComponent(userId)+'&select=user_id',{headers:{...headers,Authorization:'Bearer '+token}});admin=check.ok&&(await check.json()).length>0}
+      if(!admin){location.replace('manutencao.html');return}
+    }
+  }catch(e){console.warn('Não foi possível verificar o modo de manutenção.',e);location.replace('manutencao.html');return}
+  revealSite()})();
+}else location.replace('manutencao.html');
+</script>
+<style>html[data-maintenance-check="pending"] body{visibility:hidden}</style>
+
+<title>Sabadou — é sábado meus calabresos</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Nunito:wght@600;800&family=Comic+Neue:wght@700&display=swap">
+<style>
+:root{box-sizing:border-box;padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#12061f;--ink:#f6ecff;--pur:#a64dff;--hot:#ff4fd8;--lil:#f2b8ff;--card:rgba(166,77,255,.16);--nav:rgba(18,6,31,.8);--line:rgba(166,77,255,.5);
+--disp:"Bagel Fat One","Arial Black",Impact,sans-serif;--sans:"Nunito",system-ui,sans-serif}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f6ecff;--ink:#25093a;--card:rgba(166,77,255,.12);--nav:rgba(246,236,255,.88)}}
+:root[data-theme="dark"]{--bg:#12061f;--ink:#f6ecff;--nav:rgba(18,6,31,.8)}
+*{box-sizing:border-box}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 76px);scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:600 1.15rem/1.6 var(--sans);overflow-x:hidden}
+h1,h2,h3{font-family:var(--disp);font-weight:400;margin:0;line-height:1}
+.wrap{max-width:1280px;margin:0 auto;padding:0 clamp(20px,5vw,64px)}
+.bar{position:fixed;top:env(safe-area-inset-top,0px);left:0;height:5px;width:0;background:linear-gradient(90deg,var(--pur),var(--hot),var(--lil));z-index:30}
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--nav);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.nv{display:flex;justify-content:space-between;align-items:center;height:68px;gap:1rem}
+.logo{font-family:var(--disp);font-size:1.6rem;color:var(--ink);text-decoration:none}
+.nv nav{display:flex;gap:2rem}.nv nav a{color:var(--ink);text-decoration:none;font-weight:800;opacity:.85}.nv nav a:hover{color:var(--hot);opacity:1}
+.cta{display:inline-flex;align-items:center;gap:.6rem;margin:0 .7rem .7rem 0;font:inherit;font-weight:800;font-size:1.1rem;text-decoration:none;color:#2a0f3d;background:var(--lil);border:2px solid var(--lil);border-radius:99px;padding:1rem 2rem;cursor:pointer;transition:transform .2s,box-shadow .2s}
+.cta:hover{transform:translateY(-3px);box-shadow:0 0 40px var(--lil)}
+.cta.ghost{background:transparent;color:var(--ink);border-color:var(--pur)}
+.cta.sm{padding:.6rem 1.3rem;font-size:1rem;margin:0}
+.sec{padding:clamp(72px,11vw,150px) 0}
+.sh{margin-bottom:clamp(2rem,5vw,4rem)}
+.sh h2,.big{font-size:clamp(2.6rem,7vw,5.6rem)}
+.sh p{margin:1rem 0 0;font-size:1.3rem;opacity:.8;max-width:34em}
+.band{color:#fff}
+.hero{position:relative;overflow:hidden;background:radial-gradient(55% 55% at 85% 35%,rgba(166,77,255,.45),transparent),radial-gradient(40% 40% at 5% 95%,rgba(255,79,216,.25),transparent)}
+.hero .wrap{display:grid;grid-template-columns:1.05fr .95fr;gap:4rem;align-items:center;min-height:calc(100vh - 68px);min-height:calc(100svh - 68px);padding-top:6vh;padding-bottom:8vh}
+.hero h1{font-size:clamp(3.4rem,11vw,9rem);line-height:.92;letter-spacing:-.02em}
+.hero h1 .w{display:inline-block;opacity:0;transform:translateY(70%) rotate(-6deg) scale(.8);animation:pop 1s cubic-bezier(.2,1.4,.3,1) forwards;animation-delay:calc(var(--i)*160ms + 150ms);margin-right:.22em}
+@keyframes pop{to{opacity:1;transform:none}}
+.hero p{max-width:24em;font-size:clamp(1.2rem,2vw,1.5rem);opacity:.9;margin:1.6rem 0 2.2rem}
+.frame{position:relative;border-radius:40px;overflow:hidden;box-shadow:0 40px 110px rgba(166,77,255,.6);transform:perspective(1000px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .15s}
+.frame img{display:block;width:100%}
+.fl{position:absolute;font-size:2.4rem;animation:bob 3s ease-in-out infinite;pointer-events:none}
+@keyframes bob{50%{transform:translateY(-14px) rotate(8deg)}}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;padding:clamp(48px,7vw,90px) 0;text-align:center}
+.stats b{display:block;font:400 clamp(2.8rem,8vw,6.4rem)/1 var(--disp);background:linear-gradient(90deg,var(--pur),var(--hot));-webkit-background-clip:text;background-clip:text;color:transparent}
+.stats span{display:block;margin-top:.5rem;font-size:1.2rem;opacity:.8}
+.mq{overflow:hidden;white-space:nowrap;background:var(--pur);color:#fff;padding:.7rem 0;font-family:var(--disp);font-size:clamp(1.6rem,4vw,2.8rem)}
+.mq.b{background:var(--lil);color:#2a0f3d}.mq div{display:inline-block;will-change:transform}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:clamp(2rem,6vw,6rem);align-items:center}
+.lead{font-size:clamp(1.5rem,3vw,2.4rem);line-height:1.25;margin:1.6rem 0 2.4rem;font-weight:800}
+.split h3{font-size:clamp(1.6rem,3vw,2.4rem);margin-bottom:.8rem}.split p{margin:0;opacity:.88;max-width:30em}
+.ph{position:relative}.ph>img:first-child{display:block;width:100%;border-radius:40px;box-shadow:0 30px 90px rgba(166,77,255,.4)}
+.ph .av{position:absolute;left:-20px;bottom:-20px;width:clamp(96px,14vw,150px);aspect-ratio:1;border-radius:50%;object-fit:cover;border:5px solid var(--bg);box-shadow:0 0 0 5px var(--pur)}
+.mu{background:linear-gradient(135deg,#3b0f78,#7b2cbf 50%,#c2399f)}
+.mu .pl{background:rgba(10,0,25,.38);border-radius:40px;padding:clamp(1.4rem,4vw,3rem)}
+#eq{display:block;width:100%;height:clamp(110px,16vw,190px)}
+.ctl{display:flex;align-items:center;gap:1.2rem;margin-top:1.4rem;flex-wrap:wrap}
+#pp{flex:0 0 auto;display:grid;place-items:center;width:88px;height:88px;border-radius:50%;border:0;background:var(--lil);color:#2a0f3d;cursor:pointer;transition:transform .15s}
+#pp:active{transform:scale(.9)}
+#sk,#vol{accent-color:var(--hot)}#sk{flex:1;min-width:160px}#vol{width:110px}
+.tm{font-variant-numeric:tabular-nums;opacity:.9;min-width:8em}
+.bento{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:clamp(170px,22vw,300px);gap:1.2rem}
+.gi{margin:0;position:relative;border-radius:30px;overflow:hidden;background:#000;cursor:zoom-in;border:2px solid var(--line)}
+.gi img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.gi:hover img{transform:scale(1.07)}
+.gi figcaption{position:absolute;inset:auto 0 0 0;padding:3rem 1.2rem 1rem;background:linear-gradient(transparent,rgba(10,0,20,.9));font-family:var(--disp);color:#fff;font-size:1.3rem}
+.b1{grid-column:span 2;grid-row:span 2}.b3{grid-row:span 2}
+#lb{position:fixed;inset:0;z-index:40;display:none;place-items:center;background:rgba(10,0,20,.92);padding:5vmin;cursor:zoom-out}
+#lb.on{display:grid}#lb img{max-width:100%;max-height:100%;border-radius:24px}
+.cdb{background:radial-gradient(60% 90% at 50% 0%,rgba(255,79,216,.3),transparent),#1a0833;text-align:center}
+.boxes{display:flex;gap:clamp(.6rem,2vw,1.6rem);justify-content:center;margin-top:2rem}
+.box{flex:1;max-width:240px;padding:clamp(1rem,3vw,2.2rem) .4rem;border-radius:30px;background:rgba(255,255,255,.07);border:2px solid var(--line);font-size:1.1rem}
+.box b{display:block;font:400 clamp(2.4rem,9vw,7rem)/1 var(--disp)}
+.box.pop b{animation:tick .4s}@keyframes tick{50%{transform:scale(1.25) rotate(-5deg);color:var(--hot)}}
+.dv{margin:clamp(2.5rem,6vw,4.5rem) auto;max-width:200px;border:0;border-top:2px solid var(--line)}
+.chips{display:flex;flex-wrap:wrap;gap:.7rem;justify-content:center;margin:1.8rem 0}
+.day{font:inherit;font-weight:800;font-size:1.1rem;border:2px solid var(--pur);background:transparent;color:#fff;border-radius:99px;padding:.7rem 1.4rem;cursor:pointer;transition:transform .15s}
+.day:active{transform:scale(.92)}.day.on{background:var(--pur)}
+#dr{min-height:7rem}#dr b{display:block;font:400 clamp(2rem,6vw,4.4rem)/1 var(--disp);margin-bottom:.6rem}
+.mkw{display:flex;flex-direction:column;align-items:flex-start}
+#mw{font:inherit;font-weight:800;font-size:1.4rem;padding:1rem 1.6rem;border-radius:99px;border:2px solid var(--pur);background:var(--card);color:var(--ink);width:min(100%,380px)}
+#mo{display:block;width:min(100%,520px);margin:0 auto;aspect-ratio:1;border-radius:32px;border:3px solid var(--pur);background:var(--card);box-shadow:0 30px 80px rgba(166,77,255,.4)}
+.ckb{background:#1a0833}
+#btn{display:block;margin:0 auto;width:min(68vw,320px);aspect-ratio:1;border-radius:50%;border:8px solid var(--lil);padding:0;overflow:hidden;cursor:pointer;background:#000;animation:ring 2s infinite;transition:transform .1s;touch-action:manipulation}
+#btn img{width:100%;height:100%;object-fit:cover;object-position:58% 60%;transform:scale(2.1);transform-origin:58% 60%;display:block;pointer-events:none}
+#btn:active{transform:scale(.9) rotate(-3deg)}
+@keyframes ring{0%{box-shadow:0 0 0 0 rgba(242,184,255,.6)}100%{box-shadow:0 0 0 50px rgba(242,184,255,0)}}
+#cnt{font:400 clamp(4rem,10vw,8rem)/1 var(--disp);margin:1rem 0 .4rem}#msg{min-height:2em;opacity:.85}
+.fy{position:fixed;pointer-events:none;z-index:50;font:400 2rem var(--disp);animation:fly 1.1s ease-out forwards}
+@keyframes fly{to{transform:translate(var(--dx),-190px) rotate(var(--r));opacity:0}}
+.ig{display:grid;grid-template-columns:1.6fr 1fr;gap:clamp(2rem,5vw,5rem);align-items:center}
+.ig img{display:block;width:100%;border-radius:22px;border:2px solid var(--line);box-shadow:0 30px 90px rgba(166,77,255,.4)}
+.ig h2{font-size:clamp(2rem,4.4vw,3.6rem);margin-bottom:1.2rem}.ig p{margin:0 0 2rem;opacity:.88}
+footer{background:#0b0315;color:#f6ecff;padding:clamp(48px,7vw,80px) 0 3rem}
+footer .wrap{display:grid;grid-template-columns:1.4fr 1fr auto;gap:2rem;align-items:start}
+footer nav{display:flex;flex-direction:column;gap:.6rem}footer a{color:#f6ecff;text-decoration:none;opacity:.8}footer a:hover{opacity:1;color:var(--hot)}
+footer .cta{color:#f6ecff}
+.rv{opacity:0;transform:translateY(46px);transition:opacity .8s,transform .8s cubic-bezier(.2,.8,.2,1)}.rv.in{opacity:1;transform:none}
+.cta:focus-visible,#pp:focus-visible,#btn:focus-visible,.day:focus-visible,#mw:focus-visible,.gi:focus-visible,a:focus-visible{outline:3px solid var(--hot);outline-offset:3px}
+@media (max-width:860px){.hero .wrap,.split,.ig,footer .wrap{grid-template-columns:1fr}.hero .wrap{text-align:center;min-height:0;gap:2.5rem}.hero p{margin-left:auto;margin-right:auto}.nv nav{display:none}.stats{gap:1rem}.stats span{font-size:.95rem}.bento{grid-template-columns:1fr 1fr}.b1{grid-row:span 1}.b3{grid-row:span 1}.mkw{align-items:center;text-align:center}.ph .av{left:8px}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.hero h1 .w{animation:none;opacity:1;transform:none}.fl,#btn{animation:none}.rv{opacity:1;transform:none;transition:none}}
+
+/* ===== abas ===== */
+.nv nav.tabs{position:relative;display:flex;gap:.2rem;overflow-x:auto;scrollbar-width:none;flex:1;justify-content:center;align-self:stretch;align-items:center}
+.tabs::-webkit-scrollbar{display:none}
+.tabs a{flex:0 0 auto;padding:.5rem 1.1rem;border-radius:99px;color:var(--ink);text-decoration:none;font-weight:800;opacity:.75;transition:opacity .2s,color .2s}
+.tabs a:hover,.tabs a.on{opacity:1}.tabs a.on{color:var(--hot)}
+.ind{position:absolute;left:0;bottom:0;height:3px;width:0;border-radius:3px;background:linear-gradient(90deg,var(--pur),var(--hot));transition:transform .35s cubic-bezier(.2,.8,.2,1),width .35s}
+.panel{display:none;min-height:calc(100vh - 68px)}
+.panel.on{display:block;animation:inR .5s cubic-bezier(.2,.8,.2,1)}.panel.on.l{animation-name:inL}
+@keyframes inR{from{opacity:0;transform:translateX(80px)}}@keyframes inL{from{opacity:0;transform:translateX(-80px)}}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:1.2rem}
+.tile{display:flex;flex-direction:column;justify-content:space-between;gap:2.5rem;min-height:230px;padding:1.6rem;border-radius:30px;background:var(--card);border:2px solid var(--line);color:var(--ink);text-decoration:none;transition:transform .25s,background .25s}
+.tile:hover{transform:translateY(-8px) rotate(-1deg);background:linear-gradient(135deg,rgba(166,77,255,.4),rgba(255,79,216,.3))}
+.tile b{font:400 clamp(1.8rem,3vw,2.6rem)/1 var(--disp)}.tile b::after{content:" →"}.tile span{opacity:.85}
+/* ===== jogos ===== */
+.stage{border-radius:10px;overflow:hidden;border:4px solid #f2b8ff;box-shadow:0 8px 0 #612b91,0 18px 50px rgba(166,77,255,.38);background:#1a0833;image-rendering:pixelated}
+.stage canvas{display:block;width:100%;height:auto;touch-action:none;image-rendering:pixelated}
+.gbar{display:flex;gap:1rem;margin-top:1.4rem;flex-wrap:wrap}.gbar .cta{margin:0;user-select:none;touch-action:manipulation}
+.hint{opacity:.75;margin-top:1rem}
+/* ===== fanarts ===== */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem}
+.pn{background:var(--card);border:2px solid var(--line);border-radius:30px;padding:clamp(1.4rem,3vw,2.2rem)}
+.pn b{display:block;font:400 3.6rem/1 var(--disp);background:linear-gradient(90deg,var(--pur),var(--hot));-webkit-background-clip:text;background-clip:text;color:transparent}
+.pn h3{font-size:1.8rem;margin:.6rem 0}.pn p{margin:0;opacity:.88}
+.soon{margin-top:1.6rem;padding:clamp(1.6rem,4vw,3rem);border-radius:36px;text-align:center;background:linear-gradient(135deg,#3b0f78,#7b2cbf 50%,#c2399f);color:#fff}
+.soon h3{font-size:clamp(2rem,5vw,3.4rem);margin-bottom:.8rem}.soon p{max-width:32em;margin:0 auto 1.6rem}.soon .cta{margin:0}
+/* ===== mini player ===== */
+#mini{position:fixed;right:18px;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);z-index:25;width:58px;height:58px;border-radius:50%;border:0;background:var(--lil);color:#2a0f3d;display:none;place-items:center;cursor:pointer;box-shadow:0 10px 30px rgba(166,77,255,.6)}
+#mini.on{display:grid}#mini svg{width:26px;height:26px}
+/* ===== rodapé ===== */
+footer .wrap.fg{grid-template-columns:1.3fr 1fr 1fr 1.2fr;gap:2.5rem}
+footer h4{font:400 1.2rem var(--disp);margin:0 0 1rem;color:var(--lil)}
+footer p{margin:0 0 1rem;opacity:.75}footer .tg{margin:.6rem 0 1.2rem}
+footer .cta.sm{display:inline-flex;margin:0;font-size:.95rem}
+footer .wrap.fb{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-top:2.5rem;padding-top:1.4rem;border-top:1px solid var(--line);opacity:.7;font-size:.95rem}
+@media (max-width:860px){.nv nav.tabs{display:flex;justify-content:flex-start}.nv>.cta.sm{display:none}.tiles{grid-template-columns:1fr 1fr}.steps{grid-template-columns:1fr}footer .wrap.fg{grid-template-columns:1fr 1fr}.panel{min-height:0}}
+@media (max-width:520px){footer .wrap.fg{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){.panel.on{animation:none}.ind{transition:none}}
+
+/* ===== avisos, banner, login ===== */
+[hidden]{display:none!important}
+.nb{display:flex;align-items:center;justify-content:center;gap:.9rem;flex-wrap:wrap;padding:.65rem 1rem;background:var(--lil);color:#2a0f3d;font-weight:800;text-align:center}
+.nb a{color:#7b2cbf}.nb button{border:0;background:transparent;font-size:1.5rem;line-height:1;cursor:pointer;color:#2a0f3d;padding:0 .3rem}
+.dot{display:inline-block;width:9px;height:9px;margin-left:.45rem;border-radius:50%;background:var(--hot);vertical-align:middle;animation:pul 1.6s ease-in-out infinite}
+@keyframes pul{50%{transform:scale(1.5);opacity:.6}}
+.avl{display:grid;gap:1.2rem;max-width:820px}
+.av{padding:clamp(1.4rem,3vw,2rem);border-radius:28px;background:var(--card);border:2px solid var(--line)}
+.av.fx{border-color:var(--hot);background:linear-gradient(135deg,rgba(166,77,255,.28),rgba(255,79,216,.2))}
+.avh{display:flex;gap:.8rem;align-items:center;justify-content:space-between;flex-wrap:wrap;opacity:.9;font-size:.95rem;margin-bottom:.6rem}
+.pin{display:inline-flex;gap:.4rem;align-items:center;font-weight:800;color:var(--hot)}
+.av h3{font-size:clamp(1.4rem,3vw,2rem);line-height:1.1;margin-bottom:.7rem}.av p{margin:0;overflow-wrap:anywhere}
+.adb{display:flex;gap:.6rem;margin-top:1rem;flex-wrap:wrap}
+.adb button{font:inherit;font-weight:800;border:2px solid var(--pur);background:transparent;color:var(--ink);border-radius:99px;padding:.4rem 1rem;cursor:pointer}
+.mut{opacity:.7}.lnk{background:none;border:0;color:var(--hot);font:inherit;font-weight:800;cursor:pointer;text-decoration:underline;padding:0}
+footer .lnk{opacity:.45;color:#f6ecff;font-size:.85rem;margin-left:.6rem}
+.fld{font:inherit;font-size:1.05rem;padding:.9rem 1.1rem;border-radius:18px;border:2px solid var(--pur);background:var(--bg);color:var(--ink);width:100%}
+textarea.fld{resize:vertical;min-height:110px}
+.ed{max-width:820px;display:grid;gap:.9rem;margin-bottom:1.6rem;padding:clamp(1.2rem,3vw,1.8rem);border-radius:28px;border:2px dashed var(--hot);background:var(--card)}
+.ed h3{font-size:1.6rem;display:flex;justify-content:space-between;align-items:center;gap:1rem}
+.chk{display:flex;gap:.7rem;align-items:center}.chk input{width:22px;height:22px;accent-color:var(--hot)}
+.edb{display:flex;gap:.7rem;flex-wrap:wrap}.edb .cta{margin:0}
+dialog{border:2px solid var(--pur);border-radius:28px;background:var(--bg);color:var(--ink);padding:1.6rem;width:min(92vw,420px)}
+dialog::backdrop{background:rgba(10,0,20,.78)}#lgf{display:grid;gap:.9rem}
+/* ===== celular ===== */
+button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.ig img{cursor:zoom-in}
+#lb.wide{overflow:auto;place-items:start center}#lb.wide img{max-width:none;width:max(1100px,100%)}
+.mobhint{display:none}
+@media (max-width:860px){.fl{display:none}.tile{min-height:150px;gap:1.2rem}.bento{grid-auto-rows:150px}.hero p{font-size:1.15rem}}
+@media (max-width:700px){
+  .stage{margin-inline:calc(-1*clamp(20px,5vw,64px));border-radius:0;border-left:0;border-right:0}
+  .gbar{flex-wrap:nowrap}.gbar .cta{flex:1;justify-content:center;padding:1.4rem .8rem;font-size:1.25rem}
+  #vol{display:none}#pp{width:72px;height:72px}.box{font-size:.85rem}.cta{padding:.9rem 1.5rem}
+}
+@media (max-width:700px) and (orientation:portrait){.mobhint{display:block}}
+</style>
+</head>
+<body>
+<div class="bar" id="bar"></div>
+<header class="nav"><div class="wrap nv">
+  <a class="logo" href="#inicio">sabadou</a>
+  <nav class="tabs" role="tablist" aria-label="Seções do site"><a role="tab" href="#inicio">início</a><a role="tab" href="#avisos">avisos<i class="dot" hidden></i></a><a role="tab" href="#musica">música</a><a role="tab" href="#galeria">galeria</a><a role="tab" href="#jogos">jogos</a><a role="tab" href="#fanarts">fanarts</a><a role="tab" href="#calabresos">calabresos</a><i class="ind"></i></nav>
+  <a class="cta sm" href="https://www.instagram.com/sabadouofficiall/" target="_blank" rel="noopener">Instagram</a>
+</div></header>
+<div class="nb" id="nb" hidden><span id="nbt"></span><a href="#avisos">ver aviso</a><button id="nbx" type="button" aria-label="Fechar aviso">×</button></div>
+
+<main>
+<section class="panel" id="inicio">
+<section class="hero" id="hero"><span id="top"></span>
+  <div class="wrap">
+    <div>
+      <h1 aria-label="é sábado meus calabresos"><span class="w" style="--i:0" aria-hidden="true">é</span><span class="w" style="--i:1" aria-hidden="true">sábado</span><span class="w" style="--i:2" aria-hidden="true">meus</span><span class="w" style="--i:3" aria-hidden="true">calabresos</span></h1>
+      <p>O cantinho oficial dos calabresos. Música, galeria e coisa pra mexer.</p>
+      <button class="cta" id="hp"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>ouvir a música</button><a class="cta ghost" href="#calabresos">área dos calabresos</a>
+    </div>
+    <div class="frame" id="frame"><img src="img/sabadou-classico.jpg" alt="Sabadou, o sapo roxo, com a frase é sábado meus calabresos"></div>
+  </div>
+  <span class="fl" style="left:3%;top:12%">💜</span><span class="fl" style="right:4%;top:9%;animation-delay:-1s">✨</span><span class="fl" style="left:48%;bottom:4%;animation-delay:-2s">💖</span>
+</section>
+<div class="wrap"><div class="stats rv">
+  <div><b data-n="13" data-s=" mil+">13 mil+</b><span>calabresos no Instagram</span></div>
+  <div><b data-n="1">1</b><span>música autoral no ar</span></div>
+  <div><b data-n="100" data-s="%">100%</b><span>sábado, o ano inteiro</span></div>
+</div></div>
+<div class="mq" id="m1"><div></div></div>
+<div class="mq b" id="m2"><div></div></div>
+<section class="sec" id="sobre"><div class="wrap split">
+  <div class="rv">
+    <h2 class="big">quem é o sabadou?</h2>
+    <p class="lead">humor, sapo & sábado. A conta oficial do sábado.</p>
+    <h3>o mundo dos bacanos</h3>
+    <p>Todos os sapos desse universo são chamados de bacanos, e tem bacano de várias cores. Os fãs do Sabadou são os calabresos.</p>
+  </div>
+  <div class="ph rv"><img loading="lazy" src="img/sabadou-celular.jpg" alt="Sabadou sentado na escada olhando o celular"><img class="av" src="img/sabadou-avatar.jpg" alt="Sabadou em preto e branco"></div>
+</div></section>
+<section class="sec" id="explore"><div class="wrap">
+  <div class="sh rv"><h2>explore</h2><p>O site tem abas. Escolhe pra onde ir.</p></div>
+  <div class="tiles rv">
+    <a class="tile" href="#jogos"><b>jogos</b><span>Pule, agache e chegue no sábado.</span></a>
+    <a class="tile" href="#fanarts"><b>fanarts</b><span>O mural dos calabresos.</span></a>
+    <a class="tile" href="#musica"><b>música</b><span>A música autoral do Sabadou.</span></a>
+    <a class="tile" href="#galeria"><b>galeria</b><span>As imagens do sapo.</span></a>
+  </div>
+</div></section>
+<section class="sec" id="insta"><div class="wrap ig">
+  <img class="rv" src="img/instagram-perfil.jpg" alt="Perfil do Sabadou no Instagram">
+  <div class="rv"><h2>segue o sabadou lá também</h2><p>Posts novos, humor, sapo e sábado. Parcerias: chama na DM do Instagram.</p>
+    <a class="cta" href="https://www.instagram.com/sabadouofficiall/" target="_blank" rel="noopener">Abrir o Instagram</a></div>
+</div></section>
+</section>
+
+<section class="panel" id="avisos"><div class="sec"><div class="wrap">
+  <div class="sh rv"><h2>avisos</h2><p>Recados do Sabadou para os calabresos.</p></div>
+  <div id="adm-box"></div>
+  <div class="avl" id="avl"><p class="mut">Carregando avisos...</p></div>
+</div></div></section>
+
+<section class="panel" id="musica">
+<section class="sec band mu"><div class="wrap">
+  <div class="sh rv"><h2>música</h2><p>A música autoral do Sabadou. Aperta o play e aumenta o volume.</p></div>
+  <div class="pl rv" id="mus">
+    <canvas id="eq" width="600" height="90" aria-hidden="true"></canvas>
+    <div class="ctl"><button id="pp" aria-label="Tocar"><svg viewBox="0 0 24 24" width="34" height="34" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg></button><input id="sk" type="range" min="0" max="1000" value="0" aria-label="Posição da música"><span class="tm" id="tm">0:00</span><input id="vol" type="range" min="0" max="100" value="80" aria-label="Volume"></div>
+    <audio id="au" preload="metadata" src="audio/musica.mp3"></audio>
+  </div>
+</div></section>
+</section>
+
+<section class="panel" id="galeria">
+<section class="sec"><div class="wrap">
+  <div class="sh rv"><h2>galeria</h2><p>Clica numa imagem para ver grande.</p></div>
+  <div class="bento rv">
+    <figure class="gi b1" tabindex="0" role="button" aria-label="Ampliar"><img loading="lazy" src="img/sabadouxxx.jpg" alt="Sabadouxxx com raios e números 67"><figcaption>sabadouxxx 67</figcaption></figure>
+    <figure class="gi" tabindex="0" role="button" aria-label="Ampliar"><img src="img/sabadou-classico.jpg" alt="O clássico"><figcaption>o clássico</figcaption></figure>
+    <figure class="gi b3" tabindex="0" role="button" aria-label="Ampliar"><img loading="lazy" src="img/sabadou-celular.jpg" alt="Sabadou no celular"><figcaption>sabadou no celular</figcaption></figure>
+    <figure class="gi" tabindex="0" role="button" aria-label="Ampliar"><img loading="lazy" src="img/sabadou-e-calabresos.jpg" alt="Sabadou e calabresos"><figcaption>sabadou e calabresos</figcaption></figure>
+  </div>
+</div></section>
+
+</section>
+
+<section class="panel" id="jogos"><div class="sec"><div class="wrap">
+  <div class="sh rv"><h2>jogos</h2><p>Mais jogos chegam por aqui. Por enquanto, tem o Sabadou Run.</p></div>
+  <div class="stage rv"><canvas id="dg" width="800" height="260" aria-label="Sabadou Run, jogo do sapinho que pula e agacha"></canvas></div>
+  <div class="gbar"><button class="cta" id="gj" type="button">pular ↑</button><button class="cta ghost" id="gd" type="button">agachar ↓</button></div>
+  <p class="hint mobhint">Dica: gire o celular na horizontal pra jogar em tela maior.</p>
+  <p class="hint">Espaço ou ↑ pula, ↓ agacha. No celular, use os botões. Cada fase é um dia da semana e a última é o sábado.</p>
+</div></div></section>
+
+<section class="panel" id="fanarts"><div class="sec"><div class="wrap">
+  <div class="sh rv"><h2>fanarts</h2><p>O mural dos calabresos, com ranking semanal e mensal.</p></div>
+  <div class="steps rv">
+    <div class="pn"><b>1</b><h3>envie</h3><p>Crie sua conta com o @ do Instagram e mande a sua arte.</p></div>
+    <div class="pn"><b>2</b><h3>revisão</h3><p>O Sabadou vê tudo antes de publicar. Você recebe o aviso de que sua arte está em revisão.</p></div>
+    <div class="pn"><b>3</b><h3>mural</h3><p>Se for aprovada, entra no mural e disputa o ranking.</p></div>
+  </div>
+  <div class="soon rv"><h3>em breve</h3><p>O envio direto pelo site está sendo preparado. Enquanto isso, mostre sua arte no Instagram e marque o perfil.</p><a class="cta" href="https://www.instagram.com/sabadouofficiall/" target="_blank" rel="noopener">Ir pro Instagram</a></div>
+</div></div></section>
+
+<section class="panel" id="calabresos">
+<section class="sec" style="padding-bottom:0"><div class="wrap"><div class="sh rv" style="margin:0"><h2>área dos calabresos</h2><p>Coisas pra mexer enquanto o sábado não chega.</p></div></div></section>
+<section class="sec band cdb" id="cd" style="margin-top:clamp(2rem,5vw,4rem)"><div class="wrap rv">
+  <h2 class="big" id="cdt">Falta pouco pro sábado</h2>
+  <div class="boxes" id="boxes"><div class="box"><b>0</b>dias</div><div class="box"><b>0</b>horas</div><div class="box"><b>0</b>min</div><div class="box"><b>0</b>seg</div></div>
+  <hr class="dv">
+  <h3 class="big" style="font-size:clamp(1.8rem,4vw,3rem)">hoje é sábado?</h3>
+  <div class="chips" id="days"></div><div id="dr" aria-live="polite"></div>
+</div></section>
+<section class="sec"><div class="wrap split">
+  <div class="mkw rv"><h2 class="big">faz o seu</h2><p class="lead">Escreve um dia, ou qualquer coisa, e o Sabadou avisa os calabresos.</p>
+    <input id="mw" maxlength="18" value="sábado" aria-label="Palavra"><p style="margin-top:1.2rem;font-size:1rem;opacity:.7">No celular, segure a imagem para salvar. No computador, botão direito.</p></div>
+  <div class="rv"><img id="mo" alt="Sua frase no estilo do Sabadou"></div>
+</div></section>
+<section class="sec band ckb"><div class="wrap split">
+  <div class="rv"><button id="btn" aria-label="Sabadar"><img src="img/sabadou-classico.jpg" alt=""></button></div>
+  <div class="rv"><h2 class="big">sabadômetro</h2><p class="lead">Toque no sapo. Sem motivo. Só toca.</p><div id="cnt">0</div><div id="msg"></div></div>
+</div></section>
+</section>
+</main>
+
+<button id="mini" type="button" aria-label="Tocar ou pausar a música"></button>
+
+<footer>
+  <div class="wrap fg">
+    <div><div class="logo" style="color:#f6ecff">sabadou</div><p class="tg">é sábado, meus calabresos.</p><a class="cta ghost sm" href="https://www.instagram.com/sabadouofficiall/" target="_blank" rel="noopener">Instagram</a></div>
+    <nav aria-label="Navegar"><h4>navegar</h4><a href="#inicio">início</a><a href="#avisos">avisos</a><a href="#musica">música</a><a href="#galeria">galeria</a><a href="#jogos">jogos</a><a href="#fanarts">fanarts</a><a href="#calabresos">calabresos</a></nav>
+    <nav aria-label="Legal"><h4>legal</h4><a href="termos.html">termos de uso</a><a href="privacy.html">política de privacidade</a><a href="termos.html#direitos">direitos autorais</a><a href="termos.html#fanarts">regras das fanarts</a></nav>
+    <div><h4>parcerias</h4><p>Chama na DM do Instagram.</p><button class="cta ghost sm" id="up" type="button">Voltar ao topo</button></div>
+  </div>
+  <div class="wrap fb"><span>© <span id="yr">2026</span> Sabadou. Todos os direitos reservados.</span><span>Feito pra quem vive de sábado. <button class="lnk" id="adm" type="button" hidden>admin</button></span></div>
+</footer>
+
+<div id="lb"><img id="lbi" alt=""></div>
+
+<dialog id="lg"><form id="lgf"><h3 style="font:400 1.8rem var(--disp);margin:0">entrar (admin)</h3>
+  <input class="fld" id="le" type="email" placeholder="E-mail" autocomplete="username" required>
+  <input class="fld" id="lp" type="password" placeholder="Senha" autocomplete="current-password" required>
+  <p class="mut" id="lm" style="margin:0;min-height:1.4em"></p>
+  <div class="edb"><button class="cta" type="submit">entrar</button><button class="cta ghost" type="button" id="lc">cancelar</button></div></form></dialog>
+
+<script src="js/sabadou-sounds.js"></script>
+<script src="js/sabadou-run.js"></script>
+<script>
+
+const PLAY='<svg viewBox="0 0 24 24" width="34" height="34" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>',PAUSE='<svg viewBox="0 0 24 24" width="34" height="34" fill="currentColor" aria-hidden="true"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>';
+
+
+const $=s=>document.querySelector(s),clamp=(v,a=0,b=1)=>Math.min(b,Math.max(a,v));
+const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+
+// tilt do herói
+const hero=$('#hero'),fr=$('#frame');
+hero.addEventListener('pointermove',e=>{const r=fr.getBoundingClientRect();fr.style.setProperty('--ry',((e.clientX-r.left)/r.width-.5)*18+'deg');fr.style.setProperty('--rx',(.5-(e.clientY-r.top)/r.height)*18+'deg')});
+hero.addEventListener('pointerleave',()=>{fr.style.setProperty('--rx','0deg');fr.style.setProperty('--ry','0deg')});
+
+// faixas que aceleram com a rolagem
+const U='é sábado ✦ meus calabresos ✦ 67 ✦ sabadou ✦ ';
+const rows=[['#m1',1],['#m2',-1]].map(([s,d])=>{const el=$(s+' div');el.textContent=U.repeat(8);return{el,d,x:0,u:0}});
+let lastY=scrollY,vel=0;
+(function mq(){requestAnimationFrame(mq);vel+=(Math.abs(scrollY-lastY)-vel)*.15;lastY=scrollY;
+  for(const r of rows){if(!r.u){r.u=r.el.scrollWidth/8;if(!r.u)continue}r.x=(r.x+(still?0:1+vel*.8))%r.u;r.el.style.transform=`translateX(${r.d>0?-r.x:r.x-r.u}px)`}})();
+
+// confete de emojis
+function spawn(x,y,n=1){const E=['💜','💖','✨','67','🔮'];for(let i=0;i<n;i++){const s=document.createElement('span');s.className='fy';s.textContent=E[Math.floor(Math.random()*E.length)];s.style.left=x+'px';s.style.top=y+'px';s.style.setProperty('--dx',(Math.random()-.5)*260+'px');s.style.setProperty('--r',(Math.random()-.5)*90+'deg');s.onanimationend=()=>s.remove();document.body.appendChild(s)}}
+
+// contagem pro sábado
+const bx=[...document.querySelectorAll('.box')],prev=[];let partied=false;
+function tick(){
+  const now=new Date();
+  if(now.getDay()===6){$('#cdt').textContent='É SÁBADO MEUS CALABRESOS!!!';$('#boxes').style.display='none';
+    if(!partied&&$('#cd').offsetParent&&$('#cd').getBoundingClientRect().top<innerHeight*.6){partied=true;for(let i=0;i<30;i++)setTimeout(()=>spawn(Math.random()*innerWidth,innerHeight*.7),i*60)}return}
+  $('#boxes').style.display='';$('#cdt').textContent='Falta pouco pro sábado';
+  const t=new Date(now.getFullYear(),now.getMonth(),now.getDate()+((6-now.getDay()+7)%7)),s=Math.floor((t-now)/1000);
+  const v=[Math.floor(s/86400),Math.floor(s%86400/3600),Math.floor(s%3600/60),s%60];
+  v.forEach((n,i)=>{if(prev[i]!==n){bx[i].querySelector('b').textContent=n;bx[i].classList.remove('pop');void bx[i].offsetWidth;bx[i].classList.add('pop');prev[i]=n}});
+}
+tick();setInterval(tick,1000);
+
+// rolagem: barra, galeria horizontal, duelo
+addEventListener('scroll',()=>{$('#bar').style.width=scrollY/Math.max(1,document.documentElement.scrollHeight-innerHeight)*100+'%'},{passive:true});
+
+// sabadômetro
+let N=store.get('sab_n',0);const M={10:'tá esquentando…',30:'já é quase sábado',67:'67!!! 💜💜💜',100:'cem sabadadas. respeito.',200:'você é um calabreso de verdade'};
+$('#cnt').textContent=N;
+$('#btn').onclick=e=>{N++;store.set('sab_n',N);$('#cnt').textContent=N;if(M[N])$('#msg').textContent=M[N];
+  const r=e.clientX?[e.clientX,e.clientY]:[$('#btn').getBoundingClientRect().left+100,$('#btn').getBoundingClientRect().top+60];
+  spawn(r[0],r[1],N===67?30:3)};
+$('#up').onclick=()=>scrollTo({top:0,behavior:still?'auto':'smooth'});
+const au=$('#au'),pp=$('#pp'),sk=$('#sk'),eq=$('#eq'),g=eq.getContext('2d');let an,fd,ac;
+const fmt=s=>isFinite(s)?Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0'):'0:00';
+function setup(){if(ac)return;try{ac=new(window.AudioContext||window.webkitAudioContext)();const sc=ac.createMediaElementSource(au);an=ac.createAnalyser();an.fftSize=128;sc.connect(an);an.connect(ac.destination);fd=new Uint8Array(an.frequencyBinCount)}catch(e){an=null}}
+function toggle(){setup();if(ac&&ac.state==='suspended')ac.resume();au.paused?au.play():au.pause()}
+pp.onclick=toggle;$('#hp').onclick=()=>{location.hash='musica';toggle()};
+au.onplay=()=>{pp.innerHTML=PAUSE;pp.setAttribute('aria-label','Pausar')};
+au.onpause=()=>{pp.innerHTML=PLAY;pp.setAttribute('aria-label','Tocar')};
+au.ontimeupdate=au.onloadedmetadata=()=>{sk.value=au.duration?au.currentTime/au.duration*1000:0;$('#tm').textContent=fmt(au.currentTime)+' / '+fmt(au.duration)};
+sk.oninput=()=>{if(au.duration)au.currentTime=sk.value/1000*au.duration};
+$('#vol').oninput=e=>au.volume=e.target.value/100;au.volume=.8;
+(function draw(){requestAnimationFrame(draw);const W=eq.width,H=eq.height,n=32,bw=W/n,on=an&&!au.paused;g.clearRect(0,0,W,H);if(on)an.getByteFrequencyData(fd);
+ for(let i=0;i<n;i++){const v=on?fd[i]/255:.07+(still?0:.04*Math.sin(i+performance.now()/600)),bh=Math.max(4,v*H),gr=g.createLinearGradient(0,H,0,H-bh);gr.addColorStop(0,'#a64dff');gr.addColorStop(1,'#ff4fd8');g.fillStyle=gr;g.beginPath();g.rect(i*bw+3,H-bh,bw-6,bh);g.fill()}})();
+// hoje é sábado?
+const DN=['domingo','segunda','terça','quarta','quinta','sexta','sábado'];
+$('#days').innerHTML=DN.map((d,i)=>`<button class="day" data-d="${i}">${d}</button>`).join('');
+function pick(i){document.querySelectorAll('.day').forEach(b=>b.classList.toggle('on',+b.dataset.d===i));
+ if(i===6){$('#dr').innerHTML='<b>É SÁBADO MEUS CALABRESOS!!!</b>';const r=$('#dr').getBoundingClientRect();for(let k=0;k<20;k++)setTimeout(()=>spawn(r.left+Math.random()*r.width,Math.max(80,r.top+40),1),k*50)}
+ else{const n=6-i;$('#dr').innerHTML=`<b>NÃO É SÁBADO</b>${n===1?'falta 1 dia':'faltam '+n+' dias'} pra sábado`}}
+document.querySelectorAll('.day').forEach(b=>b.onclick=()=>pick(+b.dataset.d));pick(new Date().getDay());
+// gerador de frase
+const SRC=new Image(),mc=document.createElement('canvas'),mg=mc.getContext('2d');mc.width=mc.height=1080;SRC.src='img/sabadou-classico.jpg';
+async function meme(){const t=($('#mw').value.trim()||'sábado').toLowerCase(),S=1080;
+ try{await document.fonts.load('700 80px "Comic Neue"')}catch(e){}
+ const gr=mg.createLinearGradient(0,0,0,S);gr.addColorStop(0,'#8b4aa9');gr.addColorStop(1,'#d3aee4');mg.fillStyle=gr;mg.fillRect(0,0,S,S);
+ const o=document.createElement('canvas');o.width=o.height=S;const oc=o.getContext('2d');oc.drawImage(SRC,0,0,S,S);
+ const rg=oc.createRadialGradient(.66*S,.76*S,.26*S,.66*S,.76*S,.46*S);rg.addColorStop(0,'#000');rg.addColorStop(1,'transparent');oc.globalCompositeOperation='destination-in';oc.fillStyle=rg;oc.fillRect(0,0,S,S);
+ mg.drawImage(o,0,0);
+ let f=120;const F=s=>`700 ${s}px "Comic Neue","Comic Sans MS",cursive`;mg.font=F(f);const l1='é '+t,w=mg.measureText(l1).width;if(w>S*.8)f=Math.floor(f*S*.8/w);
+ mg.font=F(f);mg.fillStyle='#2a0f3d';mg.textBaseline='alphabetic';mg.fillText(l1,.09*S,.17*S+f*.2);mg.fillText('meus calabresos',.09*S,.17*S+f*1.35);
+ try{$('#mo').src=mc.toDataURL('image/png')}catch(e){const o=$('#mo');if(o.tagName==='IMG'){mc.id='mo';o.replaceWith(mc)}}}
+SRC.onload=meme;let mt;$('#mw').oninput=()=>{clearTimeout(mt);mt=setTimeout(meme,250)};
+// galeria ampliada
+const lb=$('#lb');document.querySelectorAll('.gi').forEach(f=>{const o=()=>{$('#lbi').src=f.querySelector('img').src;lb.classList.add('on')};f.onclick=o;f.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();o()}}});
+lb.onclick=()=>lb.classList.remove('on','wide');addEventListener('keydown',e=>{if(e.key==='Escape')lb.classList.remove('on','wide')});
+
+
+// revelar ao rolar + contadores
+const rio=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');rio.unobserve(e.target)}}),{threshold:.15});
+document.querySelectorAll('.rv').forEach(e=>still?e.classList.add('in'):rio.observe(e));
+const cio=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;cio.unobserve(e.target);const el=e.target,to=+el.dataset.n,s=el.dataset.s||'',t0=performance.now();(function f(t){const k=Math.min(1,(t-t0)/1600);el.textContent=Math.round(to*(1-Math.pow(1-k,3)))+s;if(k<1)requestAnimationFrame(f)})(t0)}),{threshold:.6});
+if(!still)document.querySelectorAll('[data-n]').forEach(e=>cio.observe(e));
+
+
+// ===== abas (rotas por #hash) =====
+const TABS=['inicio','avisos','musica','galeria','jogos','fanarts','calabresos'],tabLinks=document.querySelectorAll('.tabs a'),ind=$('.ind'),mini=$('#mini');let cur=-1;
+function moveInd(){const a=document.querySelector('.tabs a.on');if(a){ind.style.width=a.offsetWidth+'px';ind.style.transform='translateX('+a.offsetLeft+'px)'}}
+function go(id,anchor){const i=TABS.indexOf(id);if(i<0)return;const left=i<cur;
+  document.querySelectorAll('.panel').forEach(p=>{p.classList.remove('on','l');if(p.id===id){p.classList.add('on');if(left)p.classList.add('l')}});
+  tabLinks.forEach(a=>{const on=a.getAttribute('href')==='#'+id;a.classList.toggle('on',on);a.setAttribute('aria-selected',on);if(on)a.scrollIntoView({inline:'center',block:'nearest'})});
+  cur=i;moveInd();mini.classList.toggle('hide',id==='musica'||id==='jogos');
+  const e=anchor&&document.getElementById(anchor);if(e)e.scrollIntoView({behavior:still?'auto':'smooth'});else scrollTo(0,0)}
+function route(){const h=decodeURIComponent(location.hash.slice(1))||'inicio';if(TABS.includes(h))return go(h);
+  const e=document.getElementById(h),p=e&&e.closest('.panel');p?go(p.id,h):go('inicio')}
+addEventListener('hashchange',route);addEventListener('resize',moveInd);route();
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(moveInd);
+// ===== mini player (a música continua ao trocar de aba) =====
+mini.innerHTML=PLAY;
+au.addEventListener('play',()=>{mini.innerHTML=PAUSE;mini.classList.add('on')});
+au.addEventListener('pause',()=>{mini.innerHTML=PLAY});
+mini.onclick=()=>au.paused?au.play():au.pause();
+document.head.insertAdjacentHTML('beforeend','<style>#mini.hide{display:none!important}</style>');
+$('#yr').textContent=new Date().getFullYear();
+
+
+// imagem larga do Instagram abre grande e rola para os lados
+const ip=document.querySelector('#insta .ig img');if(ip)ip.onclick=()=>{$('#lbi').src=ip.src;lb.classList.add('on','wide')};
+
+// ===== avisos (avisos.json ou Supabase) + área do admin =====
+const CFG=(typeof SITE_CONFIG!=='undefined'?SITE_CONFIG:window.SITE_CONFIG)||{},ss=(k,v)=>{try{return v===undefined?sessionStorage.getItem(k):sessionStorage.setItem(k,v)}catch(e){}};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmtD=d=>{try{return new Date(/^\d{4}-\d\d-\d\d$/.test(d)?d+'T12:00:00':d).toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'})}catch(e){return''}};
+const PIN='<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M14 3l7 7-3 1-3.5 3.5.5 4.5-1.5 1.5-4-4-5 5-1-1 5-5-4-4L6 14.500 10.500 14 14 10.500z"/></svg>';
+let sb=null,isAdmin=false,AV=[],editId=null;
+async function loadAv(){
+  try{
+    if(sb){const r=await sb.from('avisos').select('*').order('fixado',{ascending:false}).order('criado_em',{ascending:false});if(r.error)throw r.error;AV=r.data}
+    else{const r=await fetch('avisos.json',{cache:'no-store'});if(!r.ok)throw 0;
+      AV=(await r.json()).map((a,i)=>({id:i,titulo:a.titulo,texto:a.texto,fixado:!!a.fixado,criado_em:a.data}));
+      AV.sort((a,b)=>(b.fixado-a.fixado)||String(b.criado_em).localeCompare(String(a.criado_em)))}
+  }catch(e){if(!AV.length)$('#avl').innerHTML='<p class="mut">Não consegui carregar os avisos agora.</p>';return}
+  renderAv();
+}
+function renderAv(){
+  $('#avl').innerHTML=AV.length?AV.map(a=>`<article class="av${a.fixado?' fx':''}"><div class="avh"><span>${a.fixado?'<span class="pin">'+PIN+'fixado</span>':''}</span><time>${esc(fmtD(a.criado_em))}</time></div><h3>${esc(a.titulo)}</h3><p>${esc(a.texto).replace(/\n/g,'<br>')}</p>${isAdmin?`<div class="adb"><button type="button" data-a="fix" data-id="${a.id}">${a.fixado?'desafixar':'fixar'}</button><button type="button" data-a="ed" data-id="${a.id}">editar</button><button type="button" data-a="del" data-id="${a.id}">apagar</button></div>`:''}</article>`).join(''):'<p class="mut">Nenhum aviso por enquanto.</p>';
+  const f=AV.find(a=>a.fixado),dot=document.querySelector('.tabs .dot');if(dot)dot.hidden=!f;
+  const key='nb_'+(f?f.id+'_'+f.titulo:'');
+  if(f&&!ss(key)){$('#nbt').textContent=f.titulo;$('#nb').hidden=false;$('#nbx').onclick=()=>{$('#nb').hidden=true;ss(key,1)}}else $('#nb').hidden=true;
+}
+$('#avl').addEventListener('click',async e=>{
+  const b=e.target.closest('button[data-a]');if(!b||!isAdmin||!sb)return;const a=AV.find(x=>String(x.id)===b.dataset.id);if(!a)return;
+  if(b.dataset.a==='del'&&confirm('Apagar este aviso?')){await sb.from('avisos').delete().eq('id',a.id);loadAv()}
+  if(b.dataset.a==='fix'){await sb.from('avisos').update({fixado:!a.fixado}).eq('id',a.id);loadAv()}
+  if(b.dataset.a==='ed'){editId=a.id;$('#at').value=a.titulo;$('#ax').value=a.texto;$('#af').checked=a.fixado;$('#apub').textContent='salvar';scrollTo({top:$('#adm-box').offsetTop-90,behavior:'smooth'})}
+});
+function renderAdm(){
+  const b=$('#adm-box');if(!isAdmin){b.innerHTML='';return}
+  b.innerHTML=`<form class="ed" id="edf"><h3>${editId?'editar aviso':'novo aviso'}<button type="button" id="aout" class="lnk">sair</button></h3><input class="fld" id="at" placeholder="Título" maxlength="120" required><textarea class="fld" id="ax" placeholder="Texto do aviso" maxlength="2000" required></textarea><label class="chk"><input type="checkbox" id="af"> fixar (vira faixa no site todo)</label><div class="edb"><button class="cta" id="apub" type="submit">publicar</button><button class="cta ghost" type="button" id="acl">limpar</button></div><p class="mut" id="am"></p></form><section class="ed"><h3>manutenção do site</h3><p class="mut" style="margin:0">Quando ativada, somente uma sessão de administrador reconhecida pelo Supabase poderá ver o site; os demais visitantes verão a página de manutenção.</p><button class="cta ghost" type="button" id="maintenance-toggle">carregando...</button><p class="mut" id="maintenance-status" aria-live="polite"></p></section>`;
+  const maintenanceButton=$('#maintenance-toggle'),maintenanceStatus=$('#maintenance-status');
+  const readMaintenance=async()=>{const r=await sb.from('site_settings').select('maintenance').eq('id',1).single();if(r.error){maintenanceStatus.textContent='Ative este recurso executando uma vez o arquivo supabase-manutencao.sql no Supabase.';maintenanceButton.disabled=true;return}maintenanceButton.dataset.enabled=String(!!r.data.maintenance);maintenanceButton.textContent=r.data.maintenance?'desativar manutenção':'ativar manutenção'};
+  readMaintenance();
+  maintenanceButton.onclick=async()=>{const enabled=maintenanceButton.dataset.enabled==='true',next=!enabled;if(!confirm(next?'Ativar a manutenção? Visitantes serão direcionados para a página de manutenção.':'Desativar a manutenção e abrir o site para todos?'))return;maintenanceButton.disabled=true;maintenanceStatus.textContent='Salvando...';const r=await sb.rpc('set_site_maintenance',{p_enabled:next});maintenanceButton.disabled=false;if(r.error){maintenanceStatus.textContent='Não foi possível alterar. Confira se executou supabase-manutencao.sql. '+r.error.message;return}maintenanceStatus.textContent=next?'Manutenção ativada.':'Manutenção desativada.';maintenanceButton.dataset.enabled=String(next);maintenanceButton.textContent=next?'desativar manutenção':'ativar manutenção'};
+  $('#edf').onsubmit=async ev=>{ev.preventDefault();
+    const row={titulo:$('#at').value.trim(),texto:$('#ax').value.trim(),fixado:$('#af').checked};
+    const r=editId!==null?await sb.from('avisos').update(row).eq('id',editId):await sb.from('avisos').insert(row);
+    if(r.error){$('#am').textContent='Erro: '+r.error.message;return}
+    editId=null;renderAdm();loadAv()};
+  $('#acl').onclick=()=>{editId=null;renderAdm()};
+  $('#aout').onclick=async()=>{await sb.auth.signOut();isAdmin=false;renderAdm();renderAv()};
+}
+async function checkAdmin(){
+  if(!sb)return;isAdmin=false;
+  const s=await sb.auth.getSession();
+  if(s.data.session){const r=await sb.from('admins').select('user_id').maybeSingle();isAdmin=!!(r.data)}
+  renderAdm();renderAv();
+}
+const lg=$('#lg');
+$('#adm').onclick=()=>{$('#lm').textContent='';lg.showModal();$('#le').focus()};
+$('#lc').onclick=()=>lg.close();
+$('#lgf').onsubmit=async ev=>{ev.preventDefault();const m=$('#lm');m.textContent='Entrando...';
+  const r=await sb.auth.signInWithPassword({email:$('#le').value.trim(),password:$('#lp').value});
+  if(r.error){m.textContent='E-mail ou senha incorretos.';return}
+  await checkAdmin();
+  if(!isAdmin){await sb.auth.signOut();m.textContent='Essa conta não tem permissão de administrador.';return}
+  lg.close();$('#lp').value='';location.hash='avisos'};
+(async()=>{
+  if(CFG.supabaseUrl&&CFG.supabaseKey){
+    try{await new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';s.onload=ok;s.onerror=no;document.head.appendChild(s)});
+      sb=supabase.createClient(CFG.supabaseUrl,CFG.supabaseKey);$('#adm').hidden=false}catch(e){sb=null}
+  }
+  await loadAv();await checkAdmin();
+  setInterval(()=>{if(!document.hidden&&editId===null)loadAv()},60000); // atualiza sozinho a cada 1 min
+})();
+</script>
+</body>
+</html>

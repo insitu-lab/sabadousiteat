@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex">
 <title>Sabadou — voltamos já</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Nunito:wght@600;800&display=swap">
-<script src="config.js"></script>
+<script src="config.js?v=20261009-18h"></script>
 <script>
 document.documentElement.dataset.maintenanceCheck='pending';
 const revealMaintenance=()=>delete document.documentElement.dataset.maintenanceCheck;
@@ -346,7 +346,8 @@ function volta(){
 
   if(!CONFIG.volta)return;
 
-  const t=new Date(CONFIG.volta)-new Date();
+  const retorno=new Date(CONFIG.volta);
+  const t=retorno-new Date();
   const el=$('#volta');
 
   if(isNaN(t)){
@@ -364,7 +365,9 @@ function volta(){
   const mm=m%60;
 
   el.textContent=
-    'volta em '+
+    'volta em '+retorno.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',timeZone:'America/Sao_Paulo'})+
+    ' às '+retorno.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',timeZone:'America/Sao_Paulo'})+
+    ' (Brasília) · faltam '+
     (d?d+'d ':'')+
     (h||d?h+'h ':'')+
     mm+'min'
