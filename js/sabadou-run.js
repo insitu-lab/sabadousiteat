@@ -93,13 +93,13 @@ function draw(){
   c.textAlign='right';c.fillText('HI '+String(hi).padStart(5,'0')+'   '+String(Math.floor(score)).padStart(5,'0'),W-16,28);
   c.textAlign='left';c.fillText(PH[phase][0]+' · fase '+(phase+1)+'/6',16,28);
   if(banner>0&&st==='run')txt(phase===5?'É SÁBADO!!!':PH[phase][0].toUpperCase(),W/2,mob?130:110,'400 '+(mob?46:58)+'px "Bagel Fat One",Impact,sans-serif',Math.min(1,banner/30));
+  if(st==='idle')txt(mob?'toque aqui pra começar':'aperta espaço ou toca aqui pra começar',W/2,mob?130:110,'800 '+(mob?20:22)+'px Nunito,sans-serif');
   if(st==='dead')txt(phase===5?'quase! o sábado é seu':'não é sábado :(',W/2,mob?120:100,'400 '+(mob?32:46)+'px "Bagel Fat One",Impact,sans-serif');
   if(st==='won'){txt('VOCÊ CHEGOU AO SÁBADO!',W/2,mob?112:98,'400 '+(mob?30:44)+'px "Bagel Fat One",Impact,sans-serif');txt('Tire um print e mande no Direct do Sabadou para ganhar um salve!',W/2,mob?153:140,'800 '+(mob?13:18)+'px Nunito,sans-serif')}
 }
 function loop(now){
   requestAnimationFrame(loop);
   if(!active()){last=now;return}
-  if(st==='idle'){const rect=cv.getBoundingClientRect();if(rect.bottom>0&&rect.top<innerHeight)reset()}
   const dt=Math.min(2.5,(now-(last||now))/16.667);last=now;t+=dt;
   step(dt);if(banner>0)banner-=dt;if(shake>0)shake-=dt;draw();
 }

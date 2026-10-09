@@ -1,4 +1,4 @@
-/* Sons CC0 locais para a interface; sons do jogo continuam sintetizados. */
+/* Áudios locais da interface e efeitos do Sabadou Run. */
 (()=>{
   let audio;
   function context(){
@@ -17,7 +17,7 @@
     gain.gain.exponentialRampToValueAtTime(.0001,now+start+duration);
     osc.connect(gain);gain.connect(a.destination);osc.start(now+start);osc.stop(now+start+duration+.02);
   }
-  const clipFiles={click:'click_001.wav',tab:'click_002.wav',frog:'select_001.wav',buy:'confirmation_001.wav'};
+  const clipFiles={click:'click-botoes.mp3',tab:'click_002.wav',frog:'click-sabadometro.mp3',buy:'compra.mp3',typing:'digitando.mp3'};
   const soundBase=new URL('assets/sfx/',document.baseURI),reported=new Set();
   function report(name,error){
     if(reported.has(name))return;
@@ -45,11 +45,12 @@
     tab(){playClip('tab')},
     frog(){playClip('frog')},
     buy(){playClip('buy')},
+    typing(){playClip('typing')},
     jump(){tone(300,0,.11,'square',.045,560)},
     lose(){tone(300,0,.18,'triangle',.055,220);tone(220,.15,.3,'sawtooth',.035,95)},
     win(){tone(523,0,.14,'triangle',.05,523);tone(659,.12,.14,'triangle',.05,659);tone(784,.24,.2,'triangle',.055,784);tone(1047,.42,.36,'triangle',.06,1047)}
   };
-  window.SabadouSounds={version:'20261008-2',play(name){sounds[name]?.()}};
+  window.SabadouSounds={version:'20261008-4',play(name){sounds[name]?.()}};
   addEventListener('pointerdown',context,{once:true,passive:true});
   addEventListener('keydown',context,{once:true});
   function buttonSound(e){
@@ -62,4 +63,12 @@
   }
   document.addEventListener('pointerdown',buttonSound,true);
   document.addEventListener('click',e=>{if(e.detail===0)buttonSound(e)},true);
+  // Input também recebe as letras digitadas pelo teclado do celular.
+  document.addEventListener('input',e=>{
+    const el=e.target;
+    if(!el.matches('input,textarea')&&!el.isContentEditable)return;
+    if(e.isComposing||!['insertText','insertCompositionText','insertFromComposition'].includes(e.inputType))return;
+    if(e.data==='')return;
+    sounds.typing();
+  });
 })();
