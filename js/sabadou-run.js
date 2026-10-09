@@ -11,7 +11,7 @@ let st='idle',score=0,hi=0,phase=0,v=5.2,y=G,vy=0,down=false,ducking=false,obs=[
 let ct=hex(PH[0][1]),cb=hex(PH[0][2]);
 try{hi=+localStorage.getItem('sab_hi')||0}catch(e){}
 let stars=[];
-const active=()=>cv.offsetParent!==null;
+const active=()=>cv.offsetParent!==null&&!document.hidden&&!document.querySelector('dialog[open]');
 
 // celular: palco mais alto e estreito, assim o sapo e os obstáculos ficam maiores
 function size(){const m=innerWidth<700;if(ready&&m===mob)return;ready=true;mob=m;W=m?420:800;H=m?330:260;G=H-46;
@@ -106,7 +106,7 @@ function loop(now){
 requestAnimationFrame(loop);
 
 addEventListener('keydown',e=>{
-  if(!active()||endDialog.open||/INPUT|TEXTAREA/.test(e.target.tagName))return;
+  if(!active()||endDialog.open||e.target.isContentEditable||e.target.closest('input,textarea,select,nav,a')||(e.target.closest('button')&&!e.target.closest('#gj,#gd')))return;
   if(['Space','ArrowUp','KeyW'].includes(e.code)){e.preventDefault();if(!e.repeat)jump()}
   if(['ArrowDown','KeyS'].includes(e.code)){e.preventDefault();down=true}
 });

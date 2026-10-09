@@ -1,8 +1,7 @@
 (()=>{
   'use strict';
-  // Aceita somente as duas versões locais conhecidas para os links de retorno.
-  const official=new URLSearchParams(location.search).get('origem')==='oficial';
-  const home=official?'index siteoficial.html':'index.html';
+  // Os avisos em vídeo pertencem à versão da atualização.
+  const home='index.html';
   document.querySelectorAll('[data-home],[data-back]').forEach(a=>a.href=home+'#avisos');
   document.querySelectorAll('[data-fanarts]').forEach(a=>a.href=home+'#fanarts');
   const video=document.getElementById('notice-video'),play=document.getElementById('watch-video');

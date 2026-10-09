@@ -49,8 +49,9 @@ Deno.serve(async (req) => {
   }
   if (userId === user.id) return reply({ error: "Não é possível excluir a própria conta admin." }, 400);
 
-  const { data: targetAdmin } = await admin
+  const { data: targetAdmin, error: targetAdminError } = await admin
     .from("admins").select("user_id").eq("user_id", userId).maybeSingle();
+  if (targetAdminError) return reply({ error: "Não foi possível verificar a conta de destino." }, 503);
   if (targetAdmin) return reply({ error: "Contas de administrador não podem ser excluídas por aqui." }, 403);
 
   // As fanarts são guardadas em uma pasta com o ID do autor. Remova os

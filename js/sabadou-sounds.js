@@ -18,16 +18,17 @@
     osc.connect(gain);gain.connect(a.destination);osc.start(now+start);osc.stop(now+start+duration+.02);
   }
   const clipFiles={click:'click-botoes.mp3',tab:'click_002.wav',frog:'click-sabadometro.mp3',buy:'compra.mp3',typing:'digitando.mp3'};
-  const soundBase=new URL('assets/sfx/',document.baseURI),reported=new Set();
+  const soundBase=new URL('../comum/assets/sfx/',document.baseURI),reported=new Set();
+  const clipUrl=name=>name==='buy'?new URL('assets/sfx/'+clipFiles[name],document.baseURI):new URL(clipFiles[name],soundBase);
   function report(name,error){
     if(reported.has(name))return;
     reported.add(name);
-    console.warn('Não foi possível tocar o efeito sonoro:',new URL(clipFiles[name],soundBase).href,error);
+    console.warn('Não foi possível tocar o efeito sonoro:',clipUrl(name).href,error);
   }
   // Reutilizar os áudios pré-carregados mantém os cliques rápidos do sapo responsivos.
   const clips=Object.fromEntries(Object.entries(clipFiles).map(([name,file])=>[name,
     Array.from({length:4},()=>{
-      const sound=new Audio(new URL(file,soundBase).href);
+      const sound=new Audio(clipUrl(name).href);
       sound.preload='auto';sound.volume=.38;
       sound.addEventListener('error',()=>report(name,sound.error));
       sound.load();return sound;

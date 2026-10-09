@@ -6,7 +6,8 @@
 <meta name="theme-color" content="#12061f">
 
 <!-- SISTEMA DE MANUTENÇÃO -->
-<script src="config.js"></script>
+<script src="../comum/config.js"></script>
+<script src="../comum/js/sabadou-maintenance.js?v=20261009-prazo"></script>
 <script>
 // A configuração remota permite ligar a manutenção pelo painel admin.
 document.documentElement.dataset.maintenanceCheck='pending';
@@ -16,20 +17,17 @@ if(cfg.supabaseUrl&&cfg.supabaseKey){
   (async()=>{try{
     const base=cfg.supabaseUrl.replace(/\/$/,'');
     const headers={apikey:cfg.supabaseKey};
-    const settings=await fetch(base+'/rest/v1/site_settings?id=eq.1&select=maintenance',{headers});
-    if(!settings.ok)throw new Error('settings unavailable');
-    const rows=await settings.json();
-    const deadline=Date.parse(cfg.maintenanceUntil);
-    if(rows[0]?.maintenance&&(!Number.isFinite(deadline)||Date.now()<deadline)){
+    const settings=await window.SabadouMaintenance.read();
+    if(window.SabadouMaintenance.isActive(settings)){
       const ref=new URL(base).hostname.split('.')[0],raw=localStorage.getItem('sb-'+ref+'-auth-token');
       const session=raw&&JSON.parse(raw),token=session?.access_token,userId=session?.user?.id;
       let admin=false;
       if(token&&userId){const check=await fetch(base+'/rest/v1/admins?user_id=eq.'+encodeURIComponent(userId)+'&select=user_id',{headers:{...headers,Authorization:'Bearer '+token}});admin=check.ok&&(await check.json()).length>0}
-      if(!admin){location.replace('manutencao.html');return}
+      if(!admin){location.replace('../comum/manutencao.html?site=atualizacao');return}
     }
-  }catch(e){console.warn('Não foi possível verificar o modo de manutenção.',e);location.replace('manutencao.html');return}
+  }catch(e){console.warn('Não foi possível verificar o modo de manutenção.',e);location.replace('../comum/manutencao.html?site=atualizacao');return}
   revealSite()})();
-}else location.replace('manutencao.html');
+}else location.replace('../comum/manutencao.html?site=atualizacao');
 </script>
 <style>html[data-maintenance-check="pending"] body{visibility:hidden}</style>
 
@@ -265,8 +263,9 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 @media (max-width:860px){.hl{padding:.4rem .85rem;font-size:.9rem}.nv{gap:.5rem}.si{flex-direction:column;align-items:stretch}.si button{width:100%;padding:.7rem}.fg{grid-template-columns:1fr 1fr;gap:.6rem}#btn{touch-action:manipulation}}
 @media (max-width:700px){body{padding-bottom:calc(62px + env(safe-area-inset-bottom,0px))}.nav{backdrop-filter:none}.nv nav.tabs{position:fixed;top:auto;left:0;right:0;bottom:0;z-index:35;height:calc(58px + env(safe-area-inset-bottom,0px));padding:4px 8px env(safe-area-inset-bottom,0px);justify-content:flex-start;gap:.2rem;background:var(--nav);backdrop-filter:blur(14px);border-top:1px solid var(--line);border-bottom:0}.nv nav.tabs a{display:flex;align-items:center;min-height:44px;padding:.3rem .65rem;font-size:.82rem}.nv nav.tabs .ind{display:none}.podium{gap:.35rem}.podium-entry{gap:.3rem}.podium-photo{width:clamp(62px,18vw,96px);border-radius:16px}.podium-tools .mini,.podium-tools .download{font-size:.7rem;padding:.14rem .35rem}.podium-votes{font-size:.75rem}.podium-base strong{font-size:2rem}}
 </style>
+<link rel="stylesheet" href="../comum/css/sabadou-improvements.css?v=20261009-3">
 </head>
-<body>
+<body data-site="atualizacao" data-site-version="2.1.0">
 <div class="bar" id="bar"></div>
 <header class="nav"><div class="wrap nv">
   <a class="logo" href="#inicio">sabadou</a>
@@ -283,9 +282,9 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
     <div>
       <h1 aria-label="é sábado meus calabresos"><span class="w" style="--i:0" aria-hidden="true">é</span><span class="w" style="--i:1" aria-hidden="true">sábado</span><span class="w" style="--i:2" aria-hidden="true">meus</span><span class="w" style="--i:3" aria-hidden="true">calabresos</span></h1>
       <p>O cantinho oficial dos calabresos. Música, galeria e coisa pra mexer.</p>
-      <button class="cta" id="hp"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>ouvir a música</button><a class="cta ghost" href="#calabresos">área dos calabresos</a>
+      <button class="cta" id="hp"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>ouvir a música</button><a class="cta ghost" href="#calabresos">área dos calabresos</a><a class="cta ghost" href="#explore">explorar o site</a>
     </div>
-    <div class="frame" id="frame"><img src="img/sabadou-classico.jpg" alt="Sabadou, o sapo roxo, com a frase é sábado meus calabresos"></div>
+    <div class="frame" id="frame"><img src="../comum/img/sabadou-classico.jpg" alt="Sabadou, o sapo roxo, com a frase é sábado meus calabresos"></div>
   </div>
   <span class="fl" style="left:3%;top:12%">💜</span><span class="fl" style="right:4%;top:9%;animation-delay:-1s">✨</span><span class="fl" style="left:48%;bottom:4%;animation-delay:-2s">💖</span>
 </section>
@@ -303,7 +302,7 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
     <h3>o mundo dos bacanos</h3>
     <p>Todos os sapos desse universo são chamados de bacanos, e tem bacano de várias cores. Os fãs do Sabadou são os calabresos.</p>
   </div>
-  <div class="ph rv"><img loading="lazy" src="img/sabadou-celular.jpg" alt="Sabadou sentado na escada olhando o celular"><img class="av" src="img/sabadou-avatar.jpg" alt="Sabadou em preto e branco"></div>
+  <div class="ph rv"><img loading="lazy" src="../comum/img/sabadou-celular.jpg" alt="Sabadou sentado na escada olhando o celular"><img class="av" src="../comum/img/sabadou-avatar.jpg" alt="Sabadou em preto e branco"></div>
 </div></section>
 <section class="sec" id="explore"><div class="wrap">
   <div class="sh rv"><h2>explore</h2><p>O site tem abas. Escolhe pra onde ir.</p></div>
@@ -315,7 +314,7 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   </div>
 </div></section>
 <section class="sec" id="insta"><div class="wrap ig">
-  <img class="rv" src="img/instagram-perfil.jpg" alt="Perfil do Sabadou no Instagram">
+  <img class="rv" src="../comum/img/instagram-perfil.jpg" alt="Perfil do Sabadou no Instagram">
   <div class="rv"><h2>segue o sabadou lá também</h2><p>Posts novos, humor, sapo e sábado. Parcerias: chama na DM do Instagram.</p>
     <a class="cta" href="https://www.instagram.com/sabadouofficiall/" target="_blank" rel="noopener">Abrir o Instagram</a></div>
 </div></section>
@@ -333,7 +332,7 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   <div class="pl rv" id="mus">
     <canvas id="eq" width="600" height="90" aria-hidden="true"></canvas>
     <div class="ctl"><button id="pp" aria-label="Tocar"><svg viewBox="0 0 24 24" width="34" height="34" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg></button><input id="sk" type="range" min="0" max="1000" value="0" aria-label="Posição da música"><span class="tm" id="tm">0:00</span><input id="vol" type="range" min="0" max="100" value="80" aria-label="Volume"></div>
-    <audio id="au" preload="metadata" src="audio/musica.mp3"></audio>
+    <audio id="au" preload="metadata" src="../comum/audio/musica.mp3"></audio>
   </div>
 </div></section>
 </section>
@@ -342,10 +341,10 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 <section class="sec"><div class="wrap">
   <div class="sh rv"><h2>galeria</h2><p>Clica numa imagem para ver grande.</p></div>
   <div class="bento rv">
-    <figure class="gi b1" tabindex="0" role="button" aria-label="Ampliar"><img loading="lazy" src="img/sabadouxxx.jpg" alt="Sabadouxxx com raios e números 67"><figcaption>sabadouxxx 67</figcaption></figure>
-    <figure class="gi" tabindex="0" role="button" aria-label="Ampliar"><img src="img/sabadou-classico.jpg" alt="O clássico"><figcaption>o clássico</figcaption></figure>
-    <figure class="gi b3" tabindex="0" role="button" aria-label="Ampliar"><img loading="lazy" src="img/sabadou-celular.jpg" alt="Sabadou no celular"><figcaption>sabadou no celular</figcaption></figure>
-    <figure class="gi" tabindex="0" role="button" aria-label="Ampliar"><img loading="lazy" src="img/sabadou-e-calabresos.jpg" alt="Sabadou e calabresos"><figcaption>sabadou e calabresos</figcaption></figure>
+    <figure class="gi b1" tabindex="0" role="button" aria-label="Ampliar"><img loading="lazy" src="../comum/img/sabadouxxx.jpg" alt="Sabadouxxx com raios e números 67"><figcaption>sabadouxxx 67</figcaption></figure>
+    <figure class="gi" tabindex="0" role="button" aria-label="Ampliar"><img src="../comum/img/sabadou-classico.jpg" alt="O clássico"><figcaption>o clássico</figcaption></figure>
+    <figure class="gi b3" tabindex="0" role="button" aria-label="Ampliar"><img loading="lazy" src="../comum/img/sabadou-celular.jpg" alt="Sabadou no celular"><figcaption>sabadou no celular</figcaption></figure>
+    <figure class="gi" tabindex="0" role="button" aria-label="Ampliar"><img loading="lazy" src="../comum/img/sabadou-e-calabresos.jpg" alt="Sabadou e calabresos"><figcaption>sabadou e calabresos</figcaption></figure>
   </div>
 </div></section>
 
@@ -362,7 +361,7 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   <p class="hint mobhint">Dica: gire o celular na horizontal pra jogar em tela maior.</p>
   <p class="hint">Espaço ou ↑ pula, ↓ agacha. No celular, use os botões. Cada fase é um dia da semana e a última é o sábado.</p>
   <section class="sec band ckb" id="sabadometro" style="margin-top:3rem;padding:2rem 0;border-radius:28px"><div class="wrap split">
-    <div><button id="btn" aria-label="Sabadar"><img src="img/sabadou-classico.jpg" alt=""></button></div>
+    <div><button id="btn" aria-label="Sabadar"><img src="../comum/img/sabadou-classico.jpg" alt=""></button></div>
     <div><h2 class="big">sabadômetro</h2><p class="lead">Toque no sapo. Sem motivo. Só toca.</p><div id="cnt">0</div><div id="msg"></div><div id="ph"></div>
       <div class="game-rewards"><b>🏆 Recompensas</b><br>Os 10 primeiros a chegar a 1 milhão de cliques ganham follow. O primeiro a chegar a 1 bilhão ganha R$ 5 via Pix. O Sabadou pode pedir confirmação da conta e do resultado.</div>
       <div class="shop"><h3>lojinha do sapo</h3><p class="hint">Cada clique rende moedas. Compre melhorias para tocar mais rápido.</p><div id="coin" style="font-size:2rem;font-weight:800"></div><div id="shl"></div></div>
@@ -408,10 +407,11 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   <div class="wrap fg">
     <div><div class="logo" style="color:#f6ecff">sabadou</div><p class="tg">é sábado, meus calabresos.</p><a class="cta ghost sm" href="https://www.instagram.com/sabadouofficiall/" target="_blank" rel="noopener">Instagram</a></div>
     <nav aria-label="Navegar"><h4>navegar</h4><a href="#inicio">início</a><a href="#avisos">avisos</a><a href="#musica">música</a><a href="#galeria">galeria</a><a href="#jogos">jogos</a><a href="#fanarts">fanarts</a><a href="#calabresos">calabresos</a></nav>
-    <nav aria-label="Legal"><h4>legal</h4><a href="termos.html">termos de uso</a><a href="privacy.html">política de privacidade</a><a href="termos.html#direitos">direitos autorais</a><a href="termos.html#fanarts">regras das fanarts</a></nav>
+    <nav aria-label="Legal"><h4>legal</h4><a href="../comum/termos.html?site=atualizacao">termos de uso</a><a href="../comum/privacy.html?site=atualizacao">política de privacidade</a><a href="../comum/termos.html?site=atualizacao#direitos">direitos autorais</a><a href="../comum/termos.html?site=atualizacao#fanarts">regras das fanarts</a></nav>
     <div><h4>parcerias</h4><p>Chama na DM do Instagram.</p><button class="cta ghost sm" id="up" type="button">Voltar ao topo</button></div>
   </div>
   <div class="wrap fb"><span>© <span id="yr">2026</span> Sabadou. Todos os direitos reservados.</span><span>Feito pra quem vive de sábado. <button class="lnk" id="adm" type="button" hidden>admin</button></span></div>
+<div class="wrap"><small class="site-version">Sabadou atualização · v2.1.0</small></div>
 </footer>
 
 <div id="lb"><img id="lbi" alt=""></div>
@@ -425,8 +425,11 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   <p class="mut" id="lm" style="margin:0;min-height:1.4em"></p>
   <div class="edb"><button class="cta" type="submit">entrar</button><button class="cta ghost" type="button" id="lc">cancelar</button></div></form></dialog>
 
-<script src="js/sabadou-sounds.js?v=20261008-4"></script>
-<script src="js/sabadou-run.js?v=20261008-4"></script>
+<script src="../comum/js/sabadou-updates.js?v=20261009-3"></script>
+<script src="../comum/js/sabadou-navigation.js?v=20261009-3"></script>
+<script src="js/sabadou-fanart-records.js?v=20261009-3"></script>
+<script src="js/sabadou-sounds.js?v=20261009-3"></script>
+<script src="../comum/js/sabadou-run.js?v=20261009-3"></script>
 <script>
 
 const PLAY='<svg viewBox="0 0 24 24" width="34" height="34" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>',PAUSE='<svg viewBox="0 0 24 24" width="34" height="34" fill="currentColor" aria-hidden="true"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>';
@@ -494,7 +497,7 @@ function pick(i){document.querySelectorAll('.day').forEach(b=>b.classList.toggle
  else{const n=6-i;$('#dr').innerHTML=`<b>NÃO É SÁBADO</b>${n===1?'falta 1 dia':'faltam '+n+' dias'} pra sábado`}}
 document.querySelectorAll('.day').forEach(b=>b.onclick=()=>pick(+b.dataset.d));pick(new Date().getDay());
 // gerador de frase
-const SRC=new Image(),mc=document.createElement('canvas'),mg=mc.getContext('2d');mc.width=mc.height=1080;SRC.src='img/sabadou-classico.jpg';
+const SRC=new Image(),mc=document.createElement('canvas'),mg=mc.getContext('2d');mc.width=mc.height=1080;SRC.src='../comum/img/sabadou-classico.jpg';
 async function meme(){const t=($('#mw').value.trim()||'sábado').toLowerCase(),S=1080;
  try{await document.fonts.load('700 80px "Comic Neue"')}catch(e){}
  const gr=mg.createLinearGradient(0,0,0,S);gr.addColorStop(0,'#8b4aa9');gr.addColorStop(1,'#d3aee4');mg.fillStyle=gr;mg.fillRect(0,0,S,S);
@@ -525,7 +528,7 @@ function go(id,anchor){const i=TABS.indexOf(id);if(i<0)return;const left=i<cur;
   tabLinks.forEach(a=>{const on=a.getAttribute('href')==='#'+id;a.classList.toggle('on',on);a.setAttribute('aria-selected',on);if(on)a.scrollIntoView({inline:'center',block:'nearest'})});
   cur=i;moveInd();mini.classList.toggle('hide',id==='musica'||id==='jogos');
   const e=anchor&&document.getElementById(anchor);if(e)e.scrollIntoView({behavior:still?'auto':'smooth'});else scrollTo(0,0)}
-function route(){const h=decodeURIComponent(location.hash.slice(1))||'inicio';if(TABS.includes(h))return go(h);
+function route(){let h;try{h=decodeURIComponent(location.hash.slice(1))||'inicio'}catch{h='inicio'};if(TABS.includes(h))return go(h);
   const e=document.getElementById(h),p=e&&e.closest('.panel');p?go(p.id,h):go('inicio')}
 addEventListener('hashchange',route);addEventListener('resize',moveInd);route();
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(moveInd);
@@ -541,7 +544,7 @@ $('#yr').textContent=new Date().getFullYear();
 // imagem larga do Instagram abre grande e rola para os lados
 const ip=document.querySelector('#insta .ig img');if(ip)ip.onclick=()=>{$('#lbi').src=ip.src;lb.classList.add('on','wide')};
 
-// ===== avisos (avisos.json ou Supabase) + área do admin =====
+// ===== avisos (../comum/avisos.json ou Supabase) + área do admin =====
 const CFG=(typeof SITE_CONFIG!=='undefined'?SITE_CONFIG:window.SITE_CONFIG)||{},ss=(k,v)=>{try{return v===undefined?sessionStorage.getItem(k):sessionStorage.setItem(k,v)}catch(e){}};
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmtD=d=>{try{return new Date(/^\d{4}-\d\d-\d\d$/.test(d)?d+'T12:00:00':d).toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'})}catch(e){return''}};
@@ -550,7 +553,7 @@ let sb=null,isAdmin=false,AV=[],editId=null;
 async function loadAv(){
   try{
     if(sb){const r=await sb.from('avisos').select('*').order('fixado',{ascending:false}).order('criado_em',{ascending:false});if(r.error)throw r.error;AV=r.data}
-    else{const r=await fetch('avisos.json',{cache:'no-store'});if(!r.ok)throw 0;
+    else{const r=await fetch('../comum/avisos.json',{cache:'no-store'});if(!r.ok)throw 0;
       AV=(await r.json()).map((a,i)=>({id:i,titulo:a.titulo,texto:a.texto,fixado:!!a.fixado,criado_em:a.data}));
       AV.sort((a,b)=>(b.fixado-a.fixado)||String(b.criado_em).localeCompare(String(a.criado_em)))}
   }catch(e){if(!AV.length)$('#avl').innerHTML='<p class="mut">Não consegui carregar os avisos agora.</p>';return}
@@ -571,18 +574,16 @@ $('#avl').addEventListener('click',async e=>{
 function renderAdm(){
   $('#tadm').hidden=!isAdmin;if(!isAdmin&&location.hash==='#admin')location.hash='inicio';
   const b=$('#adm-box');if(!isAdmin){b.innerHTML='';return}
-  b.innerHTML=`<form class="ed" id="edf"><h3>${editId?'editar aviso':'novo aviso'}<button type="button" id="aout" class="lnk">sair</button></h3><input class="fld" id="at" placeholder="Título" maxlength="120" required><textarea class="fld" id="ax" placeholder="Texto do aviso" maxlength="2000" required></textarea><label class="chk"><input type="checkbox" id="af"> fixar (vira faixa no site todo)</label><div class="edb"><button class="cta" id="apub" type="submit">publicar</button><button class="cta ghost" type="button" id="acl">limpar</button></div><p class="mut" id="am"></p></form><section class="ed"><h3>manutenção do site</h3><p class="mut" style="margin:0">Enquanto a manutenção estiver ativa, só uma sessão autenticada como administradora no Supabase poderá acessar o site.</p><button class="cta ghost" type="button" id="maintenance-toggle">carregando...</button><p class="mut" id="maintenance-status" aria-live="polite"></p></section>`;
-  const maintenanceButton=$('#maintenance-toggle'),maintenanceStatus=$('#maintenance-status');
-  const readMaintenance=async()=>{const r=await sb.from('site_settings').select('maintenance').eq('id',1).single();if(r.error){maintenanceStatus.textContent='Ative este recurso executando uma vez o arquivo supabase-manutencao.sql no Supabase.';maintenanceButton.disabled=true;return}maintenanceButton.dataset.enabled=String(!!r.data.maintenance);maintenanceButton.textContent=r.data.maintenance?'desativar manutenção':'ativar manutenção';maintenanceButton.classList.toggle('cta',true)};
-  readMaintenance();
-  maintenanceButton.onclick=async()=>{const enabled=maintenanceButton.dataset.enabled==='true',next=!enabled;if(!confirm(next?'Ativar a manutenção? Visitantes serão direcionados para a página de manutenção.':'Desativar a manutenção e abrir o site para todos?'))return;maintenanceButton.disabled=true;maintenanceStatus.textContent='Salvando...';const r=await sb.rpc('set_site_maintenance',{p_enabled:next});maintenanceButton.disabled=false;if(r.error){maintenanceStatus.textContent='Não foi possível alterar. Confira se executou supabase-manutencao.sql. '+r.error.message;return}maintenanceStatus.textContent=next?'Manutenção ativada.':'Manutenção desativada.';maintenanceButton.dataset.enabled=String(next);maintenanceButton.textContent=next?'desativar manutenção':'ativar manutenção'};
+  b.innerHTML=`<form class="ed" id="edf"><h3>${editId?'editar aviso':'novo aviso'}<button type="button" id="aout" class="lnk">sair</button></h3><input class="fld" id="at" placeholder="Título" maxlength="120" required><textarea class="fld" id="ax" placeholder="Texto do aviso" maxlength="2000" required></textarea><label class="chk"><input type="checkbox" id="af"> fixar (vira faixa no site todo)</label><div class="edb"><button class="cta" id="apub" type="submit">publicar</button><button class="cta ghost" type="button" id="acl">limpar</button></div><p class="mut" id="am"></p></form><section class="ed" data-maintenance-panel></section>`;
+  window.SabadouMaintenance.mountAdmin(sb,b.querySelector('[data-maintenance-panel]'));
+  window.SabadouUpdates.mountAdmin(sb,b);
   $('#edf').onsubmit=async ev=>{ev.preventDefault();
     const row={titulo:$('#at').value.trim(),texto:$('#ax').value.trim(),fixado:$('#af').checked};
     const r=editId!==null?await sb.from('avisos').update(row).eq('id',editId):await sb.from('avisos').insert(row);
     if(r.error){$('#am').textContent='Erro: '+r.error.message;return}
     editId=null;renderAdm();loadAv()};
   $('#acl').onclick=()=>{editId=null;renderAdm()};
-  $('#aout').onclick=async()=>{await sb.auth.signOut();isAdmin=false;renderAdm();renderAv()};
+  $('#aout').onclick=async()=>{await sb.auth.signOut({scope:'local'});isAdmin=false;renderAdm();renderAv()};
 }
 async function checkAdmin(){
   if(!sb)return;await who(true);
@@ -598,7 +599,7 @@ $('#lgf').onsubmit=async ev=>{ev.preventDefault();const m=$('#lm');m.textContent
   const r=await sb.auth.signInWithPassword({email:$('#le').value.trim(),password:$('#lp').value});
   if(r.error){m.textContent='E-mail ou senha incorretos.';return}
   await checkAdmin();
-  if(!isAdmin){await sb.auth.signOut();m.textContent='Essa conta não tem permissão de administrador.';return}
+  if(!isAdmin){await sb.auth.signOut({scope:'local'});m.textContent='Essa conta não tem permissão de administrador.';return}
   lg.close();$('#lp').value='';location.hash='admin'};
 (async()=>{
   if(CFG.supabaseUrl&&CFG.supabaseKey){
@@ -667,7 +668,7 @@ function who(force=false){const task=whoQueue.then(async()=>{if(!sb)return;
   }
   const hn=me?(isAdmin?'admin (teste)':'@'+(me.user_metadata?.handle||'fã')):'entrar';$('#fu').textContent=me?hn+' (sair)':'entrar com @';$('#hl').textContent=hn;$('#hl').title=me?'Sair':'Entrar';$('#ff').hidden=!me;
 });whoQueue=task.catch(()=>{});return task}
-$('#hl').onclick=$('#fu').onclick=async()=>{if(!sb)return alert('Fanarts ainda não disponíveis.');if(me){await sb.auth.signOut();await who();loadFa()}else ul.showModal()};
+$('#hl').onclick=$('#fu').onclick=async()=>{if(!sb)return alert('Fanarts ainda não disponíveis.');if(me){await sb.auth.signOut({scope:'local'});await who();loadFa()}else ul.showModal()};
 let signupMode=false;
 const authEmail=handle=>`${handle.toLowerCase()}@login.sabadou.invalid`;
 function setFanAuthMode(create){signupMode=create;$('#ut').textContent=create?'criar conta':'entrar';$('#usubmit').textContent=create?'criar conta':'entrar';$('#uswitch').textContent=create?'já tenho conta':'criar conta';$('#uh').placeholder='nome do Instagram (sem @)';$('#upw').autocomplete=create?'new-password':'current-password';$('#upw').placeholder=create?'senha nova, diferente da senha do Instagram':'senha';$('#um').textContent=create?'Use seu nome de usuário do Instagram sem @ e crie uma senha nova, diferente da senha do Instagram.':'Entre com seu @ e sua senha.'}
@@ -693,22 +694,45 @@ $('#ulf').onsubmit=async ev=>{ev.preventDefault();if(!sb){$('#um').textContent='
   }
   if(signupMode&&!r.data.session){$('#um').textContent='A confirmação de e-mail precisa estar desativada no Supabase para esse tipo de conta.';return}
   store.set('sab_after',location.hash.slice(1)||'calabresos');$('#upw').value='';ul.close();await who();await loadFa();location.hash=TABS.includes(store.get('sab_after'))?store.get('sab_after'):'calabresos'};
-const shrink=f=>new Promise(ok=>{const i=new Image();i.onload=()=>{const k=Math.min(1,1400/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=i.width*k;c.height=i.height*k;c.getContext('2d').drawImage(i,0,0,c.width,c.height);c.toBlob(ok,'image/jpeg',.85)};i.src=URL.createObjectURL(f)});
+const shrink=f=>new Promise((resolve,reject)=>{
+  if(!['image/jpeg','image/png','image/webp'].includes(f.type))return reject(new Error('Escolha uma imagem JPG, PNG ou WEBP.'));
+  if(f.size>20*1024*1024)return reject(new Error('A imagem precisa ter no máximo 20 MB.'));
+  const image=new Image(),url=URL.createObjectURL(f);
+  image.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('Não foi possível abrir essa imagem.'))};
+  image.onload=()=>{try{
+    if(image.width*image.height>25000000)throw new Error('A imagem é muito grande. Reduza para até 25 milhões de pixels.');
+    const scale=Math.min(1,1400/Math.max(image.width,image.height)),canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(image.width*scale));canvas.height=Math.max(1,Math.round(image.height*scale));
+    canvas.getContext('2d').drawImage(image,0,0,canvas.width,canvas.height);
+    canvas.toBlob(blob=>{if(blob)resolve(blob);else reject(new Error('Não foi possível preparar a imagem.'))},'image/jpeg',.85);
+  }catch(error){reject(error)}finally{URL.revokeObjectURL(url)}};
+  image.src=url;
+});
 $('#fi').addEventListener('change',e=>{$('#fi-name').textContent=e.target.files[0]?.name||'Nenhuma imagem escolhida'});
-$('#ff').onsubmit=async ev=>{ev.preventDefault();const m=$('#fm');if(!me||!$('#fi').files[0])return;m.textContent='Verificando seu envio...';
-  const allowed=isAdmin?{data:true}:await sb.rpc('pode_enviar_fanart');if(allowed.error){m.textContent='Não consegui verificar o limite semanal. Execute o SQL atualizado do Supabase.';return}
-  if(!allowed.data){m.textContent='Você já enviou uma fanart nesta semana. Aguarde a próxima semana ou peça ao Sabadou para liberar um reenvio.';return}
-  m.textContent='Enviando...';const b=await shrink($('#fi').files[0]),path=me.id+'/'+Date.now()+'.jpg';
-  const u=await sb.storage.from('fanarts').upload(path,b,{contentType:'image/jpeg'});if(u.error){m.textContent='Erro: '+u.error.message;return}
-  const r=await sb.from('fanarts').insert({handle:me.user_metadata?.handle||(isAdmin?'admin-teste':'?'),path});
-  if(r.error){await sb.storage.from('fanarts').remove([path]);m.textContent=r.error.message.includes('limite_semanal_fanart')?'Você já enviou uma fanart nesta semana. Aguarde a próxima semana ou peça um reenvio.':'Erro ao registrar a fanart: '+r.error.message;return}
-  m.textContent='Enviada! Ela está em análise. 💜';$('#ff').reset();$('#fi-name').textContent='Nenhuma imagem escolhida';await loadFa()};
+$('#ff').onsubmit=async ev=>{
+  ev.preventDefault();const m=$('#fm'),button=$('#ff button[type="submit"]'),file=$('#fi').files[0];if(button.disabled||!me||!file||!sb)return;
+  const userId=me.id;button.disabled=true;m.textContent='Verificando seu envio...';let path,registered=false;
+  try{
+    const allowed=isAdmin?{data:true}:await sb.rpc('pode_enviar_fanart');if(allowed.error)throw allowed.error;
+    if(!allowed.data)throw new Error('Você já enviou uma fanart nesta semana. Aguarde a próxima ou peça ao Sabadou para liberar um reenvio.');
+    const blob=await shrink(file);if(me?.id!==userId)throw new Error('Sua conta mudou. Entre novamente antes de enviar.');
+    path=userId+'/'+crypto.randomUUID()+'.jpg';m.textContent='Enviando...';
+    const upload=await sb.storage.from('fanarts').upload(path,blob,{contentType:'image/jpeg'});if(upload.error)throw upload.error;
+    const result=await sb.from('fanarts').insert({handle:me.user_metadata?.handle||(isAdmin?'admin-teste':'?'),path}).select('*').single();if(result.error)throw result.error;
+    registered=true;m.textContent='Enviada! Ela está em análise. 💜';m.insertAdjacentHTML('beforeend',window.SabadouFanartRecords.time(result.data));
+    $('#ff').reset();$('#fi-name').textContent='Nenhuma imagem escolhida';await loadFa();
+  }catch(error){
+    if(path&&!registered){try{await sb.storage.from('fanarts').remove([path])}catch{}}
+    m.textContent=String(error.message||'Não foi possível enviar agora.').includes('limite_semanal_fanart')?'Você já enviou uma fanart nesta semana. Aguarde a próxima ou peça um reenvio.':error.message||'Não foi possível enviar agora.';
+  }finally{button.disabled=false}
+};
+
 async function refreshMyFanart(){
   const box=$('#myfanart-status'),notice=$('#fanart-notice');if(!sb||!me){box.innerHTML='';return}
-  const pending=await sb.from('fanarts').select('id').eq('user_id',me.id).eq('status','pendente').order('criado_em',{ascending:false}).limit(1);
-  if(!pending.error&&pending.data?.length){box.innerHTML='<section class="fan-progress" aria-live="polite"><b>Sua fanart está em análise</b><div class="fan-track"><div class="fan-step done"><i>✓</i><span>enviada</span></div><div class="fan-track-line done"></div><div class="fan-step active"><i>2</i><span>em análise</span></div><div class="fan-track-line"></div><div class="fan-step"><i>3</i><span>resultado</span></div></div></section>'}else box.innerHTML='';
+  const pending=await sb.from('fanarts').select('*').eq('user_id',me.id).eq('status','pendente').order('criado_em',{ascending:false}).limit(1);
+  if(pending.error){box.textContent='Não foi possível consultar seu envio agora.';return}
+  if(pending.data?.length){box.innerHTML='<section class="fan-progress" aria-live="polite"><b>Sua fanart está em análise</b><div class="fan-track"><div class="fan-step done"><i>✓</i><span>enviada</span></div><div class="fan-track-line done"></div><div class="fan-step active"><i>2</i><span>em análise</span></div><div class="fan-track-line"></div><div class="fan-step"><i>3</i><span>resultado</span></div></div></section>';box.insertAdjacentHTML('beforeend',window.SabadouFanartRecords.time(pending.data[0]))}else box.innerHTML='';
   if(notice.open)return;
-  const result=await sb.from('fanarts').select('id,path,handle,status,criado_em').eq('user_id',me.id).eq('notificacao_vista',false).in('status',['aprovada','recusada']).order('criado_em',{ascending:true}).limit(1);
+  const result=await sb.from('fanarts').select('*').eq('user_id',me.id).eq('notificacao_vista',false).in('status',['aprovada','recusada']).order('criado_em',{ascending:true}).limit(1);
   const a=result.data?.[0];if(result.error||!a)return;
   $('#fanart-notice-img').src=pub(a.path);$('#fanart-notice-img').alt='Sua fanart de @'+(a.handle||'');
   $('#fanart-notice-title').textContent=a.status==='aprovada'?'Fanart aprovada!':'Fanart recusada';
@@ -718,10 +742,10 @@ async function refreshMyFanart(){
 $('#fanart-notice-close').onclick=async()=>{const id=$('#fanart-notice').dataset.fanartId;$('#fanart-notice').close();if(id&&sb)await sb.rpc('marcar_fanart_notificacao_vista',{p_fanart_id:id});await refreshMyFanart()};
 const card=(a,adm=false,approvedAdmin=false)=>{const url=pub(a.path),download=url+(url.includes('?')?'&':'?')+'download='+encodeURIComponent('fanart-'+a.handle+'.jpg');
   const actions=adm?`<button class="mini ok" data-a="ok" data-id="${a.id}">aprovar</button> <button class="mini no" data-a="no" data-id="${a.id}">recusar</button>`:approvedAdmin?`<button class="mini ok" data-a="win" data-id="${a.id}">escolher vencedora</button> <button class="mini no" data-a="del" data-id="${a.id}">remover</button>`:`<button class="lk" data-v="${a.id}">${mv[a.id]?'💜':'🤍'} ${a.votos}</button>`;
-  return `<figure class="fa${a.vencedora?' win':''}"><a class="fa-open" href="${url}" target="_blank" rel="noopener"><img loading="lazy" src="${url}" alt="Fanart de @${esc(a.handle)}; abrir imagem"></a><figcaption><span>@${esc(a.handle)}</span><div class="fa-actions">${actions}<a class="mini download" href="${download}">baixar</a></div></figcaption></figure>`};
+  return `<figure class="fa${a.vencedora?' win':''}"><a class="fa-open" href="${esc(url)}" target="_blank" rel="noopener"><img loading="lazy" src="${esc(url)}" alt="Fanart de @${esc(a.handle)}; abrir imagem"></a><figcaption><span>@${esc(a.handle)}</span>${window.SabadouFanartRecords.time(a)}<div class="fa-actions">${actions}<a class="mini download" href="${esc(download)}">baixar</a></div></figcaption></figure>`};
 const podiumCard=(a,n)=>{const url=pub(a.path),download=url+(url.includes('?')?'&':'?')+'download='+encodeURIComponent('fanart-'+a.handle+'.jpg');
   const controls=isAdmin?`<button class="mini ok" data-a="win" data-id="${a.id}">vencedora</button> <button class="mini no" data-a="del" data-id="${a.id}">remover</button>`:`<button class="lk" data-v="${a.id}">${mv[a.id]?'💜':'🤍'} ${a.votos}</button>`;
-  return `<article class="podium-entry place-${n}"><a class="podium-photo" href="${url}" target="_blank" rel="noopener"><img loading="lazy" src="${url}" alt="Fanart de @${esc(a.handle)}"></a><b class="podium-name">@${esc(a.handle)}</b><span class="podium-votes">${a.votos} votos</span><div class="podium-tools">${controls}<a class="mini download" href="${download}">baixar</a></div><div class="podium-base"><strong>${n}º</strong><small>lugar</small></div></article>`};
+  return `<article class="podium-entry place-${n}"><a class="podium-photo" href="${esc(url)}" target="_blank" rel="noopener"><img loading="lazy" src="${esc(url)}" alt="Fanart de @${esc(a.handle)}"></a><b class="podium-name">@${esc(a.handle)}</b><span class="podium-votes">${a.votos} votos</span>${window.SabadouFanartRecords.time(a)}<div class="podium-tools">${controls}<a class="mini download" href="${esc(download)}">baixar</a></div><div class="podium-base"><strong>${n}º</strong><small>lugar</small></div></article>`};
 async function loadFa(){if(!sb)return;await who();rendSA();await refreshMyFanart();mv={};
   FA=(await sb.from('fanarts').select('*').eq('status','aprovada').order('criado_em',{ascending:false})).data||[];
   if(me)((await sb.from('votos').select('fanart_id')).data||[]).forEach(x=>mv[x.fanart_id]=1);
@@ -738,7 +762,7 @@ async function loadFa(){if(!sb)return;await who();rendSA();await refreshMyFanart
   const P=(await sb.from('fanarts').select('*').eq('status','pendente').order('criado_em')).data||[];
   const T=(await sb.from('placar').select('handle,clicks,milhao_em').not('milhao_em','is',null).order('milhao_em').limit(10)).data||[];
   const B=(await sb.from('placar').select('handle,bilhao_em').not('bilhao_em','is',null).order('bilhao_em').limit(1)).data||[];
-  q.innerHTML=`<h3>fila de aprovação (${P.length})</h3><div class="fg">${P.map(a=>card(a,1)).join('')||'<p class="mut">Fila vazia.</p>'}</div><h3>🏆 vencedora da semana</h3><div class="fg">${FA.filter(a=>new Date(a.criado_em)>=d).sort((a,b)=>b.votos-a.votos).map(a=>`<figure class="fa${a.vencedora?' win':''}"><img src="${pub(a.path)}" alt=""><figcaption><span>@${esc(a.handle)} · ${a.votos}💜</span><button class="mini ok" data-a="win" data-id="${a.id}">🏆 escolher</button></figcaption></figure>`).join('')||'<p class="mut">Nenhuma aprovada nesta semana.</p>'}</div><h3>🥇 primeiros ao 1 milhão (follow)</h3><ol>${T.map(t=>`<li>@${esc(t.handle||'?')} · ${new Date(t.milhao_em).toLocaleString('pt-BR')}</li>`).join('')||'<li>Ninguém ainda.</li>'}</ol><h3>💸 primeiro a 1 bilhão (R$ 5 via Pix)</h3><ol>${B.map(t=>`<li>@${esc(t.handle||'?')} · ${new Date(t.bilhao_em).toLocaleString('pt-BR')}</li>`).join('')||'<li>Ninguém chegou ainda.</li>'}</ol>`}
+  q.innerHTML=`<h3>fila de aprovação (${P.length})</h3><div class="fg">${P.map(a=>card(a,1)).join('')||'<p class="mut">Fila vazia.</p>'}</div><h3>🏆 vencedora da semana</h3><div class="fg">${FA.filter(a=>new Date(a.criado_em)>=d).sort((a,b)=>b.votos-a.votos).map(a=>`<figure class="fa${a.vencedora?' win':''}"><img src="${esc(pub(a.path))}" alt=""><figcaption><span>@${esc(a.handle)} · ${a.votos}💜</span>${window.SabadouFanartRecords.time(a)}<button class="mini ok" data-a="win" data-id="${a.id}">🏆 escolher</button></figcaption></figure>`).join('')||'<p class="mut">Nenhuma aprovada nesta semana.</p>'}</div><h3>🥇 primeiros ao 1 milhão (follow)</h3><ol>${T.map(t=>`<li>@${esc(t.handle||'?')} · ${new Date(t.milhao_em).toLocaleString('pt-BR')}</li>`).join('')||'<li>Ninguém ainda.</li>'}</ol><h3>💸 primeiro a 1 bilhão (R$ 5 via Pix)</h3><ol>${B.map(t=>`<li>@${esc(t.handle||'?')} · ${new Date(t.bilhao_em).toLocaleString('pt-BR')}</li>`).join('')||'<li>Ninguém chegou ainda.</li>'}</ol>`;await window.SabadouFanartRecords.mount(sb,q)}
 document.addEventListener('click',async e=>{
   const release=e.target.closest('[data-release-fanart]');if(release){if(!isAdmin)return;const handle=release.dataset.handle||'?';if(!confirm(`Liberar um reenvio de fanart para @${handle} nesta semana?`))return;release.disabled=true;
     const r=await sb.rpc('liberar_reenvio_fanart',{p_user_id:release.dataset.releaseFanart});release.disabled=false;
