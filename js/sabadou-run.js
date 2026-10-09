@@ -19,8 +19,12 @@ function size(){const m=innerWidth<700;if(ready&&m===mob)return;ready=true;mob=m
   stars=Array.from({length:36},()=>({x:Math.random()*W,y:Math.random()*H*.58,s:Math.random()*1.6+.4}));
   if(st==='run')st='idle';obs=[];y=G;vy=0}
 const sp=()=>mob?.92:1;size();addEventListener('resize',size);
-function reset(){score=0;phase=0;v=6.4;y=G;vy=0;obs=[];gap=560;banner=100;st='run';shake=0}
-function jump(){if(st!=='run')return;if(y>=G-.5){vy=-12.8;window.SabadouSounds?.play('jump')}}
+function reset(){score=0;phase=0;v=6.4;y=G;vy=0;down=false;ducking=false;obs=[];gap=560;banner=100;st='run';shake=0}
+function jump(){
+  if(st==='idle')reset();
+  if(st==='dead'||st==='won'){if(!endDialog.open)endDialog.showModal();return}
+  if(st==='run'&&y>=G-.5){vy=-12.8;window.SabadouSounds?.play('jump')}
+}
 const endDialog=document.createElement('dialog');
 endDialog.style.cssText='width:min(92vw,420px);padding:1.5rem;border:2px solid #a64dff;border-radius:24px;background:#12061f;color:#f6ecff;text-align:center;font:700 1.05rem/1.5 Nunito,system-ui,sans-serif';
 endDialog.innerHTML='<h2 style="font:400 2rem/1.1 &quot;Bagel Fat One&quot;,Impact,sans-serif;margin:0 0 .8rem"></h2><p style="margin:0 0 1.2rem">Quer jogar de novo? Você também pode fechar esta janela e tirar seu print.</p><div style="display:flex;justify-content:center;gap:.7rem;flex-wrap:wrap"><button type="button" data-restart style="font:inherit;font-weight:800;border:0;border-radius:99px;padding:.75rem 1.1rem;background:#f2b8ff;color:#2a0f3d;cursor:pointer">jogar de novo</button><button type="button" data-dismiss style="font:inherit;font-weight:800;border:2px solid #a64dff;border-radius:99px;padding:.7rem 1rem;background:transparent;color:#f6ecff;cursor:pointer">fechar e tirar print</button></div>';
@@ -89,20 +93,20 @@ function draw(){
   c.textAlign='right';c.fillText('HI '+String(hi).padStart(5,'0')+'   '+String(Math.floor(score)).padStart(5,'0'),W-16,28);
   c.textAlign='left';c.fillText(PH[phase][0]+' · fase '+(phase+1)+'/6',16,28);
   if(banner>0&&st==='run')txt(phase===5?'É SÁBADO!!!':PH[phase][0].toUpperCase(),W/2,mob?130:110,'400 '+(mob?46:58)+'px "Bagel Fat One",Impact,sans-serif',Math.min(1,banner/30));
-  if(st==='idle')txt(mob?'toque aqui pra começar':'aperta espaço ou toca aqui pra começar',W/2,mob?130:110,'800 '+(mob?20:22)+'px Nunito,sans-serif');
-  if(st==='dead'){txt(phase===5?'quase! o sábado é seu':'não é sábado :(',W/2,mob?120:100,'400 '+(mob?32:46)+'px "Bagel Fat One",Impact,sans-serif');txt(mob?'toque pra tentar de novo':'espaço ou toque pra tentar de novo',W/2,mob?154:134,'800 '+(mob?18:20)+'px Nunito,sans-serif')}
-  if(st==='won'){txt('VOCÊ CHEGOU AO SÁBADO!',W/2,mob?112:98,'400 '+(mob?30:44)+'px "Bagel Fat One",Impact,sans-serif');txt('Tire um print e mande no Direct do Sabadou para ganhar um salve!',W/2,mob?153:140,'800 '+(mob?13:18)+'px Nunito,sans-serif');txt(mob?'toque pra jogar de novo':'espaço ou toque pra jogar de novo',W/2,mob?188:176,'800 '+(mob?14:17)+'px Nunito,sans-serif')}
+  if(st==='dead')txt(phase===5?'quase! o sábado é seu':'não é sábado :(',W/2,mob?120:100,'400 '+(mob?32:46)+'px "Bagel Fat One",Impact,sans-serif');
+  if(st==='won'){txt('VOCÊ CHEGOU AO SÁBADO!',W/2,mob?112:98,'400 '+(mob?30:44)+'px "Bagel Fat One",Impact,sans-serif');txt('Tire um print e mande no Direct do Sabadou para ganhar um salve!',W/2,mob?153:140,'800 '+(mob?13:18)+'px Nunito,sans-serif')}
 }
 function loop(now){
   requestAnimationFrame(loop);
   if(!active()){last=now;return}
+  if(st==='idle'){const rect=cv.getBoundingClientRect();if(rect.bottom>0&&rect.top<innerHeight)reset()}
   const dt=Math.min(2.5,(now-(last||now))/16.667);last=now;t+=dt;
   step(dt);if(banner>0)banner-=dt;if(shake>0)shake-=dt;draw();
 }
 requestAnimationFrame(loop);
 
 addEventListener('keydown',e=>{
-  if(!active()||/INPUT|TEXTAREA/.test(e.target.tagName))return;
+  if(!active()||endDialog.open||/INPUT|TEXTAREA/.test(e.target.tagName))return;
   if(['Space','ArrowUp','KeyW'].includes(e.code)){e.preventDefault();if(!e.repeat)jump()}
   if(['ArrowDown','KeyS'].includes(e.code)){e.preventDefault();down=true}
 });
