@@ -7,27 +7,9 @@
 
 <!-- SISTEMA DE MANUTENÇÃO -->
 <script src="config.js"></script>
-<script src="js/sabadou-maintenance.js?v=20261009-prazo-publicacao-20261009"></script>
+<script src="js/sabadou-maintenance.js?v=20261010-live-1-publicacao-20261009"></script>
 <script>
-// A configuração remota permite ligar a manutenção pelo painel admin.
-document.documentElement.dataset.maintenanceCheck='pending';
-const revealSite=()=>delete document.documentElement.dataset.maintenanceCheck;
-const cfg=typeof SITE_CONFIG!=='undefined'?SITE_CONFIG:{};
-if(cfg.supabaseUrl&&cfg.supabaseKey){
-  (async()=>{try{
-    const base=cfg.supabaseUrl.replace(/\/$/,'');
-    const headers={apikey:cfg.supabaseKey};
-    const settings=await window.SabadouMaintenance.read();
-    if(window.SabadouMaintenance.isActive(settings)){
-      const ref=new URL(base).hostname.split('.')[0],raw=localStorage.getItem('sb-'+ref+'-auth-token');
-      const session=raw&&JSON.parse(raw),token=session?.access_token,userId=session?.user?.id;
-      let admin=false;
-      if(token&&userId){const check=await fetch(base+'/rest/v1/admins?user_id=eq.'+encodeURIComponent(userId)+'&select=user_id',{headers:{...headers,Authorization:'Bearer '+token}});admin=check.ok&&(await check.json()).length>0}
-      if(!admin){location.replace('manutencao.html?site=atualizacao');return}
-    }
-  }catch(e){console.warn('Não foi possível verificar o modo de manutenção.',e);location.replace('manutencao.html?site=atualizacao');return}
-  revealSite()})();
-}else location.replace('manutencao.html?site=atualizacao');
+window.SabadouMaintenance.guard({url:'manutencao.html?site=atualizacao'});
 </script>
 <style>html[data-maintenance-check="pending"] body{visibility:hidden}</style>
 
@@ -268,7 +250,7 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 <link rel="stylesheet" href="css/sabadou-podium.css?v=20261009-4-publicacao-20261009">
 <link rel="stylesheet" href="css/sabadou-admin.css?v=20261010-3-publicacao-20261009">
 </head>
-<body data-site="atualizacao" data-site-version="2.2.5">
+<body data-site="atualizacao" data-site-version="2.2.6">
 <div class="bar" id="bar"></div>
 <header class="nav"><div class="wrap nv">
   <a class="logo" href="#inicio">sabadou</a>
@@ -419,7 +401,7 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
     <div><h4>parcerias</h4><p>Chama na DM do Instagram.</p><button class="cta ghost sm" id="up" type="button">Voltar ao topo</button></div>
   </div>
   <div class="wrap fb"><span>© <span id="yr">2026</span> Sabadou. Todos os direitos reservados.</span><span>Feito pra quem vive de sábado. <button class="lnk" id="adm" type="button" hidden>admin</button></span></div>
-<div class="wrap"><small class="site-version">Sabadou atualização · v2.2.5</small></div>
+<div class="wrap"><small class="site-version">Sabadou atualização · v2.2.6</small></div>
 </footer>
 
 <div id="lb"><img id="lbi" alt=""></div>
@@ -623,7 +605,7 @@ $('#lgf').onsubmit=async ev=>{ev.preventDefault();const m=$('#lm');m.textContent
 (async()=>{
   if(CFG.supabaseUrl&&CFG.supabaseKey){
     try{await new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';s.onload=ok;s.onerror=no;document.head.appendChild(s)});
-      const came=/access_token|[?&]code=/.test(location.href);sb=supabase.createClient(CFG.supabaseUrl,CFG.supabaseKey);
+      const came=/access_token|[?&]code=/.test(location.href);sb=supabase.createClient(CFG.supabaseUrl,CFG.supabaseKey);window.SabadouMaintenance.attachClient(sb);
       sb.auth.onAuthStateChange((ev)=>setTimeout(async()=>{if(typeof loadFa==='function')await loadFa();if(came&&ev==='SIGNED_IN'&&me){const t=store.get('sab_after','calabresos');location.hash=TABS.includes(t)?t:'calabresos';ul.close()}},0))}catch(e){sb=null}
   }
   await loadAv();await checkAdmin();

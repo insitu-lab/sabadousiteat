@@ -6,30 +6,12 @@
 <meta name="theme-color" content="#12061f">
 <title>Sabadou — avisos em vídeo</title>
 <script src="config.js"></script>
-<script src="js/sabadou-maintenance.js?v=20261009-prazo-publicacao-20261009"></script>
+<script src="js/sabadou-maintenance.js?v=20261010-live-1-publicacao-20261009"></script>
 <script>
-// A página dos vídeos segue a mesma manutenção da versão principal.
-document.documentElement.dataset.maintenanceCheck='pending';
-(async()=>{
-  const c=typeof SITE_CONFIG!=='undefined'?SITE_CONFIG:{};
-  try{
-    if(!c.supabaseUrl||!c.supabaseKey)throw new Error('Configuração indisponível');
-    const base=c.supabaseUrl.replace(/\/$/,''),headers={apikey:c.supabaseKey};
-    const settings=await window.SabadouMaintenance.read();
-    if(window.SabadouMaintenance.isActive(settings)){
-      const ref=new URL(base).hostname.split('.')[0];
-      const raw=localStorage.getItem('sb-'+ref+'-auth-token'),session=raw&&JSON.parse(raw);
-      let admin=false;
-      if(session?.access_token&&session?.user?.id){
-        const check=await fetch(base+'/rest/v1/admins?user_id=eq.'+encodeURIComponent(session.user.id)+'&select=user_id',{headers:{...headers,Authorization:'Bearer '+session.access_token}});
-        admin=check.ok&&(await check.json()).length>0;
-      }
-      if(!admin){location.replace('manutencao.html?site=atualizacao');return}
-    }
-    delete document.documentElement.dataset.maintenanceCheck;
-  }catch(error){console.warn('Não foi possível verificar a manutenção.',error);location.replace('manutencao.html?site=atualizacao')}
-})();
+window.SabadouMaintenance.guard({url:'manutencao.html?site=atualizacao'});
+window.SabadouMaintenance.connectRealtime().catch(error=>console.warn('Realtime indisponível; manutenção conferida periodicamente.',error));
 </script>
+<style>html[data-maintenance-check="pending"] body{visibility:hidden}</style>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Nunito:wght@600;800&display=swap">
 <link rel="stylesheet" href="css/avisos-videos.css?v=20261009-1-publicacao-20261009">
 <script src="js/avisos-videos.js?v=20261009-pastas-publicacao-20261009" defer></script>

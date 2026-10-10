@@ -2,16 +2,106 @@
 (()=>{
   'use strict';
   const cfg=typeof SITE_CONFIG!=='undefined'?SITE_CONFIG:(window.SITE_CONFIG||{});
-  const api={state:undefined};
+  const api={state:undefined},fetchLimit=8000;
+  let guard=null,client=null,channel=null,authSubscription=null,confirmedAdmin=false;
   api.deadline=settings=>settings&&Object.prototype.hasOwnProperty.call(settings,'maintenance_until')?settings.maintenance_until:(cfg.maintenanceUntil||null);
   api.isActive=settings=>!!settings?.maintenance&&(!Number.isFinite(Date.parse(api.deadline(settings)))||Date.now()<Date.parse(api.deadline(settings)));
   api.read=async()=>{
     if(!cfg.supabaseUrl||!cfg.supabaseKey)throw new Error('Configuração indisponível.');
-    const response=await fetch(cfg.supabaseUrl.replace(/\/$/,'')+'/rest/v1/site_settings?id=eq.1&select=*',{headers:{apikey:cfg.supabaseKey},cache:'no-store'});
+    const response=await request(cfg.supabaseUrl.replace(/\/$/,'')+'/rest/v1/site_settings?id=eq.1&select=*',{headers:{apikey:cfg.supabaseKey},cache:'no-store'});
     if(!response.ok)throw new Error('Não foi possível carregar a manutenção.');
     const settings=(await response.json())[0];if(!settings)throw new Error('Configuração de manutenção não encontrada.');
     api.state=settings;window.dispatchEvent(new Event('sabadou:maintenance'));return settings;
   };
+  async function request(url,options){
+    const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),fetchLimit);
+    try{return await fetch(url,{...options,signal:controller.signal})}finally{clearTimeout(timer)}
+  }
+  async function isAdmin(){
+    if(client){
+      const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),fetchLimit);
+      try{
+        const {data,error}=await client.rpc('is_admin').abortSignal(controller.signal);
+        if(error)throw error;
+        return data===true;
+      }finally{clearTimeout(timer)}
+    }
+    const base=cfg.supabaseUrl.replace(/\/$/,''),ref=new URL(base).hostname.split('.')[0];
+    let session;try{session=JSON.parse(localStorage.getItem('sb-'+ref+'-auth-token')||'null')}catch{return false}
+    if(!session?.access_token||!session?.user?.id)return false;
+    // A confirmação vem do banco; metadados locais não concedem acesso admin.
+    const response=await request(base+'/rest/v1/admins?user_id=eq.'+encodeURIComponent(session.user.id)+'&select=user_id',{
+      headers:{apikey:cfg.supabaseKey,Authorization:'Bearer '+session.access_token},cache:'no-store'
+    });
+    if(!response.ok)return false;
+    return (await response.json()).some(row=>row.user_id===session.user.id);
+  }
+  function conceal(){document.documentElement.dataset.maintenanceCheck='pending'}
+  function reveal(){delete document.documentElement.dataset.maintenanceCheck}
+  function redirect(){
+    if(!guard||guard.redirecting)return;
+    guard.redirecting=true;conceal();
+    document.querySelectorAll('audio,video').forEach(media=>media.pause());
+    location.replace(guard.url);
+  }
+  async function check(){
+    if(!guard||guard.redirecting)return;
+    if(guard.checking){guard.again=true;return}
+    guard.checking=true;
+    try{
+      const settings=await api.read();
+      if(api.isActive(settings)){
+        if(!confirmedAdmin)conceal();
+        confirmedAdmin=await isAdmin();
+        if(!confirmedAdmin){redirect();return}
+      }
+      reveal();
+    }catch(error){console.warn('Não foi possível confirmar o acesso durante a manutenção.',error);redirect()}
+    finally{
+      guard.checking=false;
+      if(guard.again){guard.again=false;check()}
+    }
+  }
+  api.guard=({url})=>{
+    if(guard)return check();
+    guard={url:new URL(url,document.baseURI).href,checking:false,again:false,redirecting:false};
+    conceal();check();
+    // Reserva para quando o Realtime cair ou ainda não estiver configurado.
+    setInterval(()=>{if(!document.hidden)check()},5000);
+    const resume=()=>{if(!document.hidden){if(!confirmedAdmin)conceal();check()}};
+    addEventListener('focus',resume);addEventListener('pageshow',resume);addEventListener('online',resume);
+    document.addEventListener('visibilitychange',resume);
+    addEventListener('storage',event=>{if(event.key?.endsWith('-auth-token')){confirmedAdmin=false;resume()}});
+    // Nenhuma interação passa enquanto o acesso está sendo conferido.
+    for(const name of ['pointerdown','click','keydown','submit'])document.addEventListener(name,event=>{
+      if(document.documentElement.dataset.maintenanceCheck==='pending'){
+        event.preventDefault();event.stopImmediatePropagation();
+      }
+    },true);
+  };
+  api.attachClient=value=>{
+    if(client===value)return;
+    if(channel&&client)client.removeChannel(channel);
+    authSubscription?.unsubscribe();client=value;confirmedAdmin=false;
+    channel=client.channel('sabadou-maintenance-live')
+      .on('postgres_changes',{event:'UPDATE',schema:'public',table:'site_settings',filter:'id=eq.1'},()=>check())
+      .subscribe(status=>{if(status==='SUBSCRIBED')check()});
+    authSubscription=client.auth.onAuthStateChange(()=>{
+      confirmedAdmin=false;setTimeout(()=>check(),0);
+    }).data.subscription;
+    check();
+  };
+  // Páginas sem login próprio, como os vídeos, também recebem o Realtime.
+  api.connectRealtime=async()=>{
+    if(client||!cfg.supabaseUrl||!cfg.supabaseKey)return;
+    if(!window.supabase)await new Promise((resolve,reject)=>{
+      const script=document.createElement('script');
+      script.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+      script.onload=resolve;script.onerror=reject;document.head.append(script);
+    });
+    if(!client)api.attachClient(window.supabase.createClient(cfg.supabaseUrl,cfg.supabaseKey));
+  };
+  api.refresh=check;
   const dateFormat=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'});
   function inputDate(value){
     if(!Number.isFinite(Date.parse(value)))return '';
@@ -51,7 +141,7 @@
       if(next&&Number.isFinite(stamp)&&stamp<=Date.now()){status.textContent='Antes de ativar, salve uma data de volta futura ou escolha “sem prazo”.';return}
       if(!confirm(next?'Ativar a manutenção e direcionar os visitantes para a página de espera?':'Desativar a manutenção e abrir o site para todos?'))return;
       lock(true);status.textContent='Salvando...';
-      try{const r=await client.rpc('set_site_maintenance',{p_enabled:next});if(r.error)throw r.error;settings.maintenance=next;apply(settings);status.textContent=describe()}
+      try{const r=await client.rpc('set_site_maintenance',{p_enabled:next});if(r.error)throw r.error;settings.maintenance=next;apply(settings);status.textContent=describe();api.refresh()}
       catch(error){status.textContent='Não foi possível alterar a manutenção. '+(error.message||'Tente novamente.')}
       finally{lock(false)}
     };
@@ -61,7 +151,7 @@
       lock(true);status.textContent='Salvando a volta...';
       try{
         const r=await client.rpc('set_site_maintenance_until',{p_until:deadline});if(r.error)throw r.error;
-        settings.maintenance_until=deadline;apply(settings);status.textContent='Prazo salvo. '+describe();
+        settings.maintenance_until=deadline;apply(settings);status.textContent='Prazo salvo. '+describe();api.refresh();
       }catch(error){status.textContent='Não foi possível salvar a volta. Confira se executou supabase-manutencao.sql. '+(error.message||'')}
       finally{lock(false)}
     };
