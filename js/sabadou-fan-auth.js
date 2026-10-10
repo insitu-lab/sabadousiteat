@@ -1,6 +1,6 @@
 /* A mesma conta com @ e senha é usada nas duas versões do site. */
 (()=>{
-  function mount({getClient,onSignedIn}){
+  function mount({getClient,onSignedIn,copy={}}){
     const dialog=document.getElementById('ul'),find=id=>dialog.querySelector('#'+id);
     const form=find('ulf'),submit=find('usubmit'),toggle=find('uswitch'),message=find('um');
     let creating=false,busy=false;
@@ -9,7 +9,7 @@
       submit.textContent=create?'criar conta':'entrar';toggle.textContent=create?'já tenho conta':'criar conta';
       find('upw').autocomplete=create?'new-password':'current-password';
       find('upw').placeholder=create?'senha nova, diferente da senha do Instagram':'senha';
-      message.textContent=create?'Use seu @ do Instagram e crie uma senha nova, diferente da senha do Instagram.':'Use a mesma conta nos dois sites para continuar com seus cliques.';
+      message.textContent=create?(copy.createHint||'Use seu @ do Instagram e crie uma senha nova, diferente da senha do Instagram.'):(copy.signInHint||'Use a mesma conta nos dois sites para continuar com seus cliques.');
     }
     toggle.onclick=()=>{if(!busy)mode(!creating)};
     form.onsubmit=async event=>{

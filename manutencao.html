@@ -1,14 +1,16 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-package-site="atualizacao">
 <head>
 <meta charset="utf-8">
+<link rel="icon" type="image/png" href="img/sabadou-favicon.png?v=20261010-1-publicacao-20261009">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex">
 <title>Sabadou — voltamos já</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Nunito:wght@600;800&display=swap">
-<script src="js/sabadou-site-links.js?v=20261009-comum-publicacao-20261009"></script>
+<script src="js/sabadou-site-links.js?v=20261010-early-publicacao-20261009"></script>
 <script src="config.js?v=20261009-18h-publicacao-20261009"></script>
 <script src="js/sabadou-maintenance.js?v=20261010-live-1-publicacao-20261009"></script>
+<script src="js/sabadou-maintenance-auth.js?v=20261010-1-publicacao-20261009" defer></script>
 <script>
 document.documentElement.dataset.maintenanceCheck='pending';
 const revealMaintenance=()=>delete document.documentElement.dataset.maintenanceCheck;
@@ -316,8 +318,7 @@ $('#admin-login-form').onsubmit=async e=>{
   e.preventDefault();const status=$('#admin-login-status'),button=e.submitter||$('#admin-login-form button[type="submit"]');button.disabled=true;status.textContent='Verificando...';
   try{
     const c=typeof SITE_CONFIG!=='undefined'?SITE_CONFIG:(window.SITE_CONFIG||{});if(!c.supabaseUrl||!c.supabaseKey)throw new Error('Login indisponível.');
-    await new Promise((ok,no)=>{const script=document.createElement('script');script.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';script.onload=ok;script.onerror=no;document.head.appendChild(script)});
-    const client=window.supabase.createClient(c.supabaseUrl,c.supabaseKey);
+    const client=await window.SabadouMaintenanceAuth.getClient();
     const login=await client.auth.signInWithPassword({email:$('#admin-email').value.trim(),password:$('#admin-password').value});
     if(login.error)throw new Error('E-mail ou senha incorretos.');
     const check=await client.from('admins').select('user_id').eq('user_id',login.data.user.id).maybeSingle();
@@ -403,7 +404,7 @@ addEventListener('pointermove',e=>{
 
 addEventListener('pointerdown',e=>{
 
-  if(e.target.closest('a'))return;
+  if(e.target.closest('a,button,input,label,dialog'))return;
 
   for(let i=0;i<5;i++){
 
