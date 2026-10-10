@@ -1,0 +1,34 @@
+/* Layout exclusivo do painel administrativo da versao atualizada. */
+#admin>.sec{padding-top:3rem;padding-bottom:4rem}
+#admin .admin-wrap{max-width:1680px;padding-inline:clamp(20px,3vw,42px)}
+#admin .sh{margin-bottom:1.5rem}
+#admin .sh p{max-width:none}
+#admin .admin-shortcuts{display:flex;flex-wrap:wrap;gap:.5rem;margin:0 0 1.5rem}
+#admin .admin-shortcuts a{display:inline-flex;align-items:center;min-height:42px;padding:.45rem .9rem;border:1px solid var(--line);border-radius:99px;background:var(--card);color:var(--ink);text-decoration:none;font-size:.95rem;font-weight:800}
+#admin .admin-shortcuts a:hover{border-color:var(--hot);color:var(--hot)}
+#admin .admin-dashboard{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:1.2rem;align-items:start}
+#admin :is(#adm-box,#sa,#podium-admin,#fq){display:contents}
+#admin :is(.admin-card,.ed,.podium-editor,.fanart-audit){grid-column:span 6;min-width:0;width:100%;max-width:none;margin:0;padding:clamp(1rem,2vw,1.5rem);border:2px solid var(--line);border-radius:24px;background:var(--card)}
+#admin :is(#accounts,#clicks-admin):empty{display:none}
+#admin :is(.admin-card,.ed,.podium-editor,.fanart-audit) h3{font-size:clamp(1.35rem,2vw,1.8rem);line-height:1.15;overflow-wrap:anywhere}
+#admin .ed{align-content:start;gap:.85rem}
+#admin .fld{min-width:0;max-width:100%;font-size:1rem;padding:.7rem .85rem}
+#admin .cta{font-size:.95rem;padding:.7rem 1rem;margin:0}
+#admin .edb{gap:.5rem}
+#admin .hint{font-size:.95rem;line-height:1.5}
+#admin .admin-card>p:last-child{margin-bottom:0}
+#admin :is(.click-admin,.click-migrations-table,.fanart-audit-table){max-height:380px;overflow:auto;scrollbar-gutter:stable;margin:1rem 0}
+#admin :is(.click-admin,.click-migrations-table,.fanart-audit-table) thead th{position:sticky;top:0;z-index:1;background:var(--bg)}
+#admin .account-delete{display:inline-block;margin-top:.35rem}
+#admin .click-adjust{flex-wrap:wrap}
+#admin .click-adjust input{width:110px}
+#admin .admin-art-list{grid-template-columns:repeat(auto-fill,minmax(180px,1fr));max-height:480px;overflow:auto;scrollbar-gutter:stable;align-content:start;margin:1rem 0 0}
+#admin .admin-rewards{display:grid;gap:1.5rem}
+#admin .admin-rewards ol{margin:.7rem 0 0;padding-left:1.5rem;overflow-wrap:anywhere}
+#admin .fanart-audit{grid-column:1/-1;overflow:visible}
+#admin .fanart-audit table{min-width:680px}
+#admin :is(#edf,#admin-maintenance,.update-admin,#accounts,#clicks-admin,#fanart-queue,#podium-order,#fanart-records){scroll-margin-top:100px}
+#admin .admin-shortcuts a:focus-visible{outline:3px solid var(--hot);outline-offset:3px}
+@media(min-width:1280px){#admin :is(#edf,#admin-maintenance,.update-admin){grid-column:span 4}}
+@media(max-width:980px){#admin :is(.admin-card,.ed,.podium-editor,.fanart-audit){grid-column:1/-1}}
+@media(max-width:600px){#admin>.sec{padding-top:2rem}#admin .admin-dashboard{gap:1rem}#admin .admin-art-list{grid-template-columns:repeat(2,minmax(0,1fr))}#admin .fld{font-size:16px}}

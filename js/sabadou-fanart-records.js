@@ -13,14 +13,14 @@
   function csvCell(value){const text=String(value??'');return '"'+(/^[=+\-@\t\r]/.test(text)?"'":'')+text.replace(/"/g,'""')+'"'}
   async function mount(client,parent){
     parent.querySelector('.fanart-audit')?.remove();
-    const section=document.createElement('section');section.className='fanart-audit';
+    const section=document.createElement('section');section.className='fanart-audit';section.id='fanart-records';
     section.innerHTML='<h3>registro dos envios</h3><p class="hint">Últimos 200 envios, incluindo pendentes e recusados. Os novos registros usam o relógio do servidor; registros antigos não têm essa confirmação.</p>';
     parent.append(section);
     const result=await client.from('fanarts').select('*').order('criado_em',{ascending:false}).limit(200);
     if(!section.isConnected)return;
     if(result.error){const message=document.createElement('p');message.textContent='Não foi possível carregar os registros.';section.append(message);return}
     const rows=result.data||[];
-    section.insertAdjacentHTML('beforeend','<table><thead><tr><th>Artista</th><th>Recebimento</th><th>Status</th><th>ID do envio</th></tr></thead><tbody>'+rows.map(art=>`<tr><td>@${esc(art.handle)}</td><td>${time(art)}</td><td>${esc(art.status)}</td><td>${esc(art.id)}</td></tr>`).join('')+'</tbody></table>');
+    section.insertAdjacentHTML('beforeend','<div class="fanart-audit-table"><table><thead><tr><th>Artista</th><th>Recebimento</th><th>Status</th><th>ID do envio</th></tr></thead><tbody>'+rows.map(art=>`<tr><td>@${esc(art.handle)}</td><td>${time(art)}</td><td>${esc(art.status)}</td><td>${esc(art.id)}</td></tr>`).join('')+'</tbody></table></div>');
     const download=document.createElement('button');download.className='mini';download.type='button';download.textContent='baixar histórico completo (CSV)';download.style.marginTop='1rem';section.append(download);parent.append(section);
     download.onclick=async()=>{
       download.disabled=true;

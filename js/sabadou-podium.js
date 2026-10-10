@@ -17,7 +17,7 @@
   function mount({client,parent,ranking,image,onSaved}){
     if(editor?.parent===parent&&(editor.dirty||editor.busy)&&editor.week===ranking.config?.week)return;
     clear(parent);
-    const section=document.createElement('section');section.className='podium-editor pn';parent.append(section);
+    const section=document.createElement('section');section.className='podium-editor pn';section.id='podium-order';parent.append(section);
     section.innerHTML='<h3>ordem do pódio</h3><p>Arraste pelo símbolo ↕ ou escolha a posição de cada fanart. Os votos são preservados. A ordem vale para esta semana.</p><p class="podium-editor-mode"></p><div class="podium-editor-list"></div><div class="edb"><button class="cta sm" type="button" data-save-order>salvar ordem</button><button class="cta ghost sm" type="button" data-auto-order>voltar à ordem por votos</button><button class="mini" type="button" data-discard-order>descartar alterações</button></div><p class="hint" role="status" aria-live="polite"></p>';
     const state={parent,week:ranking.config?.week,arts:[...ranking.arts],dirty:false,busy:false,drag:null,controller:new AbortController()};editor=state;
     const list=section.querySelector('.podium-editor-list'),notice=section.querySelector('[role="status"]'),signal=state.controller.signal;
