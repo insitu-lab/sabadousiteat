@@ -264,6 +264,7 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 @media (max-width:700px){body{padding-bottom:calc(62px + env(safe-area-inset-bottom,0px))}.nav{backdrop-filter:none}.nv nav.tabs{position:fixed;top:auto;left:0;right:0;bottom:0;z-index:35;height:calc(58px + env(safe-area-inset-bottom,0px));padding:4px 8px env(safe-area-inset-bottom,0px);justify-content:flex-start;gap:.2rem;background:var(--nav);backdrop-filter:blur(14px);border-top:1px solid var(--line);border-bottom:0}.nv nav.tabs a{display:flex;align-items:center;min-height:44px;padding:.3rem .65rem;font-size:.82rem}.nv nav.tabs .ind{display:none}.podium{gap:.35rem}.podium-entry{gap:.3rem}.podium-photo{width:clamp(62px,18vw,96px);border-radius:16px}.podium-tools .mini,.podium-tools .download{font-size:.7rem;padding:.14rem .35rem}.podium-votes{font-size:.75rem}.podium-base strong{font-size:2rem}}
 </style>
 <link rel="stylesheet" href="css/sabadou-improvements.css?v=20261009-3-publicacao-20261009">
+<link rel="stylesheet" href="css/sabadou-podium.css?v=20261009-4-publicacao-20261009">
 </head>
 <body data-site="atualizacao" data-site-version="2.1.0">
 <div class="bar" id="bar"></div>
@@ -381,7 +382,7 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   <div id="fw"></div><h3 id="rank-title">ranking da semana</h3><div id="frk"></div><h3>mural</h3><div class="fg" id="fmu"></div>
 </div></div></section>
 
-<section class="panel" id="admin"><div class="sec"><div class="wrap"><div class="sh"><h2>painel admin</h2><p>Tudo de administrador num lugar só: avisos, fanarts, vencedora, cliques e os 10 do 1 milhão.</p></div><div id="adm-box"></div><div id="accounts"></div><div id="clicks-admin"></div><div id="sa"></div><div id="fq"></div></div></div></section>
+<section class="panel" id="admin"><div class="sec"><div class="wrap"><div class="sh"><h2>painel admin</h2><p>Tudo de administrador num lugar só: avisos, fanarts, vencedora, cliques e os 10 do 1 milhão.</p></div><div id="adm-box"></div><div id="accounts"></div><div id="clicks-admin"></div><div id="sa"></div><div id="podium-admin"></div><div id="fq"></div></div></div></section>
 
 <section class="panel" id="calabresos">
 <section class="sec" style="padding-bottom:0"><div class="wrap"><div class="sh rv" style="margin:0"><h2>área dos calabresos</h2><p>Coisas pra mexer enquanto o sábado não chega.</p></div></div></section>
@@ -411,7 +412,7 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
     <div><h4>parcerias</h4><p>Chama na DM do Instagram.</p><button class="cta ghost sm" id="up" type="button">Voltar ao topo</button></div>
   </div>
   <div class="wrap fb"><span>© <span id="yr">2026</span> Sabadou. Todos os direitos reservados.</span><span>Feito pra quem vive de sábado. <button class="lnk" id="adm" type="button" hidden>admin</button></span></div>
-<div class="wrap"><small class="site-version">Sabadou atualização · v2.1.0</small></div>
+<div class="wrap"><small class="site-version">Sabadou atualização · v2.2.0</small></div>
 </footer>
 
 <div id="lb"><img id="lbi" alt=""></div>
@@ -427,7 +428,9 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 
 <script src="js/sabadou-updates.js?v=20261009-3-publicacao-20261009"></script>
 <script src="js/sabadou-fanart-records.js?v=20261009-3-publicacao-20261009"></script>
-<script src="js/sabadou-sounds.js?v=20261009-3-publicacao-20261009"></script>
+<script src="js/sabadou-podium.js?v=20261009-4-publicacao-20261009"></script>
+<script src="js/sabadou-clicks.js?v=20261009-4-publicacao-20261009"></script>
+<script src="js/sabadou-sounds.js?v=20261009-4-publicacao-20261009"></script>
 <script src="js/sabadou-run.js?v=20261009-3-publicacao-20261009"></script>
 <script>
 
@@ -472,7 +475,12 @@ addEventListener('scroll',()=>{$('#bar').style.width=scrollY/Math.max(1,document
 // sabadômetro
 let N=store.get('sab_n',0);const M={10:'tá esquentando…',30:'já é quase sábado',67:'67!!! 💜💜💜',100:'cem sabadadas. respeito.',200:'você é um calabreso de verdade'};
 $('#cnt').textContent=N;
-$('#btn').onclick=e=>{if(!me){$('#um').textContent='Entre com seu @ pra jogar e disputar o 1 milhão.';ul.showModal();return}N++;saveG();$('#cnt').textContent=N;if(M[N])$('#msg').textContent=M[N];
+$('#btn').onclick=async e=>{if(!me){$('#um').textContent='Entre com seu @ pra jogar e disputar o 1 milhão.';ul.showModal();return}
+  if(!window.SabadouClicks.acceptTap())return;
+  const userId=me.id;
+  if(isAdmin){const p=pw();N+=p;G.coin+=p;saveG();rendG()}
+  else if(!clickSession||!await clickSession.tap()||me?.id!==userId)return;
+  window.SabadouSounds?.play('frog');if(M[N])$('#msg').textContent=M[N];
   const r=e.clientX?[e.clientX,e.clientY]:[$('#btn').getBoundingClientRect().left+100,$('#btn').getBoundingClientRect().top+60];
   spawn(r[0],r[1],N===67?30:3)};
 $('#up').onclick=()=>scrollTo({top:0,behavior:still?'auto':'smooth'});
@@ -621,11 +629,37 @@ $('#lgf').onsubmit=async ev=>{ev.preventDefault();const m=$('#lm');m.textContent
 // ===== lojinha + fases do sabadômetro (progresso salvo no aparelho e, logado, no servidor) =====
 const SH=[['🖱️ mouse melhor','+1 clique por toque','p',1,15],['🐸 sapo ajudante','+1 clique/s','c',1,60],['🏡 fazendinha','+8 cliques/s','c',8,500],['🏭 fábrica de sábado','+60 cliques/s','c',60,4000]];
 const PH=[[0,'girino'],[100,'sapinho'],[1e3,'sapo de respeito'],[1e4,'calabreso'],[1e5,'mestre do sábado'],[1e6,'lenda do sábado 🏆']];
-let G=store.get('sab_g',{coin:0,lv:[0,0,0,0]}),gameProfile='';
+let G=store.get('sab_g',{coin:0,lv:[0,0,0,0]}),gameProfile='',clickSession=null,clickStatus='';
 const cost=i=>isAdmin?0:Math.ceil(SH[i][4]*Math.pow(1.15,G.lv[i])),pw=()=>1+G.lv[0],cps=()=>G.lv.reduce((a,l,i)=>a+(SH[i][2]=='c'?l*SH[i][3]:0),0);
-// O progresso de teste fica separado do progresso normal neste aparelho.
-function selectGameProfile(){const profile=isAdmin&&me?'_admin_'+me.id:'';
-  if(profile!==gameProfile){saveG();gameProfile=profile;N=store.get('sab_n'+profile,0);G=store.get('sab_g'+profile,{coin:0,lv:[0,0,0,0]})}
+// Cada conta tem seu próprio cache. O servidor confirma os totais;
+// nenhuma sincronização envia um total antigo do aparelho para o placar.
+function selectGameProfile(){const profile=me?(isAdmin?'_admin_':'_user_')+me.id:'_guest';
+  if(profile!==gameProfile){
+    saveG();clickSession?.close();clickSession=null;gameProfile=profile;clickStatus='';$('#msg').textContent='';
+    const cached=store.get('sab_g'+profile,null),owner=store.get('sab_legacy_owner',null);
+    const useLegacy=me&&!isAdmin&&!cached&&(!owner||owner===me.id)&&
+      (store.get('sab_n',0)>0||store.get('sab_g',null));
+    if(useLegacy)store.set('sab_legacy_owner',me.id);
+    N=store.get('sab_n'+profile,useLegacy?store.get('sab_n',0):0);
+    G=cached||(useLegacy?store.get('sab_g',{coin:0,lv:[0,0,0,0]}):{coin:0,lv:[0,0,0,0]});
+    if(me&&!isAdmin){
+      // Mantém uma cópia anterior à primeira leitura do servidor para
+      // recuperar manualmente um placar afetado pelo bug da versão antiga.
+      const backupKey='sab_before_server_'+me.id;
+      if(!store.get(backupKey,null))store.set(backupKey,{clicks:N,game:G});
+      const userId=me.id,oldTotal=N;
+      clickSession=window.SabadouClicks.connect({client:sb,userId,
+        legacy:cached||useLegacy?{coin:G.coin,lv:G.lv}:null,
+        onState:data=>{if(gameProfile!==profile||me?.id!==userId||isAdmin)return;
+          N=data.clicks;G={coin:data.coin,lv:data.lv};saveG();rendG();
+          if(oldTotal>N&&!store.get('sab_placar_confirmado_'+userId,false))$('#msg').textContent='Há um progresso antigo guardado neste aparelho. O admin pode conferir e repor cliques que a versão antiga perdeu.';
+          store.set('sab_placar_confirmado_'+userId,true)},
+        onMessage:text=>{if(gameProfile!==profile||me?.id!==userId)return;
+          if(text){clickStatus=text;$('#msg').textContent=text}
+          else if($('#msg').textContent===clickStatus){$('#msg').textContent='';clickStatus=''}}
+      });
+    }
+  }
   if(isAdmin)G.lv=G.lv.map(l=>Math.max(l,25));rendG();
 }
 function rendG(){$('#cnt').textContent=N;const p=PH.filter(x=>N>=x[0]).pop(),n=PH[PH.indexOf(p)+1];
@@ -633,14 +667,11 @@ function rendG(){$('#cnt').textContent=N;const p=PH.filter(x=>N>=x[0]).pop(),n=P
   $('#coin').innerHTML=`<span class="coinmark" aria-label="moedas">S</span> ${isAdmin?'∞ moedas':Math.floor(G.coin)} · ${pw()}/clique · ${cps()}/s`;
   $('#shl').innerHTML=SH.map((x,i)=>`<div class="si"><span><b>${x[0]}</b> nv ${G.lv[i]}<br><small>${x[1]}</small></span><button data-i="${i}" ${G.coin<cost(i)?'disabled':''}><span class="coinmark" aria-hidden="true">S</span> ${cost(i)}</button></div>`).join('')}
 function saveG(){store.set('sab_n'+gameProfile,N);store.set('sab_g'+gameProfile,G)}
-$('#btn').addEventListener('click',()=>{if(!me)return;const p=pw();N+=p-1;G.coin+=p;rendG()});
-$('#shl').onclick=e=>{const b=e.target.closest('button');if(!b)return;const i=+b.dataset.i;if(G.coin>=cost(i)){G.coin-=cost(i);G.lv[i]++;saveG();rendG()}};
-setInterval(()=>{const c=me?cps():0;if(c){N+=c;G.coin+=c}saveG();rendG()},1000);addEventListener('pagehide',saveG);rendG();
-setInterval(async()=>{if(!sb||!me||isAdmin)return;const userId=me.id;
-  const b=(await sb.from('placar').select('bonus').eq('user_id',me.id).maybeSingle()).data?.bonus||0;
-  if(me?.id!==userId||isAdmin)return;
-  if(b){N=Math.max(0,N+Number(b));G.coin=Math.max(0,G.coin+Number(b));saveG();rendG()}
-  if(!isAdmin)await sb.from('placar').upsert({user_id:me.id,handle:me.user_metadata?.handle,clicks:N,bonus:0})},30000);
+$('#shl').onclick=async e=>{const b=e.target.closest('button');if(!b||b.disabled||!me)return;const i=+b.dataset.i,userId=me.id;
+  if(isAdmin){G.lv[i]++;saveG();rendG();window.SabadouSounds?.play('buy');return}
+  if(clickSession&&await clickSession.buy(i)&&me?.id===userId)window.SabadouSounds?.play('buy')};
+setInterval(()=>{if(me&&isAdmin){const c=cps();N+=c;G.coin+=c;saveG();rendG()}},1000);
+addEventListener('pagehide',saveG);rendG();
 function rendSA(){const b=$('#sa');if(!isAdmin){b.innerHTML='';return}
   b.innerHTML=`<div class="si" style="display:block"><b>👑 painel admin</b><p class="hint">Só funciona com a sua conta de admin. Seus cliques não entram no ranking do 1 milhão.</p>
   <button class="mini ok" id="s1">desbloquear tudo</button> <button class="mini" id="s2">definir meus cliques</button><br><br>
@@ -648,7 +679,7 @@ function rendSA(){const b=$('#sa');if(!isAdmin){b.innerHTML='';return}
   $('#s1').onclick=()=>{G.lv=G.lv.map(l=>Math.max(l,25));G.coin+=1e9;saveG();rendG()};
   $('#s2').onclick=()=>{const v=parseInt(prompt('Quantos cliques?',N),10);if(v>=0){N=v;saveG();rendG()}};
   $('#s3').onclick=async()=>{const r=await sb.rpc('dar_clicks',{p_handle:$('#sh').value.replace('@','').trim(),p_qtd:+$('#sq').value});
-    $('#sm').textContent=r.error?'Erro: '+r.error.message:(r.data?'Enviado! Chega no aparelho do fã em até 30 s.':'Ninguém com esse @ entrou no placar ainda.')}}
+    $('#sm').textContent=r.error?'Erro: '+r.error.message:(r.data?'Enviado! O placar do fã será atualizado na próxima confirmação.':'Ninguém com esse @ entrou no placar ainda.')}}
 
 
 // ===== login de fã + fanarts =====
@@ -660,9 +691,7 @@ function who(force=false){const task=whoQueue.then(async()=>{if(!sb)return;
     checkedUserId=userId;selectGameProfile();renderAdm();renderAv();
     if(me&&!isAdmin){const registered=await sb.rpc('registrar_conta_atual');
       if(registered.error)console.warn('Execute supabase-contas-ativas.sql para reparar o registro das contas.',registered.error);
-      // Cria o placar no primeiro acesso sem substituir os cliques já registrados.
-      const handle=me.user_metadata?.handle;
-      if(handle)await sb.from('placar').upsert({user_id:me.id,handle,clicks:0},{onConflict:'user_id',ignoreDuplicates:true});
+      // O registro e a contagem são feitos por RPC; não escrevemos totais pelo navegador.
     }
   }
   const hn=me?(isAdmin?'admin (teste)':'@'+(me.user_metadata?.handle||'fã')):'entrar';$('#fu').textContent=me?hn+' (sair)':'entrar com @';$('#hl').textContent=hn;$('#hl').title=me?'Sair':'Entrar';$('#ff').hidden=!me;
@@ -748,12 +777,12 @@ const podiumCard=(a,n)=>{const url=pub(a.path),download=url+(url.includes('?')?'
 async function loadFa(){if(!sb)return;await who();rendSA();await refreshMyFanart();mv={};
   FA=(await sb.from('fanarts').select('*').eq('status','aprovada').order('criado_em',{ascending:false})).data||[];
   if(me)((await sb.from('votos').select('fanart_id')).data||[]).forEach(x=>mv[x.fanart_id]=1);
-  const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-d.getDay());const ranked=FA.filter(a=>new Date(a.criado_em)>=d).sort((a,b)=>b.votos-a.votos);
+  const ranking=await window.SabadouPodium.rank(sb,FA),ranked=ranking.arts;
   const w=FA.find(a=>a.vencedora);$('#fw').innerHTML=w?`<h3>🏆 vencedora da semana</h3><div class="fg">${card(w)}</div>`:'';
   const podium=[{a:ranked[1],n:2,c:'second'},{a:ranked[0],n:1,c:'first'},{a:ranked[2],n:3,c:'third'}].filter(x=>x.a);
   $('#frk').innerHTML=ranked.length?`<div class="podium">${podium.map(x=>podiumCard(x.a,x.n)).join('')}</div>${ranked.length>3?`<ol class="rank-others" start="4">${ranked.slice(3).map((a,i)=>`<li><b>${i+4}º</b> @${esc(a.handle)} <small>· ${a.votos} votos</small></li>`).join('')}</ol>`:''}`:'<p class="mut">Nenhuma arte aprovada nesta semana ainda.</p>';
   $('#fmu').innerHTML=FA.length?FA.map(a=>card(a,false,isAdmin)).join(''):'<p class="mut">O mural está vazio. Seja o primeiro!</p>';
-  const q=$('#fq'),accounts=$('#accounts'),clicksAdmin=$('#clicks-admin');if(!isAdmin){q.innerHTML='';accounts.innerHTML='';clicksAdmin.innerHTML='';return}
+  const q=$('#fq'),accounts=$('#accounts'),clicksAdmin=$('#clicks-admin');if(!isAdmin){q.innerHTML='';accounts.innerHTML='';clicksAdmin.innerHTML='';window.SabadouPodium.clear($('#podium-admin'));return}
   const AC=await sb.rpc('listar_contas_ativas');
   accounts.innerHTML=AC.error?'<p class="hint">Execute supabase-contas-ativas.sql no SQL Editor do Supabase para carregar as contas e os cliques.</p>':`<h3>contas cadastradas (${AC.data.length})</h3><div class="click-admin"><table><thead><tr><th>Instagram</th><th>Cadastro</th><th>ações</th></tr></thead><tbody>${AC.data.map(a=>`<tr><td>@${esc(a.handle)}</td><td>${new Date(a.criado_em).toLocaleString('pt-BR')}</td><td><button class="mini ok" type="button" data-release-fanart="${a.user_id}" data-handle="${esc(a.handle)}">liberar reenvio</button> <form class="account-delete" data-user="${a.user_id}" data-handle="${esc(a.handle)}"><button class="mini no" type="submit">excluir conta</button></form></td></tr>`).join('')||'<tr><td colspan="3">Nenhuma conta cadastrada.</td></tr>'}</tbody></table></div><p class="hint">“Liberar reenvio” autoriza uma fanart extra nesta semana. A exclusão remove a conta, os cliques do ranking, os votos e as fanarts enviadas por ela.</p>`;
   const currentClicks=[...(AC.data||[])].sort((a,b)=>Number(b.clicks||0)-Number(a.clicks||0));
@@ -761,7 +790,7 @@ async function loadFa(){if(!sb)return;await who();rendSA();await refreshMyFanart
   const P=(await sb.from('fanarts').select('*').eq('status','pendente').order('criado_em')).data||[];
   const T=(await sb.from('placar').select('handle,clicks,milhao_em').not('milhao_em','is',null).order('milhao_em').limit(10)).data||[];
   const B=(await sb.from('placar').select('handle,bilhao_em').not('bilhao_em','is',null).order('bilhao_em').limit(1)).data||[];
-  q.innerHTML=`<h3>fila de aprovação (${P.length})</h3><div class="fg">${P.map(a=>card(a,1)).join('')||'<p class="mut">Fila vazia.</p>'}</div><h3>🏆 vencedora da semana</h3><div class="fg">${FA.filter(a=>new Date(a.criado_em)>=d).sort((a,b)=>b.votos-a.votos).map(a=>`<figure class="fa${a.vencedora?' win':''}"><img src="${esc(pub(a.path))}" alt=""><figcaption><span>@${esc(a.handle)} · ${a.votos}💜</span>${window.SabadouFanartRecords.time(a)}<button class="mini ok" data-a="win" data-id="${a.id}">🏆 escolher</button></figcaption></figure>`).join('')||'<p class="mut">Nenhuma aprovada nesta semana.</p>'}</div><h3>🥇 primeiros ao 1 milhão (follow)</h3><ol>${T.map(t=>`<li>@${esc(t.handle||'?')} · ${new Date(t.milhao_em).toLocaleString('pt-BR')}</li>`).join('')||'<li>Ninguém ainda.</li>'}</ol><h3>💸 primeiro a 1 bilhão (R$ 5 via Pix)</h3><ol>${B.map(t=>`<li>@${esc(t.handle||'?')} · ${new Date(t.bilhao_em).toLocaleString('pt-BR')}</li>`).join('')||'<li>Ninguém chegou ainda.</li>'}</ol>`;await window.SabadouFanartRecords.mount(sb,q)}
+  q.innerHTML=`<h3>fila de aprovação (${P.length})</h3><div class="fg">${P.map(a=>card(a,1)).join('')||'<p class="mut">Fila vazia.</p>'}</div><h3>🏆 vencedora da semana</h3><div class="fg">${ranked.map(a=>`<figure class="fa${a.vencedora?' win':''}"><img src="${esc(pub(a.path))}" alt=""><figcaption><span>@${esc(a.handle)} · ${a.votos}💜</span>${window.SabadouFanartRecords.time(a)}<button class="mini ok" data-a="win" data-id="${a.id}">🏆 escolher</button></figcaption></figure>`).join('')||'<p class="mut">Nenhuma aprovada nesta semana.</p>'}</div><h3>🥇 primeiros ao 1 milhão (follow)</h3><ol>${T.map(t=>`<li>@${esc(t.handle||'?')} · ${new Date(t.milhao_em).toLocaleString('pt-BR')}</li>`).join('')||'<li>Ninguém ainda.</li>'}</ol><h3>💸 primeiro a 1 bilhão (R$ 5 via Pix)</h3><ol>${B.map(t=>`<li>@${esc(t.handle||'?')} · ${new Date(t.bilhao_em).toLocaleString('pt-BR')}</li>`).join('')||'<li>Ninguém chegou ainda.</li>'}</ol>`;window.SabadouPodium.mount({client:sb,parent:$('#podium-admin'),ranking,image:pub,onSaved:loadFa});await window.SabadouFanartRecords.mount(sb,q)}
 document.addEventListener('click',async e=>{
   const release=e.target.closest('[data-release-fanart]');if(release){if(!isAdmin)return;const handle=release.dataset.handle||'?';if(!confirm(`Liberar um reenvio de fanart para @${handle} nesta semana?`))return;release.disabled=true;
     const r=await sb.rpc('liberar_reenvio_fanart',{p_user_id:release.dataset.releaseFanart});release.disabled=false;

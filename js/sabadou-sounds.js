@@ -57,8 +57,7 @@
   function buttonSound(e){
     const el=e.target.closest('button,a.cta,.tabs a[role="tab"],[role="button"]');
     if(!el||el.disabled)return;
-    if(el.id==='btn')sounds.frog();
-    else if(el.closest('#shl'))sounds.buy();
+    if(el.id==='btn'||el.closest('#shl'))return;
     else if(el.matches('.tabs a[role="tab"]'))sounds.tab();
     else sounds.click();
   }
