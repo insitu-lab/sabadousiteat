@@ -46,38 +46,50 @@ const revealMaintenance=()=>delete document.documentElement.dataset.maintenanceC
   box-sizing:border-box
 }
 
-html,body{
-  height:100%;
-  margin:0
+html{
+  min-height:100%;
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%
 }
 
 body{
+  min-height:100vh;
+  min-height:100svh;
+  margin:0;
   background:
     radial-gradient(55% 50% at 80% 20%,rgba(166,77,255,.4),transparent),
     radial-gradient(45% 45% at 10% 90%,rgba(255,79,216,.25),transparent),
     var(--bg);
   color:var(--ink);
   font:600 1.15rem/1.55 var(--sans);
-  overflow:hidden
+  overflow-x:hidden
 }
 
 main{
-  min-height:100%;
+  min-height:100vh;
+  min-height:100svh;
   display:grid;
+  grid-template-columns:minmax(0,1fr);
   place-items:center;
   text-align:center;
   padding:
     calc(env(safe-area-inset-top,0px) + 24px)
-    24px
+    calc(env(safe-area-inset-right,0px) + clamp(16px,4vw,24px))
     calc(env(safe-area-inset-bottom,0px) + 24px)
+    calc(env(safe-area-inset-left,0px) + clamp(16px,4vw,24px))
 }
 
 .box{
-  width:min(100%,640px)
+  width:100%;
+  max-width:640px;
+  min-width:0;
+  margin-inline:auto;
+  overflow-wrap:anywhere
 }
 
 .fr{
   width:min(62vw,300px);
+  max-width:100%;
   margin:0 auto 2rem;
   border-radius:32px;
   overflow:hidden;
@@ -94,12 +106,13 @@ main{
   width:100%
 }
 
-/* CORREÇÃO DO TÍTULO */
+/* O título acompanha a largura disponível sem alargar o palco no celular. */
 h1{
-  font:400 clamp(2.8rem,11vw,6rem)/.95 var(--disp);
+  font:400 clamp(1.8rem,8.8vw,5.4rem)/1.05 var(--disp);
   letter-spacing:-.01em;
   margin:0;
-  white-space:nowrap;
+  white-space:normal;
+  text-wrap:balance;
 }
 
 h1 span{
@@ -159,6 +172,7 @@ h1 span{
 
 .cta{
   display:inline-block;
+  max-width:100%;
   margin-top:1.6rem;
   font:inherit;
   font-weight:800;

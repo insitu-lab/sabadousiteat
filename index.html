@@ -264,9 +264,10 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 @media (max-width:700px){body{padding-bottom:calc(62px + env(safe-area-inset-bottom,0px))}.nav{backdrop-filter:none}.nv nav.tabs{position:fixed;top:auto;left:0;right:0;bottom:0;z-index:35;height:calc(58px + env(safe-area-inset-bottom,0px));padding:4px 8px env(safe-area-inset-bottom,0px);justify-content:flex-start;gap:.2rem;background:var(--nav);backdrop-filter:blur(14px);border-top:1px solid var(--line);border-bottom:0}.nv nav.tabs a{display:flex;align-items:center;min-height:44px;padding:.3rem .65rem;font-size:.82rem}.nv nav.tabs .ind{display:none}.podium{gap:.35rem}.podium-entry{gap:.3rem}.podium-photo{width:clamp(62px,18vw,96px);border-radius:16px}.podium-tools .mini,.podium-tools .download{font-size:.7rem;padding:.14rem .35rem}.podium-votes{font-size:.75rem}.podium-base strong{font-size:2rem}}
 </style>
 <link rel="stylesheet" href="css/sabadou-improvements.css?v=20261009-3-publicacao-20261009">
+<link rel="stylesheet" href="css/sabadou-auth.css?v=20261009-5-publicacao-20261009">
 <link rel="stylesheet" href="css/sabadou-podium.css?v=20261009-4-publicacao-20261009">
 </head>
-<body data-site="atualizacao" data-site-version="2.1.0">
+<body data-site="atualizacao" data-site-version="2.2.1">
 <div class="bar" id="bar"></div>
 <header class="nav"><div class="wrap nv">
   <a class="logo" href="#inicio">sabadou</a>
@@ -412,7 +413,7 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
     <div><h4>parcerias</h4><p>Chama na DM do Instagram.</p><button class="cta ghost sm" id="up" type="button">Voltar ao topo</button></div>
   </div>
   <div class="wrap fb"><span>© <span id="yr">2026</span> Sabadou. Todos os direitos reservados.</span><span>Feito pra quem vive de sábado. <button class="lnk" id="adm" type="button" hidden>admin</button></span></div>
-<div class="wrap"><small class="site-version">Sabadou atualização · v2.2.0</small></div>
+<div class="wrap"><small class="site-version">Sabadou atualização · v2.2.1</small></div>
 </footer>
 
 <div id="lb"><img id="lbi" alt=""></div>
@@ -429,7 +430,8 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 <script src="js/sabadou-updates.js?v=20261009-3-publicacao-20261009"></script>
 <script src="js/sabadou-fanart-records.js?v=20261009-3-publicacao-20261009"></script>
 <script src="js/sabadou-podium.js?v=20261009-4-publicacao-20261009"></script>
-<script src="js/sabadou-clicks.js?v=20261009-4-publicacao-20261009"></script>
+<script src="js/sabadou-clicks.js?v=20261009-5-publicacao-20261009"></script>
+<script src="js/sabadou-fan-auth.js?v=20261009-5-publicacao-20261009"></script>
 <script src="js/sabadou-sounds.js?v=20261009-4-publicacao-20261009"></script>
 <script src="js/sabadou-run.js?v=20261009-3-publicacao-20261009"></script>
 <script>
@@ -649,10 +651,11 @@ function selectGameProfile(){const profile=me?(isAdmin?'_admin_':'_user_')+me.id
       if(!store.get(backupKey,null))store.set(backupKey,{clicks:N,game:G});
       const userId=me.id,oldTotal=N;
       clickSession=window.SabadouClicks.connect({client:sb,userId,
-        legacy:cached||useLegacy?{coin:G.coin,lv:G.lv}:null,
+        legacy:cached||(useLegacy?store.get('sab_g',null):null),
         onState:data=>{if(gameProfile!==profile||me?.id!==userId||isAdmin)return;
           N=data.clicks;G={coin:data.coin,lv:data.lv};saveG();rendG();
-          if(oldTotal>N&&!store.get('sab_placar_confirmado_'+userId,false))$('#msg').textContent='Há um progresso antigo guardado neste aparelho. O admin pode conferir e repor cliques que a versão antiga perdeu.';
+          if(data.migration?.state==='revisao')$('#msg').textContent='Seu saldo antigo está guardado e aguarda conferência do admin. Os novos cliques continuam salvos.';
+          else if(oldTotal>N&&!store.get('sab_placar_confirmado_'+userId,false))$('#msg').textContent='Há um progresso antigo guardado neste aparelho. O admin pode conferir e repor cliques que a versão antiga perdeu.';
           store.set('sab_placar_confirmado_'+userId,true)},
         onMessage:text=>{if(gameProfile!==profile||me?.id!==userId)return;
           if(text){clickStatus=text;$('#msg').textContent=text}
@@ -679,7 +682,9 @@ function rendSA(){const b=$('#sa');if(!isAdmin){b.innerHTML='';return}
   $('#s1').onclick=()=>{G.lv=G.lv.map(l=>Math.max(l,25));G.coin+=1e9;saveG();rendG()};
   $('#s2').onclick=()=>{const v=parseInt(prompt('Quantos cliques?',N),10);if(v>=0){N=v;saveG();rendG()}};
   $('#s3').onclick=async()=>{const r=await sb.rpc('dar_clicks',{p_handle:$('#sh').value.replace('@','').trim(),p_qtd:+$('#sq').value});
-    $('#sm').textContent=r.error?'Erro: '+r.error.message:(r.data?'Enviado! O placar do fã será atualizado na próxima confirmação.':'Ninguém com esse @ entrou no placar ainda.')}}
+    $('#sm').textContent=r.error?'Erro: '+r.error.message:(r.data?'Enviado! O placar do fã será atualizado na próxima confirmação.':'Ninguém com esse @ entrou no placar ainda.')};
+  window.SabadouClicks.mountMigrations(sb,b);
+}
 
 
 // ===== login de fã + fanarts =====
@@ -696,32 +701,12 @@ function who(force=false){const task=whoQueue.then(async()=>{if(!sb)return;
   }
   const hn=me?(isAdmin?'admin (teste)':'@'+(me.user_metadata?.handle||'fã')):'entrar';$('#fu').textContent=me?hn+' (sair)':'entrar com @';$('#hl').textContent=hn;$('#hl').title=me?'Sair':'Entrar';$('#ff').hidden=!me;
 });whoQueue=task.catch(()=>{});return task}
-$('#hl').onclick=$('#fu').onclick=async()=>{if(!sb)return alert('Fanarts ainda não disponíveis.');if(me){await sb.auth.signOut({scope:'local'});await who();loadFa()}else ul.showModal()};
-let signupMode=false;
-const authEmail=handle=>`${handle.toLowerCase()}@login.sabadou.invalid`;
-function setFanAuthMode(create){signupMode=create;$('#ut').textContent=create?'criar conta':'entrar';$('#usubmit').textContent=create?'criar conta':'entrar';$('#uswitch').textContent=create?'já tenho conta':'criar conta';$('#uh').placeholder='nome do Instagram (sem @)';$('#upw').autocomplete=create?'new-password':'current-password';$('#upw').placeholder=create?'senha nova, diferente da senha do Instagram':'senha';$('#um').textContent=create?'Use seu nome de usuário do Instagram sem @ e crie uma senha nova, diferente da senha do Instagram.':'Entre com seu @ e sua senha.'}
-$('#uswitch').onclick=()=>setFanAuthMode(!signupMode);
-$('#ulf').onsubmit=async ev=>{ev.preventDefault();if(!sb){$('#um').textContent='Login indisponível no momento.';return}
-  const handle=$('#uh').value.trim().replace(/^@/,'').toLowerCase(),password=$('#upw').value;
-  if(!/^[a-z0-9._]{1,30}$/.test(handle)){$('#um').textContent='Use um @ válido do Instagram (letras, números, ponto ou _).';return}
-  if(signupMode&&password.length<8){$('#um').textContent='A senha precisa ter pelo menos 8 caracteres.';return}
-  $('#um').textContent=signupMode?'Criando conta...':'Entrando...';
-  const r=signupMode?await sb.auth.signUp({email:authEmail(handle),password,options:{data:{handle}}}):await sb.auth.signInWithPassword({email:authEmail(handle),password});
-  if(r.error){
-    console.error('Erro de autenticação do Supabase:',r.error);
-    if(!signupMode){$('#um').textContent='@ ou senha incorretos.';return}
-    const code=r.error.code||'unknown',messages={
-      email_address_invalid:'O Supabase rejeitou o endereço interno usado para esse @.',
-      weak_password:'A senha não atende aos critérios do Supabase.',
-      user_already_exists:'Já existe uma conta com esse @. Tente entrar em “já tenho conta”.',
-      signup_disabled:'O cadastro está desativado nas configurações do Supabase.',
-      over_email_send_rate_limit:'O Supabase tentou enviar confirmações demais. Desative Confirm email no provedor Email e aguarde o limite liberar.',
-      database_error:'O banco rejeitou o cadastro. Confira se o SQL de registro de contas foi executado.'
-    };
-    $('#um').textContent=messages[code]||`Falha no cadastro (código ${code}).`;return
-  }
-  if(signupMode&&!r.data.session){$('#um').textContent='A confirmação de e-mail precisa estar desativada no Supabase para esse tipo de conta.';return}
-  store.set('sab_after',location.hash.slice(1)||'calabresos');$('#upw').value='';ul.close();await who();await loadFa();location.hash=TABS.includes(store.get('sab_after'))?store.get('sab_after'):'calabresos'};
+$('#hl').onclick=$('#fu').onclick=async()=>{if(!sb)return alert('Fanarts ainda não disponíveis.');if(me){await sb.auth.signOut({scope:'local'});await who();loadFa()}else fanAuth.open()};
+const fanAuth=window.SabadouFanAuth.mount({getClient:()=>sb,onSignedIn:async()=>{
+  store.set('sab_after',location.hash.slice(1)||'calabresos');
+  await who();await loadFa();
+  const target=store.get('sab_after');location.hash=TABS.includes(target)?target:'calabresos';
+}});
 const shrink=f=>new Promise((resolve,reject)=>{
   if(!['image/jpeg','image/png','image/webp'].includes(f.type))return reject(new Error('Escolha uma imagem JPG, PNG ou WEBP.'));
   if(f.size>20*1024*1024)return reject(new Error('A imagem precisa ter no máximo 20 MB.'));
