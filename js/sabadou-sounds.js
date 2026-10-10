@@ -17,7 +17,7 @@
     gain.gain.exponentialRampToValueAtTime(.0001,now+start+duration);
     osc.connect(gain);gain.connect(a.destination);osc.start(now+start);osc.stop(now+start+duration+.02);
   }
-  const clipFiles={click:'click-botoes.mp3',tab:'click_002.wav',frog:'click-sabadometro.mp3',buy:'compra.mp3',typing:'digitando.mp3'};
+  const clipFiles={click:'universfield-menu-click-147357.mp3',tab:'click_002.wav',frog:'click-sabadometro.mp3',buy:'compra.mp3',typing:'digitando.mp3'};
   const soundBase=new URL('assets/sfx/',document.baseURI),reported=new Set();
   const clipUrl=name=>name==='buy'?new URL('assets/sfx/'+clipFiles[name],document.baseURI):new URL(clipFiles[name],soundBase);
   function report(name,error){
@@ -51,7 +51,7 @@
     lose(){tone(300,0,.18,'triangle',.055,220);tone(220,.15,.3,'sawtooth',.035,95)},
     win(){tone(523,0,.14,'triangle',.05,523);tone(659,.12,.14,'triangle',.05,659);tone(784,.24,.2,'triangle',.055,784);tone(1047,.42,.36,'triangle',.06,1047)}
   };
-  window.SabadouSounds={version:'20261008-4',play(name){sounds[name]?.()}};
+  window.SabadouSounds={version:'20261010-2',play(name){sounds[name]?.()}};
   addEventListener('pointerdown',context,{once:true,passive:true});
   addEventListener('keydown',context,{once:true});
   function buttonSound(e){

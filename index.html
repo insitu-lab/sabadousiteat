@@ -266,9 +266,9 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 <link rel="stylesheet" href="css/sabadou-improvements.css?v=20261009-3-publicacao-20261009">
 <link rel="stylesheet" href="css/sabadou-auth.css?v=20261009-5-publicacao-20261009">
 <link rel="stylesheet" href="css/sabadou-podium.css?v=20261009-4-publicacao-20261009">
-<link rel="stylesheet" href="css/sabadou-admin.css?v=20261010-1-publicacao-20261009">
+<link rel="stylesheet" href="css/sabadou-admin.css?v=20261010-3-publicacao-20261009">
 </head>
-<body data-site="atualizacao" data-site-version="2.2.2">
+<body data-site="atualizacao" data-site-version="2.2.5">
 <div class="bar" id="bar"></div>
 <header class="nav"><div class="wrap nv">
   <a class="logo" href="#inicio">sabadou</a>
@@ -386,7 +386,8 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 
 <section class="panel" id="admin"><div class="sec"><div class="wrap admin-wrap">
   <div class="sh"><h2>painel admin</h2><p>Tudo de administrador num lugar só: avisos, fanarts, vencedora, cliques e os 10 do 1 milhão.</p></div>
-  <nav class="admin-shortcuts" aria-label="Atalhos do painel administrativo"><a href="#edf">avisos</a><a href="#admin-maintenance">manutenção</a><a href="#admin-update-notice">aviso de atualização</a><a href="#accounts">contas</a><a href="#clicks-admin">cliques</a><a href="#fanart-queue">fanarts</a><a href="#podium-order">pódio</a><a href="#fanart-records">histórico</a></nav>
+  <nav class="admin-shortcuts" aria-label="Selecionar painel administrativo"><a href="#edf">avisos</a><a href="#admin-maintenance">manutenção</a><a href="#admin-update-notice">aviso de atualização</a><a href="#accounts">contas</a><a href="#clicks-admin">cliques</a><a href="#admin-click-tools">ferramentas de cliques</a><a href="#admin-click-migrations">transferências</a><a href="#fanart-queue">fanarts</a><a href="#podium-order">pódio</a><a href="#fanart-winners">vencedora</a><a href="#admin-rewards">recompensas</a><a href="#fanart-records">histórico</a></nav>
+  <p class="admin-loading" role="status" hidden>Carregando painel...</p>
   <div class="admin-dashboard"><div id="adm-box"></div><div class="admin-card" id="accounts"></div><div class="admin-card" id="clicks-admin"></div><div id="sa"></div><div id="podium-admin"></div><div id="fq"></div></div>
 </div></div></section>
 
@@ -418,7 +419,7 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
     <div><h4>parcerias</h4><p>Chama na DM do Instagram.</p><button class="cta ghost sm" id="up" type="button">Voltar ao topo</button></div>
   </div>
   <div class="wrap fb"><span>© <span id="yr">2026</span> Sabadou. Todos os direitos reservados.</span><span>Feito pra quem vive de sábado. <button class="lnk" id="adm" type="button" hidden>admin</button></span></div>
-<div class="wrap"><small class="site-version">Sabadou atualização · v2.2.2</small></div>
+<div class="wrap"><small class="site-version">Sabadou atualização · v2.2.5</small></div>
 </footer>
 
 <div id="lb"><img id="lbi" alt=""></div>
@@ -435,9 +436,10 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 <script src="js/sabadou-updates.js?v=20261009-3-publicacao-20261009"></script>
 <script src="js/sabadou-fanart-records.js?v=20261010-1-publicacao-20261009"></script>
 <script src="js/sabadou-podium.js?v=20261010-1-publicacao-20261009"></script>
+<script src="js/sabadou-admin.js?v=20261010-1-publicacao-20261009"></script>
 <script src="js/sabadou-clicks.js?v=20261009-5-publicacao-20261009"></script>
 <script src="js/sabadou-fan-auth.js?v=20261009-5-publicacao-20261009"></script>
-<script src="js/sabadou-sounds.js?v=20261009-4-publicacao-20261009"></script>
+<script src="js/sabadou-sounds.js?v=20261010-2-publicacao-20261009"></script>
 <script src="js/sabadou-run.js?v=20261009-3-publicacao-20261009"></script>
 <script>
 
@@ -541,8 +543,10 @@ function go(id,anchor){const i=TABS.indexOf(id);if(i<0)return;const left=i<cur;
   document.querySelectorAll('.panel').forEach(p=>{p.classList.remove('on','l');if(p.id===id){p.classList.add('on');if(left)p.classList.add('l')}});
   tabLinks.forEach(a=>{const on=a.getAttribute('href')==='#'+id;a.classList.toggle('on',on);a.setAttribute('aria-selected',on);if(on)a.scrollIntoView({inline:'center',block:'nearest'})});
   cur=i;moveInd();mini.classList.toggle('hide',id==='musica'||id==='jogos');
+  if(id==='admin'){window.SabadouAdmin.select(anchor);scrollTo(0,0);return}
   const e=anchor&&document.getElementById(anchor);if(e)e.scrollIntoView({behavior:still?'auto':'smooth'});else scrollTo(0,0)}
 function route(){let h;try{h=decodeURIComponent(location.hash.slice(1))||'inicio'}catch{h='inicio'};if(TABS.includes(h))return go(h);
+  if(window.SabadouAdmin.handles(h))return go('admin',h);
   const e=document.getElementById(h),p=e&&e.closest('.panel');p?go(p.id,h):go('inicio')}
 addEventListener('hashchange',route);addEventListener('resize',moveInd);route();
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(moveInd);
@@ -583,7 +587,7 @@ $('#avl').addEventListener('click',async e=>{
   const b=e.target.closest('button[data-a]');if(!b||!isAdmin||!sb)return;const a=AV.find(x=>String(x.id)===b.dataset.id);if(!a)return;
   if(b.dataset.a==='del'&&confirm('Apagar este aviso?')){await sb.from('avisos').delete().eq('id',a.id);loadAv()}
   if(b.dataset.a==='fix'){await sb.from('avisos').update({fixado:!a.fixado}).eq('id',a.id);loadAv()}
-  if(b.dataset.a==='ed'){editId=a.id;$('#at').value=a.titulo;$('#ax').value=a.texto;$('#af').checked=a.fixado;$('#apub').textContent='salvar';location.hash='admin'}
+  if(b.dataset.a==='ed'){editId=a.id;$('#at').value=a.titulo;$('#ax').value=a.texto;$('#af').checked=a.fixado;$('#apub').textContent='salvar';window.SabadouAdmin.select('edf');location.hash='edf'}
 });
 function renderAdm(){
   $('#tadm').hidden=!isAdmin;if(!isAdmin&&location.hash==='#admin')location.hash='inicio';
@@ -781,7 +785,7 @@ async function loadFa(){if(!sb)return;await who();rendSA();await refreshMyFanart
   const P=(await sb.from('fanarts').select('*').eq('status','pendente').order('criado_em')).data||[];
   const T=(await sb.from('placar').select('handle,clicks,milhao_em').not('milhao_em','is',null).order('milhao_em').limit(10)).data||[];
   const B=(await sb.from('placar').select('handle,bilhao_em').not('bilhao_em','is',null).order('bilhao_em').limit(1)).data||[];
-  q.innerHTML=`<section class="admin-card" id="fanart-queue"><h3>fila de aprovação (${P.length})</h3><div class="fg admin-art-list">${P.map(a=>card(a,1)).join('')||'<p class="mut">Fila vazia.</p>'}</div></section><section class="admin-card" id="fanart-winners"><h3>🏆 vencedora da semana</h3><div class="fg admin-art-list">${ranked.map(a=>`<figure class="fa${a.vencedora?' win':''}"><img src="${esc(pub(a.path))}" alt=""><figcaption><span>@${esc(a.handle)} · ${a.votos}💜</span>${window.SabadouFanartRecords.time(a)}<button class="mini ok" data-a="win" data-id="${a.id}">🏆 escolher</button></figcaption></figure>`).join('')||'<p class="mut">Nenhuma aprovada nesta semana.</p>'}</div></section><section class="admin-card admin-rewards"><div><h3>🥇 primeiros ao 1 milhão (follow)</h3><ol>${T.map(t=>`<li>@${esc(t.handle||'?')} · ${new Date(t.milhao_em).toLocaleString('pt-BR')}</li>`).join('')||'<li>Ninguém ainda.</li>'}</ol></div><div><h3>💸 primeiro a 1 bilhão (R$ 5 via Pix)</h3><ol>${B.map(t=>`<li>@${esc(t.handle||'?')} · ${new Date(t.bilhao_em).toLocaleString('pt-BR')}</li>`).join('')||'<li>Ninguém chegou ainda.</li>'}</ol></div></section>`;window.SabadouPodium.mount({client:sb,parent:$('#podium-admin'),ranking,image:pub,onSaved:loadFa});await window.SabadouFanartRecords.mount(sb,q)}
+  q.innerHTML=`<section class="admin-card" id="fanart-queue"><h3>fila de aprovação (${P.length})</h3><div class="fg admin-art-list">${P.map(a=>card(a,1)).join('')||'<p class="mut">Fila vazia.</p>'}</div></section><section class="admin-card" id="fanart-winners"><h3>🏆 vencedora da semana</h3><div class="fg admin-art-list">${ranked.map(a=>`<figure class="fa${a.vencedora?' win':''}"><img src="${esc(pub(a.path))}" alt=""><figcaption><span>@${esc(a.handle)} · ${a.votos}💜</span>${window.SabadouFanartRecords.time(a)}<button class="mini ok" data-a="win" data-id="${a.id}">🏆 escolher</button></figcaption></figure>`).join('')||'<p class="mut">Nenhuma aprovada nesta semana.</p>'}</div></section><section class="admin-card admin-rewards" id="admin-rewards"><div><h3>🥇 primeiros ao 1 milhão (follow)</h3><ol>${T.map(t=>`<li>@${esc(t.handle||'?')} · ${new Date(t.milhao_em).toLocaleString('pt-BR')}</li>`).join('')||'<li>Ninguém ainda.</li>'}</ol></div><div><h3>💸 primeiro a 1 bilhão (R$ 5 via Pix)</h3><ol>${B.map(t=>`<li>@${esc(t.handle||'?')} · ${new Date(t.bilhao_em).toLocaleString('pt-BR')}</li>`).join('')||'<li>Ninguém chegou ainda.</li>'}</ol></div></section>`;window.SabadouPodium.mount({client:sb,parent:$('#podium-admin'),ranking,image:pub,onSaved:loadFa});await window.SabadouFanartRecords.mount(sb,q)}
 document.addEventListener('click',async e=>{
   const release=e.target.closest('[data-release-fanart]');if(release){if(!isAdmin)return;const handle=release.dataset.handle||'?';if(!confirm(`Liberar um reenvio de fanart para @${handle} nesta semana?`))return;release.disabled=true;
     const r=await sb.rpc('liberar_reenvio_fanart',{p_user_id:release.dataset.releaseFanart});release.disabled=false;
