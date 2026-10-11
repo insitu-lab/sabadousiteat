@@ -1,6 +1,6 @@
 (()=>{
   'use strict';
-  // Os avisos em vídeo pertencem à versão da atualização.
+  // A página volta aos avisos da mesma versão que a abriu.
   const home='index.html';
   document.querySelectorAll('[data-home],[data-back]').forEach(a=>a.href=home+'#avisos');
   document.querySelectorAll('[data-fanarts]').forEach(a=>a.href=home+'#fanarts');

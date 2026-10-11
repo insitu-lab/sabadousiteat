@@ -1,4 +1,4 @@
-/* Layout exclusivo do painel administrativo da versao atualizada. */
+/* Layout compartilhado do painel administrativo dos sites completos. */
 #admin>.sec{padding-top:3rem;padding-bottom:4rem}
 #admin .admin-wrap{max-width:1200px;padding-inline:clamp(20px,3vw,42px)}
 #admin .sh{margin-bottom:1.5rem}

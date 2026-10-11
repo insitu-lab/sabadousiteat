@@ -19,11 +19,4 @@
     return pending;
   }
   window.SabadouMaintenanceAuth={getClient};
-  // O pacote da atualização não carrega a tela antecipada, mesmo sem ?site=.
-  const packaged=document.documentElement.dataset.packageSite;
-  if(packaged==='oficial'||(!packaged&&window.SabadouSiteLinks?.version==='oficial')){
-    const script=document.createElement('script');
-    script.src='js/sabadou-early-access.js?v=20261010-1-publicacao-20261009';
-    document.head.append(script);
-  }
 })();

@@ -25,7 +25,7 @@
     if(error)throw error;
     write('sab_legacy_migration_'+userId,data);return data;
   }
-  function connect({client,userId,legacy,onState,onMessage}){
+  function connect({client,userId,legacy,onState,onMessage,actionRpc='sabadometro_acao'}){
     let disposed=false,busy=false,ready=false,lastReply=0,revision=null,total=null,retryAfter=0,migration=null,migrationCheck=0;
     const requestId=()=>crypto.randomUUID();
     const message=text=>{if(!disposed)onMessage(text)};
@@ -38,7 +38,7 @@
         }
         const args={p_acao:name,p_item:item,p_pedido:name==='sync'?null:requestId()};
         if(!ready&&legacy){args.p_niveis=legacy.lv;args.p_moedas=legacy.coin}
-        const {data,error}=await client.rpc('sabadometro_acao',args);
+        const {data,error}=await client.rpc(actionRpc,args);
         if(disposed)return false;
         if(error){
           retryAfter=performance.now()+30000;
@@ -61,7 +61,9 @@
         }
         ready=true;total=next;revision=nextRevision;lastReply=performance.now();retryAfter=0;
         message('');
-        onState({clicks:next,coin:Number(data.coin),lv:data.lv,revision:nextRevision,migration});
+        onState({clicks:next,coin:Number(data.coin),lv:data.lv,revision:nextRevision,migration,
+          boost:data.boost===90?90:1,weekend:data.weekend===true,
+          boostChangesAt:Number.isFinite(Date.parse(data.boost_changes_at))?data.boost_changes_at:null});
         return data.accepted===true;
       }catch(error){
         retryAfter=performance.now()+30000;

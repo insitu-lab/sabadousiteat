@@ -19,7 +19,7 @@
   }
   const clipFiles={click:'universfield-menu-click-147357.mp3',tab:'click_002.wav',frog:'click-sabadometro.mp3',buy:'compra.mp3',typing:'digitando.mp3'};
   const soundBase=new URL('assets/sfx/',document.baseURI),reported=new Set();
-  const clipUrl=name=>name==='buy'?new URL('assets/sfx/'+clipFiles[name],document.baseURI):new URL(clipFiles[name],soundBase);
+  const clipUrl=name=>new URL(clipFiles[name],soundBase);
   function report(name,error){
     if(reported.has(name))return;
     reported.add(name);
