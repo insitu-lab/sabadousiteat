@@ -25,7 +25,7 @@
     reported.add(name);
     console.warn('Não foi possível tocar o efeito sonoro:',clipUrl(name).href,error);
   }
-  // Reutilizar os áudios pré-carregados mantém os cliques rápidos do sapo responsivos.
+  // Reutilizar os áudios pré-carregados mantém os cliques rápidos do bacano responsivos.
   const clips=Object.fromEntries(Object.entries(clipFiles).map(([name,file])=>[name,
     Array.from({length:4},()=>{
       const sound=new Audio(clipUrl(name).href);

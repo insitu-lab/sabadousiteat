@@ -1,4 +1,4 @@
-/* Sabadou Run — jogo do sapinho (pula, agacha, fases = dias da semana até o sábado) */
+/* Sabadou Run — jogo do bacano (pula, agacha, fases = dias da semana até o sábado) */
 (()=>{
 const cv=document.getElementById('dg');if(!cv)return;
 const calendars=cv.dataset.obstacles==='calendars';
@@ -14,7 +14,7 @@ try{hi=+localStorage.getItem('sab_hi')||0}catch(e){}
 let stars=[];
 const active=()=>cv.offsetParent!==null&&!document.hidden&&!document.querySelector('dialog[open]');
 
-// celular: palco mais alto e estreito, assim o sapo e os obstáculos ficam maiores
+// celular: palco mais alto e estreito, assim o bacano e os obstáculos ficam maiores
 function size(){const m=innerWidth<700;if(ready&&m===mob)return;ready=true;mob=m;W=m?420:800;H=m?330:260;G=H-46;
   cv.width=W*dpr;cv.height=H*dpr;c.setTransform(dpr,0,0,dpr,0,0);
   stars=Array.from({length:36},()=>({x:Math.random()*W,y:Math.random()*H*.58,s:Math.random()*1.6+.4}));
@@ -70,7 +70,7 @@ function bg(){
 function frog(){
   const d=ducking,air=y<G-1,run=Math.floor(t/5)%2,base=Math.round(y/4)*4,x=68;
   const bodyLilac='#b87af5',highlight='#e3c6ff',shadow='#8146bd';
-  // Silhueta do sapo em blocos, com dois quadros de corrida e olhos grandes.
+  // Silhueta do bacano em blocos, com dois quadros de corrida e olhos grandes.
   const body=d?[[8,-24,44,16], [0,-16,12,12]]:[[8,-32,32,24],[0,-24,12,16],[32,-24,12,16],[4,-8,12,8],[28,-8,12,8]];
   body.forEach(([dx,dy,w,h])=>px(x+dx,base+dy,w,h,bodyLilac));
   px(x+12,base-(d?20:32),24,8,highlight);px(x+8,base-(d?8:12),32,4,shadow);
