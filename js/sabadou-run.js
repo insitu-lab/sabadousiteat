@@ -1,6 +1,7 @@
 /* Sabadou Run — jogo do sapinho (pula, agacha, fases = dias da semana até o sábado) */
 (()=>{
 const cv=document.getElementById('dg');if(!cv)return;
+const calendars=cv.dataset.obstacles==='calendars';
 const c=cv.getContext('2d',{alpha:false}),$=s=>document.querySelector(s);let W=800,H=260,G=214,mob=false,ready=false;
 const dpr=Math.min(devicePixelRatio||1,2);
 // [nome da fase, cor do topo, cor do fundo]
@@ -37,7 +38,7 @@ function spawn(){
   const k=['cal'];if(phase>=1)k.push('cal2');if(phase>=2)k.push('bird','bird');if(phase>=4)k.push('cal3');
   const T=k[Math.floor(Math.random()*k.length)],x=W+40;
   if(T==='bird')obs.push({T,x,w:48,h:26,y:G-58});
-  else{const n=T==='cal'?1:T==='cal2'?2:3;obs.push({T,x,w:n*34-2,h:44,y:G-44,n})}
+  else{const n=T==='cal'?1:T==='cal2'?2:3;obs.push({T,x,w:n*34-2,h:44,y:G-44,n,phase})}
 }
 function step(dt){
   if(st!=='run')return;
@@ -77,11 +78,21 @@ function frog(){
   px(x+(air?0:run?0:8),base-4,12,4,shadow);px(x+(air?28:run?28:20),base-4,12,4,shadow);
   if(st==='dead'){px(x+12,base-36,8,4,'#20122d');px(x+32,base-36,8,4,'#20122d')}
 }
+function calendar(x,y,dayPhase){
+  // O calendário ocupa o mesmo espaço do obstáculo que ele substitui.
+  const color=PH[dayPhase][2],day=PH[dayPhase][0].toUpperCase();
+  px(x,y,32,44,'#20122d');px(x+4,y+4,24,36,'#fff0fa');
+  px(x+4,y+4,24,8,color);px(x+8,y,4,8,'#e3c6ff');px(x+20,y,4,8,'#e3c6ff');
+  c.save();c.fillStyle='#32134f';c.font='800 7px monospace';c.textAlign='center';c.textBaseline='middle';
+  c.fillText(day,x+16,y+22,26);c.restore();
+  for(let i=0;i<3;i++)px(x+6+i*8,y+30,4,4,i===dayPhase%3?color:'#cfb2df');
+}
 function obstacle(o){
   if(o.T==='bird'){
     const flap=Math.floor(t/5)%2;px(o.x+8,o.y+8,32,16,'#ffd166');px(o.x+32,o.y+12,12,8,'#ffd166');px(o.x+40,o.y+14,8,4,'#ff8a3d');px(o.x+34,o.y+8,4,4,'#20122d');
     px(o.x+12,o.y+(flap?0:20),20,8,'#fff0a6');px(o.x+8,o.y+24,8,4,'#ffb84d');return;
   }
+  if(calendars){for(let i=0;i<o.n;i++)calendar(o.x+i*34,o.y,o.phase);return}
   // Cactos substituem os blocos genéricos, como nos obstáculos do Dino.
   for(let i=0;i<o.n;i++){const x=o.x+i*34,y=o.y;px(x+12,y,12,44,'#54d66b');px(x+4,y+14,12,8,'#54d66b');px(x+4,y+14,8,18,'#54d66b');px(x+20,y+24,12,8,'#54d66b');px(x+24,y+24,8,16,'#54d66b');px(x+16,y+4,4,28,'#a5ff91')}
 }
