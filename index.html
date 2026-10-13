@@ -2,15 +2,17 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<link rel="icon" type="image/png" href="img/sabadou-favicon.png?v=20261010-1-publicacao-20261010-release">
+<link rel="icon" type="image/png" href="img/sabadou-favicon.png?v=build-20261013111155-a2d26490">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#12061f">
+<meta name="sabadou-build" content="build-20261013111155-a2d26490">
+<script defer src="js/sabadou-release.js?v=build-20261013111155-a2d26490"></script>
 
 <!-- SISTEMA DE MANUTENÇÃO -->
-<script src="config.js"></script>
-<script src="js/sabadou-maintenance.js?v=20261010-live-1-publicacao-20261010-release"></script>
+<script src="config.js?v=build-20261013111155-a2d26490"></script>
+<script src="js/sabadou-maintenance.js?v=build-20261013111155-a2d26490"></script>
 <script>
-window.SabadouMaintenance.guard({url:'manutencao.html?site=oficial'});
+window.SabadouMaintenance.guard({url:'manutencao.html?site=atualizacao'});
 </script>
 <style>html[data-maintenance-check="pending"] body{visibility:hidden}</style>
 
@@ -92,8 +94,8 @@ h1,h2,h3{font-family:var(--disp);font-weight:400;margin:0;line-height:1}
 #mw{font:inherit;font-weight:800;font-size:1.4rem;padding:1rem 1.6rem;border-radius:99px;border:2px solid var(--pur);background:var(--card);color:var(--ink);width:min(100%,380px)}
 #mo{display:block;width:min(100%,520px);margin:0 auto;aspect-ratio:1;border-radius:32px;border:3px solid var(--pur);background:var(--card);box-shadow:0 30px 80px rgba(166,77,255,.4)}
 .ckb{background:#1a0833}
-#btn{display:block;margin:0 auto;width:min(68vw,320px);aspect-ratio:1;border-radius:50%;border:8px solid var(--lil);padding:0;overflow:hidden;cursor:pointer;background:#000;animation:ring 2s infinite;transition:transform .1s;touch-action:manipulation}
-#btn img{width:100%;height:100%;object-fit:cover;object-position:58% 60%;transform:scale(2.1);transform-origin:58% 60%;display:block;pointer-events:none}
+#btn{display:block;margin:0 auto;width:min(68vw,320px);aspect-ratio:1;border-radius:50%;border:8px solid var(--lil);padding:0;overflow:hidden;cursor:pointer;background:#12061f;animation:ring 2s infinite;transition:transform .1s;touch-action:manipulation}
+#btn img{width:100%;height:100%;object-fit:contain;object-position:center;padding:8%;display:block;pointer-events:none}
 #btn:active{transform:scale(.9) rotate(-3deg)}
 @keyframes ring{0%{box-shadow:0 0 0 0 rgba(242,184,255,.6)}100%{box-shadow:0 0 0 50px rgba(242,184,255,0)}}
 #cnt{font:400 clamp(4rem,10vw,8rem)/1 var(--disp);margin:1rem 0 .4rem}#msg{min-height:2em;opacity:.85}
@@ -246,12 +248,12 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 @media (max-width:860px){.hl{padding:.4rem .85rem;font-size:.9rem}.nv{gap:.5rem}.si{flex-direction:column;align-items:stretch}.si button{width:100%;padding:.7rem}.fg{grid-template-columns:1fr 1fr;gap:.6rem}#btn{touch-action:manipulation}}
 @media (max-width:700px){body{padding-bottom:calc(62px + env(safe-area-inset-bottom,0px))}.nav{backdrop-filter:none}.nv nav.tabs{position:fixed;top:auto;left:0;right:0;bottom:0;z-index:35;height:calc(58px + env(safe-area-inset-bottom,0px));padding:4px 8px env(safe-area-inset-bottom,0px);justify-content:flex-start;gap:.2rem;background:var(--nav);backdrop-filter:blur(14px);border-top:1px solid var(--line);border-bottom:0}.nv nav.tabs a{display:flex;align-items:center;min-height:44px;padding:.3rem .65rem;font-size:.82rem}.nv nav.tabs .ind{display:none}.podium{gap:.35rem}.podium-entry{gap:.3rem}.podium-photo{width:clamp(62px,18vw,96px);border-radius:16px}.podium-tools .mini,.podium-tools .download{font-size:.7rem;padding:.14rem .35rem}.podium-votes{font-size:.75rem}.podium-base strong{font-size:2rem}}
 </style>
-<link rel="stylesheet" href="css/sabadou-improvements.css?v=20261010-active-notices-publicacao-20261010-release">
-<link rel="stylesheet" href="css/sabadou-auth.css?v=20261009-5-publicacao-20261010-release">
-<link rel="stylesheet" href="css/sabadou-podium.css?v=20261009-4-publicacao-20261010-release">
-<link rel="stylesheet" href="css/sabadou-admin.css?v=20261010-3-publicacao-20261010-release">
+<link rel="stylesheet" href="css/sabadou-improvements.css?v=build-20261013111155-a2d26490">
+<link rel="stylesheet" href="css/sabadou-auth.css?v=build-20261013111155-a2d26490">
+<link rel="stylesheet" href="css/sabadou-podium.css?v=build-20261013111155-a2d26490">
+<link rel="stylesheet" href="css/sabadou-admin.css?v=build-20261013111155-a2d26490">
 </head>
-<body data-site="oficial" data-site-version="2.3.0">
+<body data-site="atualizacao" data-site-version="2.7.0">
 <div class="bar" id="bar"></div>
 <header class="nav"><div class="wrap nv">
   <a class="logo" href="#inicio">sabadou</a>
@@ -342,12 +344,12 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
     <div class="game-shortcut"><a class="game-pill" href="#dg">🐸 Sabadou Run <span aria-hidden="true">→</span></a><details><summary>sobre o jogo</summary><p>Pule e agache para atravessar seis fases cada vez mais difíceis. Chegue ao fim para ganhar um salve no Direct: tire um print da vitória e mande para o Instagram do Sabadou.</p></details></div>
     <div class="game-shortcut"><a class="game-pill" href="#sabadometro">💜 Sabadômetro <span aria-hidden="true">→</span></a><details><summary>sobre o desafio</summary><p>Toque no bacano para ganhar cliques e moedas, compre melhorias e suba de fase. Os 10 primeiros a registrar 1 milhão de cliques ganham follow; o primeiro a 1 bilhão ganha R$ 5 via Pix. Use uma conta por pessoa e não compartilhe sua senha.</p></details></div>
   </div>
-  <div class="stage rv"><canvas id="dg" data-obstacles="calendars" width="800" height="260" aria-label="Sabadou Run, jogo do bacano que pula calendários e agacha"></canvas></div>
+  <div class="stage rv"><canvas id="dg" width="800" height="260" aria-label="Sabadou Run, jogo do bacano que pula e agacha"></canvas></div>
   <div class="gbar"><button class="cta" id="gj" type="button">pular ↑</button><button class="cta ghost" id="gd" type="button">agachar ↓</button></div>
   <p class="hint mobhint">Dica: gire o celular na horizontal pra jogar em tela maior.</p>
   <p class="hint">Espaço ou ↑ pula, ↓ agacha. No celular, use os botões. Cada fase é um dia da semana e a última é o sábado.</p>
   <section class="sec band ckb" id="sabadometro" style="margin-top:3rem;padding:2rem 0;border-radius:28px"><div class="wrap split">
-    <div><button id="btn" aria-label="Sabadar"><img src="img/sabadou-classico.jpg" alt=""></button></div>
+    <div><button id="btn" aria-label="Sabadar"><img src="img/sabadou-favicon.png?v=build-20261013111155-a2d26490" alt=""></button></div>
     <div><h2 class="big">sabadômetro</h2><p class="lead">Toque no bacano. Sem motivo. Só toca.</p><div id="cnt">0</div><div id="msg"></div><div id="ph"></div>
       <div class="game-rewards"><b>🏆 Recompensas</b><br>Os 10 primeiros a chegar a 1 milhão de cliques ganham follow. O primeiro a chegar a 1 bilhão ganha R$ 5 via Pix. O Sabadou pode pedir confirmação da conta e do resultado.</div>
       <div class="shop"><h3>lojinha do bacano</h3><p class="hint">Compre melhorias para aumentar seus ganhos. Sábado e domingo têm turbo de 90× após 1 milhão de cliques, no horário de Brasília!</p><p class="hint" id="game-turbo" aria-live="polite"></p><div id="coin" style="font-size:2rem;font-weight:800"></div><div id="shl"></div></div>
@@ -398,11 +400,11 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   <div class="wrap fg">
     <div><div class="logo" style="color:#f6ecff">sabadou</div><p class="tg">é sábado, meus calabresos.</p><a class="cta ghost sm" href="https://www.instagram.com/sabadouofficiall/" target="_blank" rel="noopener">Instagram</a></div>
     <nav aria-label="Navegar"><h4>navegar</h4><a href="#inicio">início</a><a href="#avisos">avisos</a><a href="#musica">música</a><a href="#galeria">galeria</a><a href="#jogos">jogos</a><a href="#fanarts">fanarts</a><a href="#calabresos">calabresos</a></nav>
-    <nav aria-label="Legal"><h4>legal</h4><a href="termos.html?site=oficial">termos de uso</a><a href="privacy.html?site=oficial">política de privacidade</a><a href="termos.html?site=oficial#direitos">direitos autorais</a><a href="termos.html?site=oficial#fanarts">regras das fanarts</a></nav>
+    <nav aria-label="Legal"><h4>legal</h4><a href="termos.html?site=atualizacao">termos de uso</a><a href="privacy.html?site=atualizacao">política de privacidade</a><a href="termos.html?site=atualizacao#direitos">direitos autorais</a><a href="termos.html?site=atualizacao#fanarts">regras das fanarts</a></nav>
     <div><h4>parcerias</h4><p>Chama na DM do Instagram.</p><button class="cta ghost sm" id="up" type="button">Voltar ao topo</button></div>
   </div>
   <div class="wrap fb"><span>© <span id="yr">2026</span> Sabadou. Todos os direitos reservados.</span><span>Feito pra quem vive de sábado. <button class="lnk" id="adm" type="button" hidden>admin</button></span></div>
-<div class="wrap"><small class="site-version">Sabadou oficial · v2.3.0</small></div>
+<div class="wrap"><small class="site-version">Sabadou atualização · v2.7.0</small></div>
 </footer>
 
 <div id="lb"><img id="lbi" alt=""></div>
@@ -416,14 +418,14 @@ button,a,.day{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   <p class="mut" id="lm" style="margin:0;min-height:1.4em"></p>
   <div class="edb"><button class="cta" type="submit">entrar</button><button class="cta ghost" type="button" id="lc">cancelar</button></div></form></dialog>
 
-<script src="js/sabadou-updates.js?v=20261010-active-notices-publicacao-20261010-release"></script>
-<script src="js/sabadou-fanart-records.js?v=20261010-1-publicacao-20261010-release"></script>
-<script src="js/sabadou-podium.js?v=20261010-1-publicacao-20261010-release"></script>
-<script src="js/sabadou-admin.js?v=20261010-1-publicacao-20261010-release"></script>
-<script src="js/sabadou-clicks.js?v=20261010-weekend-publicacao-20261010-release"></script>
-<script src="js/sabadou-fan-auth.js?v=20261009-5-publicacao-20261010-release"></script>
-<script src="js/sabadou-sounds.js?v=20261010-shared-publicacao-20261010-release"></script>
-<script src="js/sabadou-run.js?v=20261010-calendars-publicacao-20261010-release"></script>
+<script src="js/sabadou-updates.js?v=build-20261013111155-a2d26490"></script>
+<script src="js/sabadou-fanart-records.js?v=build-20261013111155-a2d26490"></script>
+<script src="js/sabadou-podium.js?v=build-20261013111155-a2d26490"></script>
+<script src="js/sabadou-admin.js?v=build-20261013111155-a2d26490"></script>
+<script src="js/sabadou-clicks.js?v=build-20261013111155-a2d26490"></script>
+<script src="js/sabadou-fan-auth.js?v=build-20261013111155-a2d26490"></script>
+<script src="js/sabadou-sounds.js?v=build-20261013111155-a2d26490"></script>
+<script src="js/sabadou-run.js?v=build-20261013111155-a2d26490"></script>
 <script>
 
 const PLAY='<svg viewBox="0 0 24 24" width="34" height="34" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>',PAUSE='<svg viewBox="0 0 24 24" width="34" height="34" fill="currentColor" aria-hidden="true"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>';
@@ -622,7 +624,7 @@ $('#lgf').onsubmit=async ev=>{ev.preventDefault();const m=$('#lm');m.textContent
   $('#sbn').textContent=`${L.length} sábados no último ano. Próximo: ${f(nx.getDate())}/${f(nx.getMonth()+1)}. Quando ele passar, entra como #${L.length} e o mais antigo sai.`})();
 
 // ===== lojinha + fases do sabadômetro (progresso salvo no aparelho e, logado, no servidor) =====
-const SH=[['🖱️ mouse melhor','+1 clique por toque','p',1,19],['🐸 bacano ajudante','+1 clique/s','c',1,75],['🏡 fazendinha','+8 cliques/s','c',8,625],['🏭 fábrica de sábado','+60 cliques/s','c',60,5000]];
+const SH=[['🖱️ mouse melhor','+1 clique por toque','p',1,110],['🐸 bacano ajudante','+1 clique/s','c',1,430],['🏡 fazendinha','+8 cliques/s','c',8,3600],['🏭 fábrica de sábado','+60 cliques/s','c',60,28750]];
 const PH=[[0,'girino'],[100,'bacano'],[1e3,'bacano de respeito'],[1e4,'calabreso'],[1e5,'mestre do sábado'],[1e6,'lenda do sábado 🏆']];
 let G=store.get('sab_g',{coin:0,lv:[0,0,0,0]}),gameProfile='',clickSession=null,clickStatus='',shownTurboPeriod='';
 const localWeekend=()=>['Sat','Sun'].includes(new Intl.DateTimeFormat('en-US',{weekday:'short',timeZone:'America/Sao_Paulo'}).format(new Date()));
@@ -630,7 +632,7 @@ const confirmedPeriod=()=>Number.isFinite(Date.parse(G.boostChangesAt))&&Date.no
 const weekend=()=>!isAdmin&&confirmedPeriod()?G.weekend===true:localWeekend();
 // O horário local só ajuda a exibir o período. Pontos de fãs vêm do servidor.
 const turbo=()=>isAdmin?(N>=1e6&&localWeekend()?90:1):(G.boost===90&&G.weekend===true&&confirmedPeriod()?90:1);
-const cost=i=>isAdmin?0:Math.ceil(SH[i][4]*Math.pow(1.15,G.lv[i])),pw=()=>(1+G.lv[0])*turbo(),cps=()=>G.lv.reduce((a,l,i)=>a+(SH[i][2]=='c'?l*SH[i][3]:0),0)*turbo();
+const cost=i=>isAdmin?0:(G.shopPrices?.[i]??Math.ceil(SH[i][4]*Math.pow(1.15,G.lv[i])*(N>=1e6?55:1))),pw=()=>(1+G.lv[0])*turbo(),cps=()=>G.lv.reduce((a,l,i)=>a+(SH[i][2]=='c'?l*SH[i][3]:0),0)*turbo();
 // Cada conta tem seu próprio cache. O servidor confirma os totais;
 // nenhuma sincronização envia um total antigo do aparelho para o placar.
 function selectGameProfile(){const profile=me?(isAdmin?'_admin_':'_user_')+me.id:'_guest';
@@ -648,10 +650,10 @@ function selectGameProfile(){const profile=me?(isAdmin?'_admin_':'_user_')+me.id
       const backupKey='sab_before_server_'+me.id;
       if(!store.get(backupKey,null))store.set(backupKey,{clicks:N,game:G});
       const userId=me.id,oldTotal=N;
-      clickSession=window.SabadouClicks.connect({client:sb,userId,actionRpc:'sabadometro_acao',
+      clickSession=window.SabadouClicks.connect({client:sb,userId,actionRpc:'sabadometro_acao_v2',
         legacy:cached||(useLegacy?store.get('sab_g',null):null),
         onState:data=>{if(gameProfile!==profile||me?.id!==userId||isAdmin)return;
-          N=data.clicks;G={coin:data.coin,lv:data.lv,boost:data.boost,weekend:data.weekend,boostChangesAt:data.boostChangesAt};saveG();rendG();
+          N=data.clicks;G={coin:data.coin,lv:data.lv,boost:data.boost,weekend:data.weekend,boostChangesAt:data.boostChangesAt,shopPrices:data.shopPrices};saveG();rendG();
           if(data.migration?.state==='revisao')$('#msg').textContent='Seu saldo antigo está guardado e aguarda conferência do admin. Os novos cliques continuam salvos.';
           else if(oldTotal>N&&!store.get('sab_placar_confirmado_'+userId,false))$('#msg').textContent='Há um progresso antigo guardado neste aparelho. O admin pode conferir e repor cliques que a versão antiga perdeu.';
           store.set('sab_placar_confirmado_'+userId,true)},

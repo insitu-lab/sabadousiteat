@@ -25,7 +25,7 @@
     if(error)throw error;
     write('sab_legacy_migration_'+userId,data);return data;
   }
-  function connect({client,userId,legacy,onState,onMessage,actionRpc='sabadometro_acao'}){
+  function connect({client,userId,legacy,onState,onMessage,actionRpc='sabadometro_acao_v2'}){
     let disposed=false,busy=false,ready=false,lastReply=0,revision=null,total=null,retryAfter=0,migration=null,migrationCheck=0;
     const requestId=()=>crypto.randomUUID();
     const message=text=>{if(!disposed)onMessage(text)};
@@ -36,14 +36,17 @@
         if(!ready||(migration?.state==='revisao'&&performance.now()-migrationCheck>=30000)){
           migration=await migrateLegacy(client,userId);migrationCheck=performance.now();if(disposed)return false;
         }
-        const args={p_acao:name,p_item:item,p_pedido:name==='sync'?null:requestId()};
+        const args={p_acao:name,p_item:item,p_pedido:name==='sync'?null:requestId(),p_economia:'20261011-threehours-1'};
         if(!ready&&legacy){args.p_niveis=legacy.lv;args.p_moedas=legacy.coin}
         const {data,error}=await client.rpc(actionRpc,args);
         if(disposed)return false;
         if(error){
           retryAfter=performance.now()+30000;
           console.warn('Sabadômetro: contagem não confirmada.',error);
-          if(error.message?.includes('progresso_antigo_precisa_revisao')){
+          if(error.message?.includes('site_desatualizado_recarregue')){
+            ready=false;window.SabadouRelease?.check();
+            message('Uma versão nova está chegando. Atualize a página para continuar; seu progresso está salvo.');
+          }else if(error.message?.includes('progresso_antigo_precisa_revisao')){
             message('Seu progresso antigo ficou guardado neste aparelho. Peça ao admin para conferir o placar antes de continuar.');
           }else if(error.code==='PGRST202'||error.code==='42883'){
             message('O Sabadômetro está aguardando uma atualização. Seu progresso continua guardado.');
@@ -63,7 +66,10 @@
         message('');
         onState({clicks:next,coin:Number(data.coin),lv:data.lv,revision:nextRevision,migration,
           boost:data.boost===90?90:1,weekend:data.weekend===true,
-          boostChangesAt:Number.isFinite(Date.parse(data.boost_changes_at))?data.boost_changes_at:null});
+          boostChangesAt:Number.isFinite(Date.parse(data.boost_changes_at))?data.boost_changes_at:null,
+          shopPrices:Array.isArray(data.shop_prices)&&data.shop_prices.length===4&&
+            data.shop_prices.every(price=>Number.isFinite(Number(price))&&Number(price)>0)
+            ?data.shop_prices.map(Number):null});
         return data.accepted===true;
       }catch(error){
         retryAfter=performance.now()+30000;

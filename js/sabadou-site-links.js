@@ -3,7 +3,11 @@
   const requested=new URLSearchParams(location.search).get('site');
   const version=(requested||document.documentElement.dataset.packageSite)==='atualizacao'?'atualizacao':'oficial';
   const entries={oficial:'index.html',atualizacao:'index.html'};
-  const home=new URL(entries[version],document.baseURI).href;
+  const homeUrl=new URL(entries[version],document.baseURI);
+  // A volta da manutenção deve buscar o HTML publicado, mesmo em aparelhos
+  // que mantinham o index antigo em cache antes de receber o monitor de versão.
+  if(/^https?:$/.test(location.protocol))homeUrl.searchParams.set('__sabadou_return',Date.now());
+  const home=homeUrl.href;
   window.SabadouSiteLinks={home,version};
   function links(){
     document.querySelectorAll('a[href]').forEach(link=>{
